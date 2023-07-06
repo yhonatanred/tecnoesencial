@@ -1,0 +1,128 @@
+//Funciones que llamo cuando el documento esta listo
+jQuery(document).ready( function(){
+	cx_armador_submenu();
+	
+	//Quita el boton "precio" del 
+	var quitaprecio = jQuery('.cx-contenido-servicios article').height();
+	if(quitaprecio>0){
+		jQuery(".menu-item-18").remove();
+	}
+	
+	
+
+});
+
+//Funcion para armar el submenu
+function cx_armador_submenu(){
+	
+	var cx_obj = jQuery(".cx-submenu").attr('cxobj');
+	
+	
+	
+	
+	if(cx_obj=='cx-servicio'){
+		
+		var cx_submenu='<nav class="cx_cont_submenu"><ul>';
+		
+		//solicito todos los elementos de la clase
+		let cx_servicios = document.getElementsByClassName('cx-servicio');
+		
+		
+		
+		for(i=0;i<cx_servicios.length;i++){
+		
+			
+			id=cx_servicios[i].id;
+			img_url=jQuery("#"+id+" .cx-cont-img img").attr('src');
+			titulo=jQuery("#"+id+" .cx-servicio-info .cxtitulo").html();
+			precio=jQuery("#"+id+" .cx-servicio-info .cx-servicio-precio .cx-servicio-valor").html();
+			
+			
+			//slug=convertToSlug(titulo);
+			
+			
+			
+			cx_submenu+='<li><a href="#'+id+'"><img src="'+img_url+'" ><div class="cx-submenu-info"><span class="cx-submenu-titulo">'+titulo+'</span><span class="cx-submenu-precio">'+precio+'</span></div></a></li>';
+			
+		}
+		
+	}else if(cx_obj=='h2'){
+		
+		var cx_submenu='<nav class="cx_cont_submenu cx-sbt-h2"><ul>';
+		
+		//solicito todos los elementos de la clase
+		let cx_titulos = document.getElementsByClassName('belandingfila');
+		var cx_contador=1;
+		
+		// les asigno el id a cada elemento
+		for(i=0;i<cx_titulos.length;i++){
+			
+			jQuery(cx_titulos[i]).attr('id','cx-tit'+cx_contador);
+			cx_contador++;
+			
+		}
+		
+		
+		cx_titulos = document.getElementsByClassName('belandingfila');
+		
+		for(i=0;i<cx_titulos.length;i++){
+
+			id=cx_titulos[i].id;
+			titulo= jQuery("#"+id+" h2").html();
+			slug=id;
+			
+			cx_submenu+='<li><a href="#'+slug+'"><span class="cx-submenu-titulo">'+titulo+'</span></a></li>';	
+		}
+		
+		jQuery('.cx-submenu').css('cssText', 'margin-bottom: 0 !important;');
+		
+	}
+	
+	cx_submenu+='</ul></nav>';
+
+	
+	jQuery(".cx-submenu").html(cx_submenu);
+}
+
+function convertToSlug(Text) {
+	return Text.toLowerCase()
+		.replace("<b>", '')
+		.replace("</b>", '')
+		.replace(/[^\w ]+/g, '')
+		.replace(/ +/g, '-');
+			 
+}
+
+//Funcion para hacer acciones segun scroll
+jQuery(window).scroll(function(event) {
+	
+	
+	 var scrollTop = jQuery(document).scrollTop();
+	 var scrolllimite = jQuery('.cx-contenido-servicios article').height();
+	 
+	 //Permite que solo lo haga en las paginas de servicios
+	 if(scrolllimite!=null){
+		 if(scrollTop>=scrolllimite){ 
+			jQuery('.el-chateador-beha').addClass('cxflotante');
+		 }else{
+			 jQuery('.el-chateador-beha').removeClass('cxflotante');
+		 }
+	 }
+	 
+});
+
+var estadoBnt2=false;
+ //Funcion para cambiar el icono del menu
+ jQuery(document).on('click', '.cx-servicios-menu a', function(e){
+	e.preventDefault();// esta funcion previene que actualice el navegador
+	
+    if(estadoBnt2==false){ 
+		jQuery('.cx-servicios-menu a').addClass('cx-flecha-arriba');
+		estadoBnt2=true;
+		console.log("epa");
+	}else{
+		 jQuery('.cx-servicios-menu a').removeClass('cx-flecha-arriba');
+		 estadoBnt2=false;
+	}
+    
+ });
