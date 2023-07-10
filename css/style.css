@@ -1169,7 +1169,7 @@ a[href*='tel'], a[href*='mailto'] {
 	position: absolute;
 	top: 60%;
 	left: 50%;
-	font-size: 55px;
+	font-size: 15px;
 	line-height: 1;
 	font-weight: 500;
 	letter-spacing: .05em;
@@ -1178,7 +1178,6 @@ a[href*='tel'], a[href*='mailto'] {
 	color: rgba(255, 255, 255, 0.05);
 	transform: translate3d(-50%, -50%, 0);
 	will-change: transform;
-	white-space: nowrap;
 }
 
 .box-pricing-popular .box-pricing-badge {
@@ -1286,14 +1285,14 @@ a[href*='tel'], a[href*='mailto'] {
 
 @media (min-width: 576px) {
 	.box-pricing-divider > span {
-		font-size: 60px;
+		font-size: 20px;
 		color: rgba(255, 255, 255, 0.03);
 	}
 }
 
 @media (min-width: 992px) {
 	.box-pricing-divider > span {
-		font-size: 68px;
+		font-size: 30px;
 	}
 }
 
@@ -6237,7 +6236,7 @@ textarea.textarea-lg {
 	margin-left: auto;
 	margin-right: auto;
 	padding-top: 10px;
-	background-image: url(../images/quote-jean.png);
+	background-image: url(../images/logo-texto-precios.png);
 	background-repeat: no-repeat;
 	background-position: 50% 0;
 }
