@@ -1175,7 +1175,7 @@ a[href*='tel'], a[href*='mailto'] {
 	letter-spacing: .05em;
 	text-transform: uppercase;
 	font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-	color: rgba(255, 255, 255, 0.05);
+	color: rgba(255, 255, 255, 0.09);
 	transform: translate3d(-50%, -50%, 0);
 	will-change: transform;
 }
@@ -1286,13 +1286,13 @@ a[href*='tel'], a[href*='mailto'] {
 @media (min-width: 576px) {
 	.box-pricing-divider > span {
 		font-size: 20px;
-		color: rgba(255, 255, 255, 0.03);
+		color: rgba(255, 255, 255, 0.09);
 	}
 }
 
 @media (min-width: 992px) {
 	.box-pricing-divider > span {
-		font-size: 30px;
+		font-size: 25px;
 	}
 }
 
