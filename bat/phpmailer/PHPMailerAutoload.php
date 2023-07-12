@@ -21,7 +21,7 @@
  * PHPMailer SPL autoloader.
  * @param string $classname The name of the class to load
  */
-function PHPMailerAutoload($classname)
+function PHPMailerAutoload(smtp)
 {
     //Can't use __DIR__ as it's only in PHP 5.3+
     $filename = dirname(__FILE__).DIRECTORY_SEPARATOR.'class.'.strtolower($classname).'.php';
