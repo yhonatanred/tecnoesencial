@@ -82,7 +82,7 @@ try {
         array($subject, $_SERVER['SERVER_NAME']),
         $template);
 
-    $mail = new PHPMailer(true);
+    $mail = new PHPMailer(false);
 
 
     if ($formConfig['useSmtp']) {
