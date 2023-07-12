@@ -6,7 +6,9 @@ $formConfig = json_decode($formConfigFile, true);
 date_default_timezone_set('Etc/UTC');
 
 try {
-    require './phpmailer/PHPMailerAutoload.php';
+    require './phpmailer/PHPMailerAutoload.php';    
+    require './phpmailer/class.smtp.php';
+
 
     $recipients = $formConfig['recipientEmail'];
 
@@ -82,7 +84,7 @@ try {
         array($subject, $_SERVER['SERVER_NAME']),
         $template);
 
-    $mail = new PHPMailer(false);
+    $mail = new PHPMailer(true);
 
 
     if ($formConfig['useSmtp']) {
