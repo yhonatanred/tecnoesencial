@@ -474,19 +474,19 @@
 			var regularConstraintsMessages = [
 				{
 					type: regula.Constraint.Required,
-					newMessage: "The text field is required."
+					newMessage: "El campo de texto es obligatorio."
 				},
 				{
 					type: regula.Constraint.Email,
-					newMessage: "The email is not a valid email."
+					newMessage: "El correo electrónico no es válido."
 				},
 				{
 					type: regula.Constraint.Numeric,
-					newMessage: "Only numbers are required"
+					newMessage: "Solo se requieren números."
 				},
 				{
 					type: regula.Constraint.Selected,
-					newMessage: "Please choose an option."
+					newMessage: "Por favor, elija una opción."
 				}
 			];
 
@@ -1101,13 +1101,13 @@
 		if (plugins.rdMailForm.length) {
 			var i, j, k,
 				msg = {
-					'MF000': 'Successfully sent!',
-					'MF001': 'Recipients are not set!',
-					'MF002': 'Form will not work locally!',
-					'MF003': 'Please, define email field in your form!',
-					'MF004': 'Please, define type of your form!',
-					'MF254': 'Something went wrong with PHPMailer!',
-					'MF255': 'Aw, snap! Something went wrong.'
+					'MF000': '¡Enviado con éxito!',
+					'MF001': '¡Los destinatarios no están configurados!',
+					'MF002': '¡El formulario no funcionará localmente!',
+					'MF003': '¡Por favor, define el campo de correo electrónico en tu formulario!',
+					'MF004': '¡Por favor, define el tipo de tu formulario!',
+					'MF254': '¡Algo salió mal con PHPMailer!',
+					'MF255': '¡Oh, chasquido! Algo salió mal.'
 				};
 
 			for (i = 0; i < plugins.rdMailForm.length; i++) {
@@ -1175,8 +1175,19 @@
 							form.addClass('form-in-process');
 
 							if (output.hasClass("snackbars")) {
-								output.html('<p><span class="icon text-middle fa fa-circle-o-notch fa-spin icon-xxs"></span><span>Sending</span></p>');
+								output.html('<p><span class="icon text-middle fa fa-circle-o-notch fa-spin icon-xxs"></span><span>Mensaje Enviado</span></p>');
 								output.addClass("active");
+								form.clearForm();
+								if (select.length) {
+									select.select2("val", "");
+								}
+		
+								form.find('input, textarea').trigger('blur');
+								
+								setTimeout(function () {
+									output.removeClass("active error success");
+									form.removeClass('success');
+								}, 3500);
 							}
 						} else {
 							return false;
