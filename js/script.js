@@ -1172,16 +1172,16 @@
 								return false;
 							}
 
-							form.addClass('form-in-process');
+							form.addClass('form-in-process success');
 
 							if (output.hasClass("snackbars")) {
-								output.html('<p><span class="icon text-middle fa fa-circle-o-notch fa-spin icon-xxs"></span><span>Mensaje Enviado</span></p>');
-								output.addClass("active");
-								form.clearForm();		
-								form.find('input, textarea').trigger('blur');								
+								output.html('<p><span class="icon text-middle mdi mdi-check icon-xxs"></span><span>Mensaje Enviado</span></p>');	
+								output.addClass("active");		
+								form.clearForm();						
 								setTimeout(function () {
 									output.removeClass("active error success");
 									form.removeClass('success');
+									location.href='http://tecnoesencial.com/#home';
 								}, 3500);
 							}
 						} else {
