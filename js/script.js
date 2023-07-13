@@ -1177,11 +1177,7 @@
 							if (output.hasClass("snackbars")) {
 								output.html('<p><span class="icon text-middle fa fa-circle-o-notch fa-spin icon-xxs"></span><span>Mensaje Enviado</span></p>');
 								output.addClass("active");
-								form.clearForm();
-								if (select.length) {
-									select.select2("val", "");
-								}
-		
+								form.clearForm();		
 								form.find('input, textarea').trigger('blur');
 								
 								setTimeout(function () {
