@@ -1,22 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Productos | TecnoEsencial</title>
+  <link rel="stylesheet" href="https://raw.githubusercontent.com/yhonatanred/tecnoesencial/main/css/style.css" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #004080;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
+    /* Ajustes específicos para el carrusel */
     .container {
       display: flex;
       flex-wrap: wrap;
@@ -25,82 +15,159 @@
       padding: 2rem;
     }
     .card {
+      max-width: 320px;
       background: white;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      max-width: 300px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
       padding: 1rem;
       text-align: center;
+      position: relative;
     }
-    .card img {
-      max-width: 100%;
-      height: auto;
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+    .carousel img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: none;
       border-radius: 6px;
     }
-    .card h2 {
-      font-size: 1.2rem;
-      color: #004080;
-      margin: 1rem 0 0.5rem;
+    .carousel img.active {
+      display: block;
     }
-    .card p {
-      font-size: 0.95rem;
-      color: #333;
+    .carousel button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0,0,0,0.4);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      border-radius: 3px;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    .carousel button:hover {
+      background-color: rgba(0,0,0,0.7);
+    }
+    .carousel button.prev {
+      left: 10px;
+    }
+    .carousel button.next {
+      right: 10px;
     }
     .whatsapp-button {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 10px 20px;
-      background-color: #25D366;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.85rem;
-      color: #777;
+      background-color: #25D366 !important;
+      color: white !important;
+      padding: 10px 20px !important;
+      border-radius: 6px !important;
+      font-weight: bold !important;
+      text-decoration: none !important;
+      display: inline-block !important;
+      margin-top: 1rem !important;
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Tienda TecnoEsencial</h1>
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav__logo">TecnoEsencial</a>
+    <div class="nav__menu" id="nav-menu">
+      <ul class="nav__list">
+        <li class="nav__item"><a href="index.html" class="nav__link">Inicio</a></li>
+        <li class="nav__item"><a href="productos.html" class="nav__link active-link">Productos</a></li>
+        <li class="nav__item"><a href="servicios.html" class="nav__link">Servicios</a></li>
+        <li class="nav__item"><a href="#contact" class="nav__link">Contacto</a></li>
+      </ul>
+    </div>
+  </nav>
 </header>
 
-<section class="container">
+<main class="main container">
 
-  <!-- Producto 1 -->
-  <div class="card">
-    <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Producto 1">
-    <h2>Set de planchas para doblar acrílico</h2>
-    <p>¡Precisión y calidad en cada curva!</p>
-    <a class="whatsapp-button" href="https://wa.me/573173669002?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Set%20de%20planchas%20para%20doblar%20acrílico" target="_blank">Solicitar por WhatsApp</a>
-  </div>
+  <section class="products container">
+    <!-- Producto 1 -->
+    <article class="product-card card" data-product="Set de planchas para doblar acrílico">
+      <div class="carousel">
+        <button class="prev" aria-label="Anterior">&lt;</button>
+        <button class="next" aria-label="Siguiente">&gt;</button>
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" class="active" alt="Set planchas imagen 1" />
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Set planchas imagen 2" />
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Set planchas imagen 3" />
+      </div>
+      <h2 class="product-card__title">Set de planchas para doblar acrílico</h2>
+      <p class="product-card__desc">¡Precisión y calidad en cada curva!</p>
+      <a class="button whatsapp-button" href="https://wa.me/573173669002?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Set%20de%20planchas%20para%20doblar%20acrílico" target="_blank" rel="noopener noreferrer">Solicitar por WhatsApp</a>
+    </article>
 
-  <!-- Producto 2 -->
-  <div class="card">
-    <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Producto 2">
-    <h2>Cámara WiFi Inteligente 1080p</h2>
-    <p>Panorámica 355°, Visión Nocturna, Audio y Detección de Movimiento</p>
-    <a class="whatsapp-button" href="https://wa.me/573173669002?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Cámara%20WiFi%20Inteligente%201080p" target="_blank">Solicitar por WhatsApp</a>
-  </div>
+    <!-- Producto 2 -->
+    <article class="product-card card" data-product="Cámara WiFi Inteligente 1080p">
+      <div class="carousel">
+        <button class="prev" aria-label="Anterior">&lt;</button>
+        <button class="next" aria-label="Siguiente">&gt;</button>
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" class="active" alt="Cámara WiFi imagen 1" />
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Cámara WiFi imagen 2" />
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Cámara WiFi imagen 3" />
+      </div>
+      <h2 class="product-card__title">Cámara WiFi Inteligente 1080p</h2>
+      <p class="product-card__desc">Panorámica 355°, Visión Nocturna, Audio y Detección de Movimiento</p>
+      <a class="button whatsapp-button" href="https://wa.me/573173669002?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Cámara%20WiFi%20Inteligente%201080p" target="_blank" rel="noopener noreferrer">Solicitar por WhatsApp</a>
+    </article>
 
-  <!-- Producto 3 -->
-  <div class="card">
-    <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Producto 3">
-    <h2>Parrilla para Yamaha FZ 250</h2>
-    <p>¡Perfecta para tus viajes!</p>
-    <a class="whatsapp-button" href="https://wa.me/573173669002?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Parrilla%20para%20Yamaha%20FZ%20250" target="_blank">Solicitar por WhatsApp</a>
-  </div>
+    <!-- Producto 3 -->
+    <article class="product-card card" data-product="Parrilla para Yamaha FZ 250">
+      <div class="carousel">
+        <button class="prev" aria-label="Anterior">&lt;</button>
+        <button class="next" aria-label="Siguiente">&gt;</button>
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" class="active" alt="Parrilla Yamaha imagen 1" />
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Parrilla Yamaha imagen 2" />
+        <img src="https://github.com/yhonatanred/tecnoesencial/blob/main/images/Formatear-sistema-pc-o-portatil.png?raw=true" alt="Parrilla Yamaha imagen 3" />
+      </div>
+      <h2 class="product-card__title">Parrilla para Yamaha FZ 250</h2>
+      <p class="product-card__desc">¡Perfecta para tus viajes!</p>
+      <a class="button whatsapp-button" href="https://wa.me/573173669002?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20Parrilla%20para%20Yamaha%20FZ%20250" target="_blank" rel="noopener noreferrer">Solicitar por WhatsApp</a>
+    </article>
+  </section>
 
-</section>
+</main>
 
-<footer>
-  &copy; 2025 TecnoEsencial. Todos los derechos reservados.
+<footer class="footer container">
+  <p>&copy; 2025 TecnoEsencial. Todos los derechos reservados.</p>
 </footer>
+
+<script>
+  document.querySelectorAll('.carousel').forEach(carousel => {
+    const images = carousel.querySelectorAll('img');
+    let index = 0;
+    const prevBtn = carousel.querySelector('.prev');
+    const nextBtn = carousel.querySelector('.next');
+
+    function showImage(i) {
+      images.forEach((img, idx) => {
+        img.classList.toggle('active', idx === i);
+      });
+    }
+
+    prevBtn.addEventListener('click', () => {
+      index = (index - 1 + images.length) % images.length;
+      showImage(index);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      index = (index + 1) % images.length;
+      showImage(index);
+    });
+  });
+</script>
 
 </body>
 </html>
