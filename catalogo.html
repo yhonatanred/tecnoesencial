@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html class="wide wow-animation" lang="es">
+  <head>
+    <title>Catalogo | TecnoEsencial</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <!-- Stylesheets-->
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Poppins:400,500,600%7CTeko:300,400,500%7CMaven+Pro:500">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="css/style.css">    
+    <style>.ie-panel{display: none;background: #212121;padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);clear: both;text-align:center;position: relative;z-index: 1;} html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {display: block;}</style>
+    <style>
+    /* Ajustes específicos para el carrusel */
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .card {
+      max-width: 320px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+    .carousel img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: none;
+      border-radius: 6px;
+    }
+    .carousel img.active {
+      display: block;
+    }
+    .carousel button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0,0,0,0.4);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      border-radius: 3px;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    .carousel button:hover {
+      background-color: rgba(0,0,0,0.7);
+    }
+    .carousel button.prev {
+      left: 10px;
+    }
+    .carousel button.next {
+      right: 10px;
+    }
+    .whatsapp-button {
+      background-color: #25D366 !important;
+      color: white !important;
+      padding: 10px 20px !important;
+      border-radius: 6px !important;
+      font-weight: bold !important;
+      text-decoration: none !important;
+      display: inline-block !important;
+      margin-top: 1rem !important;
+    }
+    iframe {
+      width: 100%;
+      height: 90vh; /* Ajusta la altura según necesites */
+      border: none;
+    }
+  </style>
+  </head>
+  <body>
+    <div class="ie-panel"><a href="http://windows.microsoft.com/en-US/internet-explorer/"><img src="images/warning_bar_0000_us.jpg" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today."></a></div>
+    <div class="preloader">
+      <div class="preloader-body">
+        <div class="cssload-container"><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+    <div class="page">
+      <div id="home">
+        <!-- Page Header-->
+        <header class="section page-header">
+          <!-- RD Navbar-->
+          <div class="rd-navbar-wrap">
+            <nav class="rd-navbar rd-navbar-classic" data-layout="rd-navbar-fixed" data-sm-layout="rd-navbar-fixed" data-md-layout="rd-navbar-fixed" data-md-device-layout="rd-navbar-fixed" data-lg-layout="rd-navbar-static" data-lg-device-layout="rd-navbar-fixed" data-xl-layout="rd-navbar-static" data-xl-device-layout="rd-navbar-static" data-xxl-layout="rd-navbar-static" data-xxl-device-layout="rd-navbar-static" data-lg-stick-up-offset="46px" data-xl-stick-up-offset="46px" data-xxl-stick-up-offset="46px" data-lg-stick-up="true" data-xl-stick-up="true" data-xxl-stick-up="true">
+              <div class="rd-navbar-main-outer">
+                <div class="rd-navbar-main">
+                  <!-- RD Navbar Panel-->
+                  <div class="rd-navbar-panel">
+                    <!-- RD Navbar Toggle-->
+                    <button class="rd-navbar-toggle" data-rd-navbar-toggle=".rd-navbar-nav-wrap"><span></span></button>
+                    <!-- RD Navbar Brand-->
+                    <div class="rd-navbar-brand"><a class="brand" href="index.html"><img src="images/Logo-Tecno-Esencial.png" alt="" width="223" height="50"/></a></div>
+                  </div>
+                  <div class="rd-navbar-main-element">
+                    <div class="rd-navbar-nav-wrap">
+                      <!-- RD Navbar Share-->
+                      <a class=" fa fa-phone fa-2x text-success " href="tel: +573173669002">
+                      </a>
+                      <ul class="rd-navbar-nav">
+                        <li class="rd-nav-item active"><a class="rd-nav-link" href="#home">Inicio</a></li>
+                        <li class="rd-nav-item"><a class="rd-nav-link" href="#services">Servicios</a></li>
+                        <!--<li class="rd-nav-item"><a class="rd-nav-link" href="#projects">Proyectos</a></li>-->
+                        <li class="rd-nav-item"><a class="rd-nav-link" href="#team">Equipo</a></li>
+                        <li class="rd-nav-item"><a class="rd-nav-link" href="http://tecnoesencial.online/tienda.html">Tienda</a></li>
+                        <li class="rd-nav-item"><a class="rd-nav-link" href="#promociones">Promociones</a></li>
+                        <li class="rd-nav-item"><a class="rd-nav-link" href="#contacts">Contacto</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </nav>
+          </div>
+        </header>
+
+<main>
+  <div style="position: relative; width: 100%; height: 0; padding-top: 141.4286%;
+ padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
+ border-radius: 8px; will-change: transform;">
+  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+    src="https://www.canva.com/design/DAGpcnGOOa8/eylDq1sOpPz0VJetwqt2MA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+  </iframe>
+</div>
+<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGpcnGOOa8&#x2F;eylDq1sOpPz0VJetwqt2MA&#x2F;view?utm_content=DAGpcnGOOa8&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Catalogo</a> de Yhonatan Aranda
+</main>
+      <!-- Page Footer-->
+      <footer class="section section-fluid footer-minimal context-dark">
+        <div class="bg-gray-15">
+          <div class="container-fluid">
+            <!--
+            <div class="footer-minimal-inset oh">
+              <ul class="footer-list-category-2">
+                <li><a href="#">DISEÑO DE INTERFAZ DE USUARIO</a></li>
+                <li><a href="#">APLICACIONES DE WINDOWS/MAC OS</a></li>
+                <li><a href="#">APLICACIONES ANDROID/IOS</a></li>
+                <li><a href="#">SOLUCIONES EN LA NUBE</a></li>
+                <li><a href="#">ATENCIÓN AL CLIENTE</a></li>
+              </ul>
+            </div>
+          -->
+            <div class="footer-minimal-bottom-panel text-sm-left">
+              <div class="row row-10 align-items-md-center">
+                <div class="col-sm-6 col-md-4 text-sm-right text-md-center">
+                  <div>
+                    <ul class="list-inline list-inline-sm footer-social-list-2">
+                      <li><a class="icon fa fa-facebook" href="#"></a></li>
+                      <li><a class="icon fa fa-twitter" href="#"></a></li>
+                      <li><a class="icon fa fa-google-plus" href="#"></a></li>
+                      <li><a class="icon fa fa-instagram" href="#"></a></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-4 order-sm-first">
+                  <!-- Rights-->
+                  <p class="rights"><span>&copy;&nbsp;</span><span class="copyright-year"></span> <span>TecnoEsencial</span>
+                  </p>
+                </div>
+                <div class="col-sm-6 col-md-4 text-md-right"><span>Reservados todos los derechos.</span> <span> Diseño&nbsp;por&nbsp;<a href="https://tecnoesencial.online">TecnoEsencial</a></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      
+    <!-- Global Mailform Output-->
+    <div class="snackbars" id="form-output-global"></div>
+    <!-- Javascript-->
+    <script src="js/core.min.js"></script>
+    <script src="js/script.js"></script>    
+    <!-- coded by Himic-->
+    <div>
+      <div id="whatsAppWidget" style="position: fixed; left: 24px; bottom: 48px; float: left; z-index:20;">
+        <a href="https://api.whatsapp.com/send?phone=573173669002&amp;text=%C2%A1Hola%21+Estoy+en+la+tienda+Tecno+Esencial+y+quiero+pedir+m%C3%A1s+informaci%C3%B3n." target="_blank" rel="noopener noreferer nofollow">
+          <div style="float: right; height: 50px; width: 50px; border-radius: 50%; overflow: hidden; box-shadow: 2px 2px 6px rgba(0,0,0,0.4); text-align: center; line-height: 50px; color: white; background-color: #4dc247;">
+            <svg style="display: inline; fill: white" viewBox="0 0 32 32" width="41px" height="50px" xmlns:xlink="http://www.w3.org/1999/xlink">
+              <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.478-1.318.13-.33.244-.73.244-1.088 0-.058 0-.144-.03-.215-.1-.172-2.434-1.39-2.678-1.39zm-2.908 7.593c-1.747 0-3.48-.53-4.942-1.49L7.793 24.41l1.132-3.337a8.955 8.955 0 0 1-1.72-5.272c0-4.955 4.04-8.995 8.997-8.995S25.2 10.845 25.2 15.8c0 4.958-4.04 8.998-8.998 8.998zm0-19.798c-5.96 0-10.8 4.842-10.8 10.8 0 1.964.53 3.898 1.546 5.574L5 27.176l5.974-1.92a10.807 10.807 0 0 0 16.03-9.455c0-5.958-4.842-10.8-10.802-10.8z" fill-rule="evenodd">
+              </path>
+            </svg>
+          </div>
+        </a>
+      </div>
+    </div>
+
+<script>
+  document.querySelectorAll('.carousel').forEach(carousel => {
+    const images = carousel.querySelectorAll('img');
+    let index = 0;
+    const prevBtn = carousel.querySelector('.prev');
+    const nextBtn = carousel.querySelector('.next');
+
+    function showImage(i) {
+      images.forEach((img, idx) => {
+        img.classList.toggle('active', idx === i);
+      });
+    }
+
+    prevBtn.addEventListener('click', () => {
+      index = (index - 1 + images.length) % images.length;
+      showImage(index);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      index = (index + 1) % images.length;
+      showImage(index);
+    });
+  });
+</script>
+
+</body>
+</html>
