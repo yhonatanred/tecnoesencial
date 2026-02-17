@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECNOESENCIAL | Soluciones Tecnológicas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="background-glow"></div>
+
+    <nav class="glass-nav">
+        <div class="logo-container">
+            <img src="logo.png" alt="TecnoEsencial" class="nav-logo">
+            <span class="brand-name">TECNO<span class="highlight">ESENCIAL</span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#ia-diagnostic">Diagnóstico IA</a></li>
+            <li><a href="#tienda">Tienda</a></li>
+        </ul>
+        <a href="https://wa.me/573173669002" class="btn-nav">Contactar</a>
+    </nav>
+
+    <header id="inicio" class="hero-section">
+        <div class="hero-content">
+            <h1 class="glitch-text">OPTIMIZACIÓN <br> <span class="gradient-text">AL MÁXIMO NIVEL</span></h1>
+            <p>Expertos en Hardware y Software en <strong>Cali y Jamundí</strong>.</p>
+            <div class="hero-buttons">
+                <a href="#ia-diagnostic" class="btn-primary"><i class="fas fa-robot"></i> Diagnóstico Virtual</a>
+                <a href="#servicios" class="btn-secondary">Ver Servicios</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="ia-diagnostic" class="section-padding">
+        <h2 class="section-title"><i class="fas fa-microchip"></i> ASISTENTE VIRTUAL TECNO</h2>
+        <div class="chat-container">
+            <div class="chat-header">
+                <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                <span>SYSTEM_DIAGNOSTIC_V2.0.exe</span>
+            </div>
+            <div class="chat-box" id="chat-box">
+                <div class="msg-bot">Hola. Soy la IA de Tecnoesencial. ¿Qué problema tiene tu equipo o qué buscas hoy? (Ej: "Mi pc está lento", "necesito ram", "virus")</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Escribe aquí tu problema...">
+                <button onclick="responderChat()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <section id="servicios" class="section-padding">
+        <h2 class="section-title">NUESTROS SERVICIOS</h2>
+        <div class="grid-container" id="contenedor-servicios"></div>
+    </section>
+
+    <section id="testimonios" class="section-padding">
+        <h2 class="section-title"><i class="fas fa-users"></i> CLIENTES SATISFECHOS</h2>
+        <div class="grid-container" id="contenedor-testimonios"></div>
+    </section>
+
+    <section id="tienda" class="section-padding">
+        <h2 class="section-title">TIENDA TECNO</h2>
+        <div class="grid-container" id="contenedor-productos"></div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 TECNOESENCIAL. Cali - Jamundí.</p>
+    </footer>
+
+    <div class="whatsapp-container">
+        <div class="tooltip-text">¿Necesitas ayuda técnica?</div>
+        <a href="https://wa.me/573173669002" class="whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
