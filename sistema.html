@@ -20,6 +20,7 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9rem; }
         input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 8px; color: white; outline: none; transition: 0.3s; }
+        input[type="file"] { padding: 10px; background: rgba(0,243,255,0.1); border: 1px dashed var(--primary-blue); color: var(--primary-blue); width: 100%; border-radius: 8px; cursor: pointer; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); }
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; margin-bottom: 10px;}
         .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #ddd; }
@@ -42,6 +43,7 @@
         .finanzas-box { margin-top:20px; padding:15px; background:rgba(0,0,0,0.6); border-radius:8px; border: 1px solid #333;}
         .fin-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: #aaa; }
         .fin-total { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #555; font-size: 1.3rem; color: var(--primary-blue); font-weight: bold;}
+        .btn-foto { background: rgba(0,243,255,0.1); color: var(--primary-blue); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 8px; border: 1px solid var(--primary-blue); }
     </style>
 </head>
 <body>
@@ -56,9 +58,7 @@
 
     <div class="panel active" id="panel-cliente">
         <h2>Rastrear mi Equipo</h2>
-        <div class="form-group">
-            <input type="text" id="ticket-id" placeholder="Ingresa tu código (Ej: TCN-12345)">
-        </div>
+        <div class="form-group"><input type="text" id="ticket-id" placeholder="Ej: TCN-12345"></div>
         <button class="btn btn-blue" onclick="consultarTicket()">Buscar Estado</button>
         <div class="loader" id="loader-cliente"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>
         
@@ -69,16 +69,12 @@
                 <strong>Recogido en:</strong> <span id="res-dir"></span><br>
                 <strong>Fecha Ingreso:</strong> <span id="res-fecha"></span>
             </div>
-            
             <h3 style="color:var(--primary-blue); font-size:1.1rem;">Línea de Tiempo</h3>
             <div class="timeline" id="timeline-container"></div>
             
             <div class="finanzas-box">
                 <div class="fin-row"><span>Valor Revisión:</span> <span id="fin-rev"></span></div>
                 <div class="fin-row"><span>Costos de Reparación:</span> <span id="fin-rep"></span></div>
-                <div style="font-size:0.8rem; color:#888; text-align:center; margin-top:5px;">
-                    *Si autorizas la reparación, la revisión es GRATIS.
-                </div>
                 <div class="fin-total"><span>Total Estimado:</span> <span id="fin-total"></span></div>
             </div>
         </div>
@@ -94,250 +90,210 @@
 
     <div class="panel" id="panel-tech-dashboard" style="max-width: 600px;">
         <h2>Mis Tickets Asignados</h2>
-        <p style="text-align:center; color:#00f3ff; margin-bottom:20px;">Hola, <span id="dash-nombre-tecnico"></span></p>
-        
-        <button class="btn btn-outline" onclick="mostrarPanel('panel-tecnico-nuevo')" style="margin-bottom: 20px;">
-            <i class="fas fa-plus-circle"></i> Crear Nuevo Ingreso
-        </button>
-
-        <h3 style="font-size: 1.1rem; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px;">Equipos en Proceso</h3>
+        <button class="btn btn-outline" onclick="mostrarPanel('panel-tecnico-nuevo')" style="margin-bottom: 20px;"><i class="fas fa-plus-circle"></i> Crear Nuevo Ingreso</button>
         <div id="lista-mis-tickets"></div>
         <div class="loader" id="loader-dashboard"><i class="fas fa-spinner fa-spin"></i> Cargando tickets...</div>
     </div>
 
     <div class="panel" id="panel-tecnico-nuevo" style="max-width: 600px;">
         <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Nuevo Ingreso</h2>
-        <div class="form-group"><label>Nombre del Cliente</label><input type="text" id="form-cliente"></div>
-        <div class="form-group"><label>WhatsApp del Cliente</label><input type="number" id="form-whatsapp"></div>
-        <div class="form-group"><label>Dirección de Recogida / Sede</label><input type="text" id="form-direccion" placeholder="Ej: Casa cliente (Palmira) o Local"></div>
-        <div class="form-group"><label>Equipo (Marca y Modelo)</label><input type="text" id="form-equipo"></div>
+        <div class="form-group"><label>Cliente</label><input type="text" id="form-cliente"></div>
+        <div class="form-group"><label>WhatsApp</label><input type="number" id="form-whatsapp"></div>
+        <div class="form-group"><label>Dirección</label><input type="text" id="form-direccion"></div>
+        <div class="form-group"><label>Equipo</label><input type="text" id="form-equipo"></div>
         
         <div class="form-group">
-            <label style="color:var(--primary-purple);">Inventario Recibido</label>
+            <label style="color:var(--primary-purple);">Inventario</label>
             <div class="checkbox-grid">
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Cargador"> Cargador</label>
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Maletín"> Maletín</label>
-                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Mouse"> Mouse</label>
-                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Sin Accesorios"> Sin Accesorios</label>
             </div>
-            <input type="text" id="form-inv-obs" placeholder="Observaciones extras (Ej: Cargador pelado, maletín roto...)" style="margin-top: 10px; font-size: 0.9rem;">
+            <input type="text" id="form-inv-obs" placeholder="Observaciones extras (Ej: rayones, golpes...)" style="margin-top: 10px;">
         </div>
 
-        <div class="form-group"><label>Diagnóstico en Sitio</label><textarea id="form-diagnostico" rows="2"></textarea></div>
-        <div class="form-group"><label>Valor de Revisión Inicial ($)</label><input type="number" id="form-precio-rev" placeholder="Ej: 30000"></div>
+        <div class="form-group"><label>Diagnóstico Inicial</label><textarea id="form-diagnostico" rows="2"></textarea></div>
+        <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="form-precio-rev"></div>
+        
+        <div class="form-group">
+            <label><i class="fas fa-camera"></i> Subir Foto de Evidencia</label>
+            <input type="file" id="form-foto" accept="image/*" capture="environment">
+        </div>
 
         <button class="btn btn-blue" onclick="crearTicket()">Registrar Ticket</button>
-        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Guardando...</div>
+        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Subiendo foto y guardando...</div>
     </div>
 
     <div class="panel" id="panel-actualizar" style="max-width: 600px;">
-        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Actualizar Ticket</h2>
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Actualizar</h2>
         <h3 id="act-id-ticket" style="text-align:center; color:white; margin-bottom:15px;"></h3>
-        
         <div class="form-group">
-            <label>Nuevo Estado</label>
+            <label>Estado</label>
             <select id="act-estado">
-                <option value="En Laboratorio">En Laboratorio</option>
                 <option value="En Diagnóstico">En Diagnóstico</option>
-                <option value="Esperando Aprobación">Esperando Aprobación Cliente</option>
+                <option value="En Laboratorio">En Laboratorio</option>
                 <option value="Esperando Repuesto">Esperando Repuesto</option>
-                <option value="Reparado">Reparado / Listo para entregar</option>
-                <option value="Entregado">Entregado al Cliente (Cerrar)</option>
+                <option value="Reparado">Reparado / Listo</option>
+                <option value="Entregado">Entregado (Cerrar)</option>
             </select>
         </div>
+        <div class="form-group"><label>Detalle del Avance</label><textarea id="act-detalle" rows="2"></textarea></div>
+        <div class="form-group"><label>Costo Agregado ($)</label><input type="number" id="act-costo"></div>
         
-        <div class="form-group"><label>Detalle del Avance (El cliente leerá esto)</label><textarea id="act-detalle" rows="3" placeholder="Ej: Se instaló disco SSD de 480GB y Windows 11."></textarea></div>
-        <div class="form-group"><label>Costo Agregado en este paso ($) - Opcional</label><input type="number" id="act-costo" placeholder="Ej: 140000"></div>
+        <div class="form-group">
+            <label><i class="fas fa-camera"></i> Subir Foto del Avance/Repuesto</label>
+            <input type="file" id="act-foto" accept="image/*" capture="environment">
+        </div>
 
         <button class="btn btn-blue" onclick="guardarActualizacion()">Guardar Avance</button>
-        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Actualizando...</div>
+        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Subiendo foto y actualizando...</div>
     </div>
 
     <script>
-        // 🔴🔴🔴 REEMPLAZA AQUÍ TU NUEVA URL DE GOOGLE SCRIPT 🔴🔴🔴
+        // 🔴🔴🔴 REEMPLAZA AQUÍ TU URL 🔴🔴🔴
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW3DCk_VRl0vU-zZIqwmWAV38RJafJsJ_XI-vQDjAPah1ysv4Xjzt-1G0QZPWhfvl7/exec";
         
-        let tecnicoActual = ""; 
-        let ticketSeleccionado = "";
+        let tecnicoActual = ""; let ticketSeleccionado = "";
+        document.getElementById('ticket-id').addEventListener('keypress', function(e){if(e.key==='Enter') consultarTicket();});
+        document.getElementById('login-pass').addEventListener('keypress', function(e){if(e.key==='Enter') iniciarSesion();});
+        function mostrarPanel(idPanel) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.getElementById(idPanel).classList.add('active'); if(idPanel !== 'panel-cliente' && idPanel !== 'panel-login') document.getElementById('nav-menu').style.display = 'none'; }
+        const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
 
-        // Activar tecla ENTER
-        document.getElementById('ticket-id').addEventListener('keypress', function (e) { if (e.key === 'Enter') consultarTicket(); });
-        document.getElementById('login-pass').addEventListener('keypress', function (e) { if (e.key === 'Enter') iniciarSesion(); });
-
-        function mostrarPanel(idPanel) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.getElementById(idPanel).classList.add('active');
-            if(idPanel !== 'panel-cliente' && idPanel !== 'panel-login') {
-                document.getElementById('nav-menu').style.display = 'none';
-            }
+        // Transformar Foto a código (Base64) para enviarla a Google
+        function convertirArchivo(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
 
-        const formatearDinero = (valor) => { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(valor); };
-
         async function iniciarSesion() {
-            const user = document.getElementById('login-user').value;
-            const pass = document.getElementById('login-pass').value;
-            if(!user || !pass) return alert("Completa los datos");
-
+            const user = document.getElementById('login-user').value, pass = document.getElementById('login-pass').value;
+            if(!user || !pass) return;
             document.getElementById('loader-login').style.display = "block";
             try {
-                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "login", usuario: user, password: pass }) });
-                const result = await response.json();
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "login", usuario: user, password: pass }) });
+                const result = await res.json();
                 document.getElementById('loader-login').style.display = "none";
-
-                if(result.status === "success") {
-                    tecnicoActual = result.data.nombre;
-                    document.getElementById('dash-nombre-tecnico').innerText = tecnicoActual;
-                    cargarMisTickets(); 
-                } else { alert("Usuario o contraseña incorrectos."); }
-            } catch (error) { document.getElementById('loader-login').style.display = "none"; alert("Error de conexión."); }
+                if(result.status === "success") { tecnicoActual = result.data.nombre; cargarMisTickets(); } 
+                else { alert("Credenciales incorrectas."); }
+            } catch (e) { document.getElementById('loader-login').style.display = "none"; alert("Error."); }
         }
 
         async function cargarMisTickets() {
             mostrarPanel('panel-tech-dashboard');
-            const contenedor = document.getElementById('lista-mis-tickets');
-            const loader = document.getElementById('loader-dashboard');
-            contenedor.innerHTML = "";
-            loader.style.display = "block";
-
+            document.getElementById('loader-dashboard').style.display = "block";
+            document.getElementById('lista-mis-tickets').innerHTML = "";
             try {
-                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "listar_tickets", tecnico_nombre: tecnicoActual }) });
-                const result = await response.json();
-                loader.style.display = "none";
-
-                if(result.status === "success") {
-                    if(result.tickets.length === 0) contenedor.innerHTML = "<p style='color:#aaa;'>No tienes equipos activos.</p>";
-                    result.tickets.forEach(t => {
-                        contenedor.innerHTML += `
-                            <div class="ticket-card" onclick="abrirActualizador('${t.id}')">
-                                <span class="status-badge">${t.estado}</span>
-                                <strong>${t.id}</strong><br>
-                                <span style="color:#aaa; font-size:0.9rem;">${t.cliente} - ${t.equipo}</span>
-                            </div>
-                        `;
-                    });
-                }
-            } catch (e) { loader.style.display = "none"; alert("Error cargando tickets."); }
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "listar_tickets", tecnico_nombre: tecnicoActual }) });
+                const result = await res.json();
+                document.getElementById('loader-dashboard').style.display = "none";
+                if(result.tickets.length === 0) document.getElementById('lista-mis-tickets').innerHTML = "<p>No hay equipos.</p>";
+                result.tickets.forEach(t => {
+                    document.getElementById('lista-mis-tickets').innerHTML += `
+                        <div class="ticket-card" onclick="abrirActualizador('${t.id}')">
+                            <span class="status-badge">${t.estado}</span><strong>${t.id}</strong><br>
+                            <span style="color:#aaa; font-size:0.9rem;">${t.cliente} - ${t.equipo}</span>
+                        </div>`;
+                });
+            } catch (e) { document.getElementById('loader-dashboard').style.display = "none"; }
         }
 
-        function abrirActualizador(id) {
-            ticketSeleccionado = id;
-            document.getElementById('act-id-ticket').innerText = "Ticket: " + id;
-            document.getElementById('act-detalle').value = "";
-            document.getElementById('act-costo').value = "";
-            mostrarPanel('panel-actualizar');
-        }
-
-        async function guardarActualizacion() {
-            const detalle = document.getElementById('act-detalle').value;
-            const estado = document.getElementById('act-estado').value;
-            const costo = document.getElementById('act-costo').value;
-            
-            if(!detalle) return alert("Debes escribir un detalle del avance.");
-
-            document.getElementById('loader-act').style.display = "block";
-            try {
-                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ 
-                    accion: "actualizar_ticket", id_ticket: ticketSeleccionado, tecnico_nombre: tecnicoActual, 
-                    detalle: detalle, nuevo_estado: estado, costo_adicional: costo 
-                })});
-                const result = await response.json();
-                document.getElementById('loader-act').style.display = "none";
-
-                if(result.status === "success") { alert("Ticket actualizado."); cargarMisTickets(); }
-            } catch (e) { document.getElementById('loader-act').style.display = "none"; alert("Error al guardar."); }
-        }
+        function abrirActualizador(id) { ticketSeleccionado = id; document.getElementById('act-id-ticket').innerText = "Ticket: " + id; mostrarPanel('panel-actualizar'); }
 
         async function crearTicket() {
-            let inventarioArr = [];
-            document.querySelectorAll('.inv-check:checked').forEach(chk => inventarioArr.push(chk.value));
-            
-            // Unimos el texto de observaciones con los checks
-            const obsInventario = document.getElementById('form-inv-obs').value.trim();
-            let inventarioFinal = inventarioArr.join(", ");
-            if (obsInventario !== "") {
-                inventarioFinal += " | Obs: " + obsInventario;
-            }
-            
-            const datosTicket = {
+            let invArr = []; document.querySelectorAll('.inv-check:checked').forEach(c => invArr.push(c.value));
+            let invFinal = invArr.join(", ");
+            const obs = document.getElementById('form-inv-obs').value.trim();
+            if(obs) invFinal += " | Obs: " + obs;
+
+            const datos = {
                 accion: "crear_ticket", tecnico_principal: tecnicoActual,
-                cliente: document.getElementById('form-cliente').value,
-                whatsapp: document.getElementById('form-whatsapp').value,
-                direccion: document.getElementById('form-direccion').value,
-                equipo: document.getElementById('form-equipo').value,
-                inventario: inventarioFinal,
-                diagnostico: document.getElementById('form-diagnostico').value,
+                cliente: document.getElementById('form-cliente').value, whatsapp: document.getElementById('form-whatsapp').value,
+                direccion: document.getElementById('form-direccion').value, equipo: document.getElementById('form-equipo').value,
+                inventario: invFinal, diagnostico: document.getElementById('form-diagnostico').value,
                 valor_revision: document.getElementById('form-precio-rev').value
             };
 
-            if(!datosTicket.cliente || !datosTicket.equipo) return alert("Completa los campos obligatorios.");
+            // Procesar foto si hay
+            const fileInput = document.getElementById('form-foto');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                datos.foto_base64 = await convertirArchivo(file);
+                datos.foto_mime = file.type;
+            }
 
+            if(!datos.cliente || !datos.equipo) return alert("Completa cliente y equipo.");
             document.getElementById('loader-registro').style.display = "block";
             try {
-                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(datosTicket) });
-                const result = await response.json();
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(datos) });
+                const result = await res.json();
                 document.getElementById('loader-registro').style.display = "none";
-
                 if(result.status === "success") {
                     alert(`¡Ticket Creado: ${result.ticket}!`);
-                    document.querySelectorAll('input:not(#login-user, #login-pass), textarea').forEach(el => el.value = '');
-                    document.querySelectorAll('.inv-check').forEach(chk => chk.checked = false);
+                    document.querySelectorAll('input:not(#login-user, #login-pass), textarea').forEach(e => e.value='');
+                    document.querySelectorAll('.inv-check').forEach(c => c.checked=false);
                     cargarMisTickets();
                 }
-            } catch (e) { document.getElementById('loader-registro').style.display = "none"; alert("Error."); }
+            } catch (e) { document.getElementById('loader-registro').style.display = "none"; }
+        }
+
+        async function guardarActualizacion() {
+            const datos = {
+                accion: "actualizar_ticket", id_ticket: ticketSeleccionado, tecnico_nombre: tecnicoActual,
+                detalle: document.getElementById('act-detalle').value, nuevo_estado: document.getElementById('act-estado').value,
+                costo_adicional: document.getElementById('act-costo').value
+            };
+
+            const fileInput = document.getElementById('act-foto');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                datos.foto_base64 = await convertirArchivo(file);
+                datos.foto_mime = file.type;
+            }
+
+            if(!datos.detalle) return alert("Escribe un avance.");
+            document.getElementById('loader-act').style.display = "block";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(datos) });
+                const result = await res.json();
+                document.getElementById('loader-act').style.display = "none";
+                if(result.status === "success") { alert("Actualizado"); cargarMisTickets(); }
+            } catch (e) { document.getElementById('loader-act').style.display = "none"; }
         }
 
         async function consultarTicket() {
-            const idTicket = document.getElementById('ticket-id').value.toUpperCase().trim();
-            if(!idTicket) return alert("Ingresa tu código.");
-
-            const loader = document.getElementById('loader-cliente');
-            const resultadoDiv = document.getElementById('resultado-cliente');
-            loader.style.display = "block"; resultadoDiv.style.display = "none";
-
+            const id = document.getElementById('ticket-id').value.toUpperCase().trim();
+            if(!id) return;
+            document.getElementById('loader-cliente').style.display = "block"; document.getElementById('resultado-cliente').style.display = "none";
             try {
-                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: idTicket }) });
-                const result = await response.json();
-                loader.style.display = "none";
-
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: id }) });
+                const result = await res.json();
+                document.getElementById('loader-cliente').style.display = "none";
                 if(result.status === "success") {
                     const t = result.ticket;
-                    document.getElementById('res-equipo').innerText = t.equipo;
-                    document.getElementById('res-tecnico').innerText = t.tecnico;
-                    document.getElementById('res-dir').innerText = t.direccion;
-                    document.getElementById('res-fecha').innerText = t.fecha;
+                    document.getElementById('res-equipo').innerText = t.equipo; document.getElementById('res-tecnico').innerText = t.tecnico;
+                    document.getElementById('res-dir').innerText = t.direccion; document.getElementById('res-fecha').innerText = t.fecha;
                     
-                    const rev = parseFloat(t.valor_revision);
-                    const rep = parseFloat(t.total_reparacion);
-                    const totalPagar = rep > 0 ? rep : rev;
-
+                    const rev = parseFloat(t.valor_revision); const rep = parseFloat(t.total_reparacion);
                     document.getElementById('fin-rev').innerText = formatearDinero(rev);
                     document.getElementById('fin-rep').innerText = rep > 0 ? formatearDinero(rep) : "$0";
-                    
-                    const totalElement = document.getElementById('fin-total');
-                    totalElement.innerText = formatearDinero(totalPagar);
-                    if(rep > 0) {
-                        document.getElementById('fin-rev').style.textDecoration = "line-through";
-                        document.getElementById('fin-rev').style.color = "#ff5555";
-                    } else {
-                        document.getElementById('fin-rev').style.textDecoration = "none";
-                        document.getElementById('fin-rev').style.color = "#aaa";
-                    }
+                    document.getElementById('fin-total').innerText = formatearDinero(rep > 0 ? rep : rev);
 
-                    const timeline = document.getElementById('timeline-container');
-                    timeline.innerHTML = "";
-                    result.historial.forEach(paso => {
-                        let badgeCosto = paso.costo > 0 ? `<span style="color:#00f3ff; font-size:0.8rem; margin-left:10px;">(+ ${formatearDinero(paso.costo)})</span>` : '';
+                    const timeline = document.getElementById('timeline-container'); timeline.innerHTML = "";
+                    result.historial.forEach(p => {
+                        let btnFoto = p.foto ? `<br><a href="${p.foto}" target="_blank" class="btn-foto"><i class="fas fa-camera"></i> Ver Foto de Evidencia</a>` : '';
+                        let bCosto = p.costo > 0 ? `<span style="color:#00f3ff; font-size:0.8rem;">(+ ${formatearDinero(p.costo)})</span>` : '';
                         timeline.innerHTML += `
                             <div class="timeline-item">
-                                <div class="timeline-date">${paso.fecha} - <strong>${paso.estado}</strong></div>
-                                <div class="timeline-text">${paso.detalle} ${badgeCosto}</div>
-                            </div>
-                        `;
+                                <div class="timeline-date">${p.fecha} - <strong>${p.estado}</strong></div>
+                                <div class="timeline-text">${p.detalle} ${bCosto} ${btnFoto}</div>
+                            </div>`;
                     });
-                    resultadoDiv.style.display = "block";
-                } else { alert("Código no encontrado."); }
-            } catch (e) { loader.style.display = "none"; alert("Error consultando."); }
+                    document.getElementById('resultado-cliente').style.display = "block";
+                } else alert("Código no encontrado.");
+            } catch (e) { document.getElementById('loader-cliente').style.display = "none"; }
         }
     </script>
 </body>
