@@ -43,7 +43,7 @@
         .finanzas-box { margin-top:20px; padding:15px; background:rgba(0,0,0,0.6); border-radius:8px; border: 1px solid #333;}
         .fin-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: #aaa; }
         .fin-total { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #555; font-size: 1.3rem; color: var(--primary-blue); font-weight: bold;}
-        .btn-foto { background: rgba(0,243,255,0.1); color: var(--primary-blue); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 8px; border: 1px solid var(--primary-blue); }
+        .btn-foto { background: rgba(0,243,255,0.1); color: var(--primary-blue); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 8px; border: 1px solid var(--primary-blue); margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -99,8 +99,8 @@
         <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Nuevo Ingreso</h2>
         <div class="form-group"><label>Cliente</label><input type="text" id="form-cliente" placeholder="Ej: Carlos Ramírez"></div>
         <div class="form-group"><label>WhatsApp</label><input type="number" id="form-whatsapp" placeholder="Ej: 3173669002"></div>
-        <div class="form-group"><label>Dirección</label><input type="text" id="form-direccion" placeholder="Ej: Cll 10 # 5-20, Barrio Centro (Palmira)"></div>
-        <div class="form-group"><label>Equipo</label><input type="text" id="form-equipo" placeholder="Ej: Portátil HP Pavilion x360, Color Plata"></div>
+        <div class="form-group"><label>Dirección</label><input type="text" id="form-direccion" placeholder="Ej: Cll 10 # 5-20 (Palmira)"></div>
+        <div class="form-group"><label>Equipo</label><input type="text" id="form-equipo" placeholder="Ej: Portátil HP Pavilion"></div>
         
         <div class="form-group">
             <label style="color:var(--primary-purple);">Inventario</label>
@@ -109,22 +109,22 @@
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Mouse"> Mouse</label>
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Teclado"> Teclado</label>
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Maletín"> Maletín</label>
-                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Pantalla"> Pantalla/Monitor</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Pantalla"> Pantalla</label>
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Sin Accesorios"> Sin Accesorios</label>
             </div>
-            <input type="text" id="form-inv-obs" placeholder="Ej: El cargador tiene el cable pelado. Pantalla con rayón leve." style="margin-top: 10px;">
+            <input type="text" id="form-inv-obs" placeholder="Ej: Pantalla rayada, falta tecla Esc..." style="margin-top: 10px;">
         </div>
 
-        <div class="form-group"><label>Diagnóstico Inicial</label><textarea id="form-diagnostico" rows="2" placeholder="Ej: El equipo no enciende, se reporta caída previa. Bisagra izquierda floja."></textarea></div>
+        <div class="form-group"><label>Diagnóstico Inicial</label><textarea id="form-diagnostico" rows="2" placeholder="Ej: Equipo no da video."></textarea></div>
         <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="form-precio-rev" placeholder="Ej: 30000"></div>
         
         <div class="form-group">
-            <label><i class="fas fa-camera"></i> Subir Foto de Evidencia Inicial</label>
-            <input type="file" id="form-foto" accept="image/*" capture="environment">
+            <label><i class="fas fa-camera"></i> Evidencia (Máximo 5 fotos)</label>
+            <input type="file" id="form-foto" accept="image/*" multiple>
         </div>
 
         <button class="btn btn-blue" onclick="crearTicket()">Registrar Ticket</button>
-        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Guardando y procesando imagen...</div>
+        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Subiendo fotos... esto puede tardar unos segundos.</div>
     </div>
 
     <div class="panel" id="panel-actualizar" style="max-width: 600px;">
@@ -140,16 +140,16 @@
                 <option value="Entregado">Entregado (Cerrar)</option>
             </select>
         </div>
-        <div class="form-group"><label>Detalle del Avance</label><textarea id="act-detalle" rows="2" placeholder="Ej: Se detectó falla en placa base. Se inicia proceso de microsoldadura."></textarea></div>
+        <div class="form-group"><label>Detalle del Avance</label><textarea id="act-detalle" rows="2" placeholder="Ej: Se instaló disco SSD."></textarea></div>
         <div class="form-group"><label>Costo Agregado ($)</label><input type="number" id="act-costo" placeholder="Ej: 150000"></div>
         
         <div class="form-group">
-            <label><i class="fas fa-camera"></i> Subir Foto del Avance o Repuesto Nuevo</label>
-            <input type="file" id="act-foto" accept="image/*" capture="environment">
+            <label><i class="fas fa-camera"></i> Fotos del Avance (Máximo 5)</label>
+            <input type="file" id="act-foto" accept="image/*" multiple>
         </div>
 
         <button class="btn btn-blue" onclick="guardarActualizacion()">Guardar Avance</button>
-        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Actualizando y subiendo imagen...</div>
+        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Subiendo fotos...</div>
     </div>
 
     <script>
@@ -162,6 +162,7 @@
         function mostrarPanel(idPanel) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.getElementById(idPanel).classList.add('active'); if(idPanel !== 'panel-cliente' && idPanel !== 'panel-login') document.getElementById('nav-menu').style.display = 'none'; }
         const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
 
+        // FUNCIÓN MEJORADA: Convierte múltiples archivos
         function convertirArchivo(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -169,6 +170,21 @@
                 reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
             });
+        }
+
+        async function procesarFotosInput(inputId) {
+            const archivos = document.getElementById(inputId).files;
+            if (archivos.length === 0) return [];
+            if (archivos.length > 5) {
+                alert("Solo puedes subir un máximo de 5 fotos a la vez.");
+                return null;
+            }
+            let arrayFotos = [];
+            for (let i = 0; i < archivos.length; i++) {
+                let base64 = await convertirArchivo(archivos[i]);
+                arrayFotos.push({ base64: base64, mime: archivos[i].type });
+            }
+            return arrayFotos;
         }
 
         async function iniciarSesion() {
@@ -211,20 +227,18 @@
             const obs = document.getElementById('form-inv-obs').value.trim();
             if(obs) invFinal += " | Obs: " + obs;
 
+            // Procesar hasta 5 fotos
+            const fotosProcesadas = await procesarFotosInput('form-foto');
+            if(fotosProcesadas === null) return; // Se excede el límite
+
             const datos = {
                 accion: "crear_ticket", tecnico_principal: tecnicoActual,
                 cliente: document.getElementById('form-cliente').value, whatsapp: document.getElementById('form-whatsapp').value,
                 direccion: document.getElementById('form-direccion').value, equipo: document.getElementById('form-equipo').value,
                 inventario: invFinal, diagnostico: document.getElementById('form-diagnostico').value,
-                valor_revision: document.getElementById('form-precio-rev').value
+                valor_revision: document.getElementById('form-precio-rev').value,
+                fotos: fotosProcesadas // Array de fotos
             };
-
-            const fileInput = document.getElementById('form-foto');
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                datos.foto_base64 = await convertirArchivo(file);
-                datos.foto_mime = file.type;
-            }
 
             if(!datos.cliente || !datos.equipo) return alert("Completa cliente y equipo.");
             document.getElementById('loader-registro').style.display = "block";
@@ -242,18 +256,15 @@
         }
 
         async function guardarActualizacion() {
+            const fotosProcesadas = await procesarFotosInput('act-foto');
+            if(fotosProcesadas === null) return;
+
             const datos = {
                 accion: "actualizar_ticket", id_ticket: ticketSeleccionado, tecnico_nombre: tecnicoActual,
                 detalle: document.getElementById('act-detalle').value, nuevo_estado: document.getElementById('act-estado').value,
-                costo_adicional: document.getElementById('act-costo').value
+                costo_adicional: document.getElementById('act-costo').value,
+                fotos: fotosProcesadas // Array de fotos
             };
-
-            const fileInput = document.getElementById('act-foto');
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                datos.foto_base64 = await convertirArchivo(file);
-                datos.foto_mime = file.type;
-            }
 
             if(!datos.detalle) return alert("Escribe un avance.");
             document.getElementById('loader-act').style.display = "block";
@@ -285,12 +296,19 @@
 
                     const timeline = document.getElementById('timeline-container'); timeline.innerHTML = "";
                     result.historial.forEach(p => {
-                        let btnFoto = p.foto ? `<br><a href="${p.foto}" target="_blank" class="btn-foto"><i class="fas fa-camera"></i> Ver Foto de Evidencia</a>` : '';
+                        let btnFotosHTML = "";
+                        if(p.foto && p.foto.trim() !== "") {
+                            let urls = p.foto.split(", ");
+                            urls.forEach((url, i) => {
+                                btnFotosHTML += `<br><a href="${url}" target="_blank" class="btn-foto"><i class="fas fa-camera"></i> Evidencia ${i+1}</a>`;
+                            });
+                        }
+                        
                         let bCosto = p.costo > 0 ? `<span style="color:#00f3ff; font-size:0.8rem;">(+ ${formatearDinero(p.costo)})</span>` : '';
                         timeline.innerHTML += `
                             <div class="timeline-item">
                                 <div class="timeline-date">${p.fecha} - <strong>${p.estado}</strong></div>
-                                <div class="timeline-text">${p.detalle} ${bCosto} ${btnFoto}</div>
+                                <div class="timeline-text">${p.detalle} ${bCosto} ${btnFotosHTML}</div>
                             </div>`;
                     });
                     document.getElementById('resultado-cliente').style.display = "block";
