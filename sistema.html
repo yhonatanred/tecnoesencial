@@ -82,8 +82,8 @@
 
     <div class="panel" id="panel-login">
         <h2>Acceso Técnico</h2>
-        <div class="form-group"><label>Usuario</label><input type="text" id="login-user"></div>
-        <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass"></div>
+        <div class="form-group"><label>Usuario</label><input type="text" id="login-user" placeholder="Ej: admin"></div>
+        <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass" placeholder="Ej: tecno123"></div>
         <button class="btn btn-blue" onclick="iniciarSesion()">Ingresar</button>
         <div class="loader" id="loader-login"><i class="fas fa-spinner fa-spin"></i> Verificando...</div>
     </div>
@@ -97,30 +97,34 @@
 
     <div class="panel" id="panel-tecnico-nuevo" style="max-width: 600px;">
         <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Nuevo Ingreso</h2>
-        <div class="form-group"><label>Cliente</label><input type="text" id="form-cliente"></div>
-        <div class="form-group"><label>WhatsApp</label><input type="number" id="form-whatsapp"></div>
-        <div class="form-group"><label>Dirección</label><input type="text" id="form-direccion"></div>
-        <div class="form-group"><label>Equipo</label><input type="text" id="form-equipo"></div>
+        <div class="form-group"><label>Cliente</label><input type="text" id="form-cliente" placeholder="Ej: Carlos Ramírez"></div>
+        <div class="form-group"><label>WhatsApp</label><input type="number" id="form-whatsapp" placeholder="Ej: 3173669002"></div>
+        <div class="form-group"><label>Dirección</label><input type="text" id="form-direccion" placeholder="Ej: Cll 10 # 5-20, Barrio Centro (Palmira)"></div>
+        <div class="form-group"><label>Equipo</label><input type="text" id="form-equipo" placeholder="Ej: Portátil HP Pavilion x360, Color Plata"></div>
         
         <div class="form-group">
             <label style="color:var(--primary-purple);">Inventario</label>
             <div class="checkbox-grid">
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Cargador"> Cargador</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Mouse"> Mouse</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Teclado"> Teclado</label>
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Maletín"> Maletín</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Pantalla"> Pantalla/Monitor</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Sin Accesorios"> Sin Accesorios</label>
             </div>
-            <input type="text" id="form-inv-obs" placeholder="Observaciones extras (Ej: rayones, golpes...)" style="margin-top: 10px;">
+            <input type="text" id="form-inv-obs" placeholder="Ej: El cargador tiene el cable pelado. Pantalla con rayón leve." style="margin-top: 10px;">
         </div>
 
-        <div class="form-group"><label>Diagnóstico Inicial</label><textarea id="form-diagnostico" rows="2"></textarea></div>
-        <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="form-precio-rev"></div>
+        <div class="form-group"><label>Diagnóstico Inicial</label><textarea id="form-diagnostico" rows="2" placeholder="Ej: El equipo no enciende, se reporta caída previa. Bisagra izquierda floja."></textarea></div>
+        <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="form-precio-rev" placeholder="Ej: 30000"></div>
         
         <div class="form-group">
-            <label><i class="fas fa-camera"></i> Subir Foto de Evidencia</label>
+            <label><i class="fas fa-camera"></i> Subir Foto de Evidencia Inicial</label>
             <input type="file" id="form-foto" accept="image/*" capture="environment">
         </div>
 
         <button class="btn btn-blue" onclick="crearTicket()">Registrar Ticket</button>
-        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Subiendo foto y guardando...</div>
+        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Guardando y procesando imagen...</div>
     </div>
 
     <div class="panel" id="panel-actualizar" style="max-width: 600px;">
@@ -136,16 +140,16 @@
                 <option value="Entregado">Entregado (Cerrar)</option>
             </select>
         </div>
-        <div class="form-group"><label>Detalle del Avance</label><textarea id="act-detalle" rows="2"></textarea></div>
-        <div class="form-group"><label>Costo Agregado ($)</label><input type="number" id="act-costo"></div>
+        <div class="form-group"><label>Detalle del Avance</label><textarea id="act-detalle" rows="2" placeholder="Ej: Se detectó falla en placa base. Se inicia proceso de microsoldadura."></textarea></div>
+        <div class="form-group"><label>Costo Agregado ($)</label><input type="number" id="act-costo" placeholder="Ej: 150000"></div>
         
         <div class="form-group">
-            <label><i class="fas fa-camera"></i> Subir Foto del Avance/Repuesto</label>
+            <label><i class="fas fa-camera"></i> Subir Foto del Avance o Repuesto Nuevo</label>
             <input type="file" id="act-foto" accept="image/*" capture="environment">
         </div>
 
         <button class="btn btn-blue" onclick="guardarActualizacion()">Guardar Avance</button>
-        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Subiendo foto y actualizando...</div>
+        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Actualizando y subiendo imagen...</div>
     </div>
 
     <script>
@@ -158,7 +162,6 @@
         function mostrarPanel(idPanel) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.getElementById(idPanel).classList.add('active'); if(idPanel !== 'panel-cliente' && idPanel !== 'panel-login') document.getElementById('nav-menu').style.display = 'none'; }
         const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
 
-        // Transformar Foto a código (Base64) para enviarla a Google
         function convertirArchivo(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -216,7 +219,6 @@
                 valor_revision: document.getElementById('form-precio-rev').value
             };
 
-            // Procesar foto si hay
             const fileInput = document.getElementById('form-foto');
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
