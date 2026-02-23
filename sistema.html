@@ -71,7 +71,6 @@
             </div>
             <h3 style="color:var(--primary-blue); font-size:1.1rem;">Línea de Tiempo</h3>
             <div class="timeline" id="timeline-container"></div>
-            
             <div class="finanzas-box">
                 <div class="fin-row"><span>Valor Revisión:</span> <span id="fin-rev"></span></div>
                 <div class="fin-row"><span>Costos de Reparación:</span> <span id="fin-rep"></span></div>
@@ -124,7 +123,7 @@
         </div>
 
         <button class="btn btn-blue" onclick="crearTicket()">Registrar Ticket</button>
-        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Subiendo fotos... esto puede tardar unos segundos.</div>
+        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Comprimiendo fotos y guardando...</div>
     </div>
 
     <div class="panel" id="panel-actualizar" style="max-width: 600px;">
@@ -149,7 +148,7 @@
         </div>
 
         <button class="btn btn-blue" onclick="guardarActualizacion()">Guardar Avance</button>
-        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Subiendo fotos...</div>
+        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Actualizando y subiendo fotos...</div>
     </div>
 
     <script>
@@ -162,12 +161,29 @@
         function mostrarPanel(idPanel) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.getElementById(idPanel).classList.add('active'); if(idPanel !== 'panel-cliente' && idPanel !== 'panel-login') document.getElementById('nav-menu').style.display = 'none'; }
         const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
 
-        // FUNCIÓN MEJORADA: Convierte múltiples archivos
-        function convertirArchivo(file) {
+        // 🔥 NUEVA FUNCIÓN MÁGICA: Comprime las fotos antes de enviarlas (Evita que Google se bloquee)
+        function comprimirImagen(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; // Resolución perfecta web
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Convierte a JPG comprimido al 70%
+                        const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve({ base64: base64, mime: 'image/jpeg' });
+                    };
+                };
                 reader.onerror = error => reject(error);
             });
         }
@@ -181,8 +197,8 @@
             }
             let arrayFotos = [];
             for (let i = 0; i < archivos.length; i++) {
-                let base64 = await convertirArchivo(archivos[i]);
-                arrayFotos.push({ base64: base64, mime: archivos[i].type });
+                let fotoComprimida = await comprimirImagen(archivos[i]);
+                arrayFotos.push(fotoComprimida);
             }
             return arrayFotos;
         }
@@ -208,7 +224,7 @@
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "listar_tickets", tecnico_nombre: tecnicoActual }) });
                 const result = await res.json();
                 document.getElementById('loader-dashboard').style.display = "none";
-                if(result.tickets.length === 0) document.getElementById('lista-mis-tickets').innerHTML = "<p>No hay equipos.</p>";
+                if(result.tickets.length === 0) document.getElementById('lista-mis-tickets').innerHTML = "<p>No hay equipos activos.</p>";
                 result.tickets.forEach(t => {
                     document.getElementById('lista-mis-tickets').innerHTML += `
                         <div class="ticket-card" onclick="abrirActualizador('${t.id}')">
@@ -227,9 +243,8 @@
             const obs = document.getElementById('form-inv-obs').value.trim();
             if(obs) invFinal += " | Obs: " + obs;
 
-            // Procesar hasta 5 fotos
             const fotosProcesadas = await procesarFotosInput('form-foto');
-            if(fotosProcesadas === null) return; // Se excede el límite
+            if(fotosProcesadas === null) return;
 
             const datos = {
                 accion: "crear_ticket", tecnico_principal: tecnicoActual,
@@ -237,7 +252,7 @@
                 direccion: document.getElementById('form-direccion').value, equipo: document.getElementById('form-equipo').value,
                 inventario: invFinal, diagnostico: document.getElementById('form-diagnostico').value,
                 valor_revision: document.getElementById('form-precio-rev').value,
-                fotos: fotosProcesadas // Array de fotos
+                fotos: fotosProcesadas
             };
 
             if(!datos.cliente || !datos.equipo) return alert("Completa cliente y equipo.");
@@ -263,7 +278,7 @@
                 accion: "actualizar_ticket", id_ticket: ticketSeleccionado, tecnico_nombre: tecnicoActual,
                 detalle: document.getElementById('act-detalle').value, nuevo_estado: document.getElementById('act-estado').value,
                 costo_adicional: document.getElementById('act-costo').value,
-                fotos: fotosProcesadas // Array de fotos
+                fotos: fotosProcesadas
             };
 
             if(!datos.detalle) return alert("Escribe un avance.");
@@ -297,11 +312,13 @@
                     const timeline = document.getElementById('timeline-container'); timeline.innerHTML = "";
                     result.historial.forEach(p => {
                         let btnFotosHTML = "";
-                        if(p.foto && p.foto.trim() !== "") {
+                        if(p.foto && p.foto.trim() !== "" && !p.foto.includes("Error")) {
                             let urls = p.foto.split(", ");
                             urls.forEach((url, i) => {
-                                btnFotosHTML += `<br><a href="${url}" target="_blank" class="btn-foto"><i class="fas fa-camera"></i> Evidencia ${i+1}</a>`;
+                                btnFotosHTML += `<br><a href="${url}" target="_blank" class="btn-foto"><i class="fas fa-camera"></i> Ver Foto ${i+1}</a>`;
                             });
+                        } else if (p.foto && p.foto.includes("Error")) {
+                            btnFotosHTML += `<br><span style="color:red; font-size:0.8rem;">Error cargando foto</span>`;
                         }
                         
                         let bCosto = p.costo > 0 ? `<span style="color:#00f3ff; font-size:0.8rem;">(+ ${formatearDinero(p.costo)})</span>` : '';
