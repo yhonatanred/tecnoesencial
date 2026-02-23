@@ -7,69 +7,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ESTILOS FUTURISTAS (HEREDADOS DE TU WEB) */
-        :root {
-            --bg-dark: #050510;
-            --primary-blue: #00f3ff;
-            --primary-purple: #bc13fe;
-            --glass-bg: rgba(20, 20, 35, 0.8);
-            --glass-border: rgba(0, 243, 255, 0.3);
-            --text-main: #ffffff;
-        }
+        :root { --bg-dark: #050510; --primary-blue: #00f3ff; --primary-purple: #bc13fe; --glass-bg: rgba(20, 20, 35, 0.8); --glass-border: rgba(0, 243, 255, 0.3); --text-main: #ffffff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        
-        /* Fondo Animado */
         .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(188,19,254,0.1), transparent), radial-gradient(circle at 80% 20%, rgba(0,243,255,0.15), transparent); z-index: -1; }
-
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 30px; text-align: center; color: white; text-shadow: 0 0 10px var(--primary-blue); }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 30px; text-align: center; color: white; text-shadow: 0 0 10px var(--primary-blue); cursor: pointer;}
         .logo span { color: var(--primary-blue); }
-
-        /* Contenedores Glassmorphism */
         .panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; padding: 30px; width: 100%; max-width: 500px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); margin-bottom: 20px; display: none; }
-        .panel.active { display: block; animation: fadeIn 0.5s ease; }
+        .panel.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
         h2 { font-family: 'Orbitron', sans-serif; color: var(--primary-blue); margin-bottom: 20px; text-align: center; font-size: 1.5rem; }
-
-        /* Formularios */
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9rem; }
-        input[type="text"], input[type="password"], input[type="number"], select, textarea {
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 8px; color: white; outline: none; transition: 0.3s;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
-        
-        /* Checkboxes Neon para Inventario */
-        .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 8px; color: white; outline: none; transition: 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); }
+        .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; margin-bottom: 10px;}
         .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #ddd; }
         .checkbox-item input { accent-color: var(--primary-purple); width: 18px; height: 18px; }
-
-        /* Botones */
         .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; font-family: 'Rajdhani', sans-serif; }
-        .btn-blue { background: linear-gradient(90deg, #0055ff, var(--primary-blue)); color: white; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); }
-        .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0, 243, 255, 0.6); }
+        .btn-blue { background: linear-gradient(90deg, #0055ff, var(--primary-blue)); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--primary-purple); color: var(--primary-purple); }
         .btn-outline:hover { background: var(--primary-purple); color: white; }
-
-        /* Rastreador Cliente */
         .timeline { border-left: 2px solid var(--primary-blue); padding-left: 20px; margin-top: 20px; }
         .timeline-item { position: relative; margin-bottom: 20px; }
-        .timeline-item::before { content: ''; position: absolute; left: -27px; top: 0; width: 12px; height: 12px; background: var(--primary-blue); border-radius: 50%; box-shadow: 0 0 10px var(--primary-blue); }
+        .timeline-item::before { content: ''; position: absolute; left: -27px; top: 0; width: 12px; height: 12px; background: var(--primary-blue); border-radius: 50%; }
         .timeline-date { font-size: 0.8rem; color: #888; }
         .timeline-text { color: #ddd; font-size: 0.95rem; margin-top: 5px; }
-
-        /* Loader */
-        .loader { display: none; text-align: center; margin-top: 15px; color: var(--primary-blue); font-size: 1.2rem; }
-        
+        .loader { display: none; text-align: center; margin-top: 15px; color: var(--primary-blue); }
         .nav-buttons { display: flex; gap: 10px; max-width: 500px; width: 100%; margin-bottom: 20px; }
+        .ticket-card { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 15px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .ticket-card:hover { border-color: var(--primary-blue); }
+        .status-badge { background: var(--primary-purple); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; float: right; }
+        .info-cliente { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; border-left: 3px solid var(--primary-purple);}
+        .finanzas-box { margin-top:20px; padding:15px; background:rgba(0,0,0,0.6); border-radius:8px; border: 1px solid #333;}
+        .fin-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: #aaa; }
+        .fin-total { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #555; font-size: 1.3rem; color: var(--primary-blue); font-weight: bold;}
     </style>
 </head>
 <body>
 
     <div class="bg-glow"></div>
-
-    <div class="logo">TECNO<span>ESENCIAL</span></div>
+    <div class="logo" onclick="location.reload()">TECNO<span>ESENCIAL</span></div>
 
     <div class="nav-buttons" id="nav-menu">
         <button class="btn btn-outline" onclick="mostrarPanel('panel-cliente')"><i class="fas fa-search"></i> Soy Cliente</button>
@@ -78,224 +56,288 @@
 
     <div class="panel active" id="panel-cliente">
         <h2>Rastrear mi Equipo</h2>
-        <p style="text-align:center; color:#aaa; margin-bottom:20px;">Ingresa el código que te dio el técnico.</p>
         <div class="form-group">
-            <input type="text" id="ticket-id" placeholder="Ej: TCN-12345">
+            <input type="text" id="ticket-id" placeholder="Ingresa tu código (Ej: TCN-12345)">
         </div>
         <button class="btn btn-blue" onclick="consultarTicket()">Buscar Estado</button>
-        <div class="loader" id="loader-cliente"><i class="fas fa-spinner fa-spin"></i> Conectando al servidor...</div>
+        <div class="loader" id="loader-cliente"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>
         
         <div id="resultado-cliente" style="display:none; margin-top:20px;">
-            <h3 style="color:var(--primary-purple); border-bottom:1px solid #444; padding-bottom:10px;">Equipo: <span id="res-equipo"></span></h3>
-            <div class="timeline" id="timeline-container">
+            <div class="info-cliente">
+                <strong>Equipo:</strong> <span id="res-equipo"></span><br>
+                <strong>Técnico Encargado:</strong> <span id="res-tecnico"></span><br>
+                <strong>Recogido en:</strong> <span id="res-dir"></span><br>
+                <strong>Fecha Ingreso:</strong> <span id="res-fecha"></span>
+            </div>
+            
+            <h3 style="color:var(--primary-blue); font-size:1.1rem;">Línea de Tiempo</h3>
+            <div class="timeline" id="timeline-container"></div>
+            
+            <div class="finanzas-box">
+                <div class="fin-row"><span>Valor Revisión:</span> <span id="fin-rev"></span></div>
+                <div class="fin-row"><span>Costos de Reparación:</span> <span id="fin-rep"></span></div>
+                <div style="font-size:0.8rem; color:#888; text-align:center; margin-top:5px;">
+                    *Si autorizas la reparación, la revisión es GRATIS.
                 </div>
-            <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.5); border-radius:8px; text-align:center;">
-                <span style="color:#aaa;">Costo Total Estimado:</span><br>
-                <strong style="color:var(--primary-blue); font-size:1.5rem;" id="res-precio"></strong>
+                <div class="fin-total"><span>Total Estimado:</span> <span id="fin-total"></span></div>
             </div>
         </div>
     </div>
 
     <div class="panel" id="panel-login">
-        <h2>Acceso Autorizado</h2>
-        <div class="form-group">
-            <label>Usuario</label>
-            <input type="text" id="login-user">
-        </div>
-        <div class="form-group">
-            <label>Contraseña</label>
-            <input type="password" id="login-pass">
-        </div>
+        <h2>Acceso Técnico</h2>
+        <div class="form-group"><label>Usuario</label><input type="text" id="login-user"></div>
+        <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass"></div>
         <button class="btn btn-blue" onclick="iniciarSesion()">Ingresar</button>
-        <div class="loader" id="loader-login"><i class="fas fa-spinner fa-spin"></i> Verificando credenciales...</div>
+        <div class="loader" id="loader-login"><i class="fas fa-spinner fa-spin"></i> Verificando...</div>
     </div>
 
-    <div class="panel" id="panel-tecnico" style="max-width: 600px;">
-        <h2>Nuevo Ingreso a Laboratorio</h2>
-        <p style="text-align:center; color:#00f3ff; margin-bottom:20px;">Técnico: <span id="nombre-tecnico-activo"></span></p>
+    <div class="panel" id="panel-tech-dashboard" style="max-width: 600px;">
+        <h2>Mis Tickets Asignados</h2>
+        <p style="text-align:center; color:#00f3ff; margin-bottom:20px;">Hola, <span id="dash-nombre-tecnico"></span></p>
+        
+        <button class="btn btn-outline" onclick="mostrarPanel('panel-tecnico-nuevo')" style="margin-bottom: 20px;">
+            <i class="fas fa-plus-circle"></i> Crear Nuevo Ingreso
+        </button>
 
-        <div class="form-group">
-            <label>Nombre del Cliente</label>
-            <input type="text" id="form-cliente" placeholder="Ej: Carlos Ramírez">
-        </div>
-        <div class="form-group">
-            <label>WhatsApp del Cliente</label>
-            <input type="number" id="form-whatsapp" placeholder="Ej: 3170000000">
-        </div>
-        <div class="form-group">
-            <label>Dirección de Recogida</label>
-            <input type="text" id="form-direccion" placeholder="Ej: Palmira, Barrio Centro, Cll 10 #5-20">
-        </div>
-        <div class="form-group">
-            <label>Equipo (Marca y Modelo)</label>
-            <input type="text" id="form-equipo" placeholder="Ej: Portátil HP Pavilion x360">
-        </div>
+        <h3 style="font-size: 1.1rem; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px;">Equipos en Proceso</h3>
+        <div id="lista-mis-tickets"></div>
+        <div class="loader" id="loader-dashboard"><i class="fas fa-spinner fa-spin"></i> Cargando tickets...</div>
+    </div>
+
+    <div class="panel" id="panel-tecnico-nuevo" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Nuevo Ingreso</h2>
+        <div class="form-group"><label>Nombre del Cliente</label><input type="text" id="form-cliente"></div>
+        <div class="form-group"><label>WhatsApp del Cliente</label><input type="number" id="form-whatsapp"></div>
+        <div class="form-group"><label>Dirección de Recogida / Sede</label><input type="text" id="form-direccion" placeholder="Ej: Casa cliente (Palmira) o Local"></div>
+        <div class="form-group"><label>Equipo (Marca y Modelo)</label><input type="text" id="form-equipo"></div>
         
         <div class="form-group">
-            <label style="color:var(--primary-purple);">Inventario Recibido (Marca lo que entregó el cliente)</label>
+            <label style="color:var(--primary-purple);">Inventario Recibido</label>
             <div class="checkbox-grid">
-                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Cargador Original"> Cargador Original</label>
-                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Cargador Genérico"> Cargador Genérico</label>
-                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Maletín/Funda"> Maletín/Funda</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Cargador"> Cargador</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Maletín"> Maletín</label>
                 <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Mouse"> Mouse</label>
-                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Cable de Poder"> Cable de Poder</label>
-                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Sin Accesorios"> Equipo Solo (Sin Acc.)</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Sin Accesorios"> Sin Accesorios</label>
             </div>
+            <input type="text" id="form-inv-obs" placeholder="Observaciones extras (Ej: Cargador pelado, maletín roto...)" style="margin-top: 10px; font-size: 0.9rem;">
         </div>
 
-        <div class="form-group">
-            <label>Diagnóstico en Sitio / Daño Reportado</label>
-            <textarea id="form-diagnostico" rows="3" placeholder="Ej: Equipo no da video. Bisagra izquierda rota."></textarea>
-        </div>
-        <div class="form-group">
-            <label>Cotización Inicial / Precio Estimado ($)</label>
-            <input type="text" id="form-precio" placeholder="Ej: 160000">
-        </div>
+        <div class="form-group"><label>Diagnóstico en Sitio</label><textarea id="form-diagnostico" rows="2"></textarea></div>
+        <div class="form-group"><label>Valor de Revisión Inicial ($)</label><input type="number" id="form-precio-rev" placeholder="Ej: 30000"></div>
 
-        <button class="btn btn-blue" onclick="crearTicket()">Registrar y Generar Ticket</button>
-        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Guardando en base de datos...</div>
+        <button class="btn btn-blue" onclick="crearTicket()">Registrar Ticket</button>
+        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Guardando...</div>
+    </div>
+
+    <div class="panel" id="panel-actualizar" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Actualizar Ticket</h2>
+        <h3 id="act-id-ticket" style="text-align:center; color:white; margin-bottom:15px;"></h3>
+        
+        <div class="form-group">
+            <label>Nuevo Estado</label>
+            <select id="act-estado">
+                <option value="En Laboratorio">En Laboratorio</option>
+                <option value="En Diagnóstico">En Diagnóstico</option>
+                <option value="Esperando Aprobación">Esperando Aprobación Cliente</option>
+                <option value="Esperando Repuesto">Esperando Repuesto</option>
+                <option value="Reparado">Reparado / Listo para entregar</option>
+                <option value="Entregado">Entregado al Cliente (Cerrar)</option>
+            </select>
+        </div>
+        
+        <div class="form-group"><label>Detalle del Avance (El cliente leerá esto)</label><textarea id="act-detalle" rows="3" placeholder="Ej: Se instaló disco SSD de 480GB y Windows 11."></textarea></div>
+        <div class="form-group"><label>Costo Agregado en este paso ($) - Opcional</label><input type="number" id="act-costo" placeholder="Ej: 140000"></div>
+
+        <button class="btn btn-blue" onclick="guardarActualizacion()">Guardar Avance</button>
+        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Actualizando...</div>
     </div>
 
     <script>
-        // 🔴🔴🔴 PEGA AQUÍ LA URL LARGA QUE COPIASTE DE GOOGLE APPS SCRIPT 🔴🔴🔴
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-LWwa4vgJh92Gj_LdDh9h7q1JyluC323gT9alNEpdk5YkJiOOLAZd29hFfb2ObRHC/exec";
+        // 🔴🔴🔴 REEMPLAZA AQUÍ TU NUEVA URL DE GOOGLE SCRIPT 🔴🔴🔴
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW3DCk_VRl0vU-zZIqwmWAV38RJafJsJ_XI-vQDjAPah1ysv4Xjzt-1G0QZPWhfvl7/exec";
         
-        let tecnicoActual = ""; // Aquí guardaremos quién inició sesión
+        let tecnicoActual = ""; 
+        let ticketSeleccionado = "";
 
-        // Función para cambiar entre pantallas
+        // Activar tecla ENTER
+        document.getElementById('ticket-id').addEventListener('keypress', function (e) { if (e.key === 'Enter') consultarTicket(); });
+        document.getElementById('login-pass').addEventListener('keypress', function (e) { if (e.key === 'Enter') iniciarSesion(); });
+
         function mostrarPanel(idPanel) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.getElementById(idPanel).classList.add('active');
-            
-            // Ocultar botones de menú si entra el técnico
-            if(idPanel === 'panel-tecnico') {
+            if(idPanel !== 'panel-cliente' && idPanel !== 'panel-login') {
                 document.getElementById('nav-menu').style.display = 'none';
             }
         }
 
-        // 1. FUNCIÓN DE LOGIN
+        const formatearDinero = (valor) => { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(valor); };
+
         async function iniciarSesion() {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
-            const loader = document.getElementById('loader-login');
-
             if(!user || !pass) return alert("Completa los datos");
 
+            document.getElementById('loader-login').style.display = "block";
+            try {
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "login", usuario: user, password: pass }) });
+                const result = await response.json();
+                document.getElementById('loader-login').style.display = "none";
+
+                if(result.status === "success") {
+                    tecnicoActual = result.data.nombre;
+                    document.getElementById('dash-nombre-tecnico').innerText = tecnicoActual;
+                    cargarMisTickets(); 
+                } else { alert("Usuario o contraseña incorrectos."); }
+            } catch (error) { document.getElementById('loader-login').style.display = "none"; alert("Error de conexión."); }
+        }
+
+        async function cargarMisTickets() {
+            mostrarPanel('panel-tech-dashboard');
+            const contenedor = document.getElementById('lista-mis-tickets');
+            const loader = document.getElementById('loader-dashboard');
+            contenedor.innerHTML = "";
             loader.style.display = "block";
 
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ accion: "login", usuario: user, password: pass })
-                });
-                
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "listar_tickets", tecnico_nombre: tecnicoActual }) });
                 const result = await response.json();
                 loader.style.display = "none";
 
                 if(result.status === "success") {
-                    tecnicoActual = result.data.nombre;
-                    document.getElementById('nombre-tecnico-activo').innerText = tecnicoActual;
-                    mostrarPanel('panel-tecnico');
-                } else {
-                    alert("Acceso Denegado: Usuario o contraseña incorrectos.");
+                    if(result.tickets.length === 0) contenedor.innerHTML = "<p style='color:#aaa;'>No tienes equipos activos.</p>";
+                    result.tickets.forEach(t => {
+                        contenedor.innerHTML += `
+                            <div class="ticket-card" onclick="abrirActualizador('${t.id}')">
+                                <span class="status-badge">${t.estado}</span>
+                                <strong>${t.id}</strong><br>
+                                <span style="color:#aaa; font-size:0.9rem;">${t.cliente} - ${t.equipo}</span>
+                            </div>
+                        `;
+                    });
                 }
-            } catch (error) {
-                loader.style.display = "none";
-                alert("Error de conexión con la base de datos.");
-            }
+            } catch (e) { loader.style.display = "none"; alert("Error cargando tickets."); }
         }
 
-        // 2. FUNCIÓN CREAR TICKET (TÉCNICO)
+        function abrirActualizador(id) {
+            ticketSeleccionado = id;
+            document.getElementById('act-id-ticket').innerText = "Ticket: " + id;
+            document.getElementById('act-detalle').value = "";
+            document.getElementById('act-costo').value = "";
+            mostrarPanel('panel-actualizar');
+        }
+
+        async function guardarActualizacion() {
+            const detalle = document.getElementById('act-detalle').value;
+            const estado = document.getElementById('act-estado').value;
+            const costo = document.getElementById('act-costo').value;
+            
+            if(!detalle) return alert("Debes escribir un detalle del avance.");
+
+            document.getElementById('loader-act').style.display = "block";
+            try {
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ 
+                    accion: "actualizar_ticket", id_ticket: ticketSeleccionado, tecnico_nombre: tecnicoActual, 
+                    detalle: detalle, nuevo_estado: estado, costo_adicional: costo 
+                })});
+                const result = await response.json();
+                document.getElementById('loader-act').style.display = "none";
+
+                if(result.status === "success") { alert("Ticket actualizado."); cargarMisTickets(); }
+            } catch (e) { document.getElementById('loader-act').style.display = "none"; alert("Error al guardar."); }
+        }
+
         async function crearTicket() {
-            // Recoger los checks marcados
             let inventarioArr = [];
             document.querySelectorAll('.inv-check:checked').forEach(chk => inventarioArr.push(chk.value));
             
+            // Unimos el texto de observaciones con los checks
+            const obsInventario = document.getElementById('form-inv-obs').value.trim();
+            let inventarioFinal = inventarioArr.join(", ");
+            if (obsInventario !== "") {
+                inventarioFinal += " | Obs: " + obsInventario;
+            }
+            
             const datosTicket = {
-                accion: "crear_ticket",
-                tecnico_principal: tecnicoActual,
+                accion: "crear_ticket", tecnico_principal: tecnicoActual,
                 cliente: document.getElementById('form-cliente').value,
                 whatsapp: document.getElementById('form-whatsapp').value,
                 direccion: document.getElementById('form-direccion').value,
                 equipo: document.getElementById('form-equipo').value,
-                inventario: inventarioArr.join(", "),
+                inventario: inventarioFinal,
                 diagnostico: document.getElementById('form-diagnostico').value,
-                cotizacion: document.getElementById('form-precio').value
+                valor_revision: document.getElementById('form-precio-rev').value
             };
 
-            if(!datosTicket.cliente || !datosTicket.equipo) return alert("El nombre y el equipo son obligatorios.");
+            if(!datosTicket.cliente || !datosTicket.equipo) return alert("Completa los campos obligatorios.");
 
-            const loader = document.getElementById('loader-registro');
-            loader.style.display = "block";
-
+            document.getElementById('loader-registro').style.display = "block";
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(datosTicket)
-                });
-                
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(datosTicket) });
                 const result = await response.json();
-                loader.style.display = "none";
+                document.getElementById('loader-registro').style.display = "none";
 
                 if(result.status === "success") {
-                    alert(`¡Ticket Creado con Éxito!\n\nEntrega este código al cliente: ${result.ticket}\nEnvíale el enlace de la web para que lo rastree.`);
-                    // Limpiar formulario
-                    document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+                    alert(`¡Ticket Creado: ${result.ticket}!`);
+                    document.querySelectorAll('input:not(#login-user, #login-pass), textarea').forEach(el => el.value = '');
                     document.querySelectorAll('.inv-check').forEach(chk => chk.checked = false);
-                } else {
-                    alert("Error al guardar.");
+                    cargarMisTickets();
                 }
-            } catch (error) {
-                loader.style.display = "none";
-                alert("Error de conexión al guardar el ticket.");
-            }
+            } catch (e) { document.getElementById('loader-registro').style.display = "none"; alert("Error."); }
         }
 
-        // 3. FUNCIÓN CONSULTAR TICKET (CLIENTE)
         async function consultarTicket() {
             const idTicket = document.getElementById('ticket-id').value.toUpperCase().trim();
+            if(!idTicket) return alert("Ingresa tu código.");
+
             const loader = document.getElementById('loader-cliente');
             const resultadoDiv = document.getElementById('resultado-cliente');
-            
-            if(!idTicket) return alert("Por favor ingresa tu código de ticket.");
-
-            loader.style.display = "block";
-            resultadoDiv.style.display = "none";
+            loader.style.display = "block"; resultadoDiv.style.display = "none";
 
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ accion: "consultar_ticket", id_ticket: idTicket })
-                });
-                
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: idTicket }) });
                 const result = await response.json();
                 loader.style.display = "none";
 
                 if(result.status === "success") {
-                    document.getElementById('res-equipo').innerText = result.ticket.equipo;
-                    document.getElementById('res-precio').innerText = "$" + result.ticket.total;
+                    const t = result.ticket;
+                    document.getElementById('res-equipo').innerText = t.equipo;
+                    document.getElementById('res-tecnico').innerText = t.tecnico;
+                    document.getElementById('res-dir').innerText = t.direccion;
+                    document.getElementById('res-fecha').innerText = t.fecha;
                     
-                    // Renderizar línea de tiempo
+                    const rev = parseFloat(t.valor_revision);
+                    const rep = parseFloat(t.total_reparacion);
+                    const totalPagar = rep > 0 ? rep : rev;
+
+                    document.getElementById('fin-rev').innerText = formatearDinero(rev);
+                    document.getElementById('fin-rep').innerText = rep > 0 ? formatearDinero(rep) : "$0";
+                    
+                    const totalElement = document.getElementById('fin-total');
+                    totalElement.innerText = formatearDinero(totalPagar);
+                    if(rep > 0) {
+                        document.getElementById('fin-rev').style.textDecoration = "line-through";
+                        document.getElementById('fin-rev').style.color = "#ff5555";
+                    } else {
+                        document.getElementById('fin-rev').style.textDecoration = "none";
+                        document.getElementById('fin-rev').style.color = "#aaa";
+                    }
+
                     const timeline = document.getElementById('timeline-container');
-                    timeline.innerHTML = ""; // Limpiar
-                    
+                    timeline.innerHTML = "";
                     result.historial.forEach(paso => {
+                        let badgeCosto = paso.costo > 0 ? `<span style="color:#00f3ff; font-size:0.8rem; margin-left:10px;">(+ ${formatearDinero(paso.costo)})</span>` : '';
                         timeline.innerHTML += `
                             <div class="timeline-item">
-                                <div class="timeline-date">${paso.fecha} - Estado: <strong>${paso.estado}</strong></div>
-                                <div class="timeline-text">${paso.detalle}</div>
+                                <div class="timeline-date">${paso.fecha} - <strong>${paso.estado}</strong></div>
+                                <div class="timeline-text">${paso.detalle} ${badgeCosto}</div>
                             </div>
                         `;
                     });
-                    
                     resultadoDiv.style.display = "block";
-                } else {
-                    alert("No encontramos ese código en el sistema. Verifica que esté bien escrito.");
-                }
-            } catch (error) {
-                loader.style.display = "none";
-                alert("Error de conexión buscando el ticket.");
-            }
+                } else { alert("Código no encontrado."); }
+            } catch (e) { loader.style.display = "none"; alert("Error consultando."); }
         }
     </script>
 </body>
