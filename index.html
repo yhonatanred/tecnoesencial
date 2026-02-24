@@ -8,16 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Ajuste de Cuadrícula para evitar que las tarjetas se estiren */
+        /* Ajuste de Cuadrícula */
         .grid-container { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
             gap: 20px; 
             justify-content: center; 
-            justify-items: center; /* Centra los elementos si hay pocos */
+            justify-items: center; 
         }
         
-        /* Clase base para todas las tarjetas (Servicios, Tienda, Equipo, Testimonios) */
         .glass-card {
             background: rgba(20,20,35,0.8);
             border: 1px solid rgba(0,243,255,0.3);
@@ -27,38 +26,60 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 350px; /* Tamaño máximo perfecto para PC */
+            max-width: 350px;
             position: relative;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
-        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary-purple, #bc13fe); }
+        .glass-card:hover { 
+            transform: translateY(-5px); 
+            border-color: var(--primary-purple, #bc13fe); 
+            box-shadow: 0 10px 20px rgba(188, 19, 254, 0.2);
+        }
 
-        /* Estilos del Carrito en el Menú Superior */
         .nav-actions { display: flex; align-items: center; gap: 10px; }
         .btn-cart-nav { background: linear-gradient(90deg, #bc13fe, #00f3ff); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: 'Rajdhani', sans-serif; transition: 0.3s;}
-        .btn-cart-nav:hover { transform: scale(1.05); }
+        .btn-cart-nav:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(0, 243, 255, 0.6);}
         .btn-cart-nav .badge { background: #050510; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold; }
 
-        /* Estilos del Modal del carrito (Se mantiene igual) */
+        /* 🔥 NUEVOS EFECTOS HOVER PARA BOTONES DE SERVICIOS Y TIENDA */
+        .btn-quote-service {
+            display: block; text-align: center; margin-top: 15px; text-decoration: none; padding: 12px; 
+            border: 1px solid #00f3ff; color: #00f3ff; border-radius: 5px; transition: all 0.3s ease; 
+            font-weight: bold; background: transparent; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem;
+        }
+        .btn-quote-service:hover {
+            background: #00f3ff; color: #050510; box-shadow: 0 0 15px rgba(0, 243, 255, 0.6); transform: translateY(-2px);
+        }
+
+        .btn-add-cart {
+            width: 100%; padding: 12px; background: linear-gradient(90deg, #bc13fe, #00f3ff); 
+            border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; 
+            transition: all 0.3s ease; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem;
+        }
+        .btn-add-cart:hover {
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.6); transform: scale(1.02); filter: brightness(1.2);
+        }
+
         .modal-hidden { display: none; }
         .cart-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .cart-content { background: rgba(20, 20, 35, 0.95); border: 1px solid rgba(0, 243, 255, 0.3); border-radius: 15px; padding: 30px; width: 90%; max-width: 500px; color: white; position: relative; max-height: 80vh; overflow-y: auto; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #00f3ff; cursor: pointer; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #00f3ff; cursor: pointer; transition: 0.3s; }
+        .close-modal:hover { color: #ff5555; transform: rotate(90deg); }
         .cart-item { border-bottom: 1px solid #333; padding: 10px 0; display: flex; justify-content: space-between; align-items: center;}
         .cart-item-info { flex-grow: 1; }
         .cart-item-title { font-weight: bold; color: #00f3ff; font-family: 'Rajdhani', sans-serif;}
         .cart-item-price { color: #bc13fe; }
-        .btn-remove { background: transparent; border: 1px solid #ff5555; color: #ff5555; border-radius: 5px; cursor: pointer; padding: 5px; margin-left: 10px;}
+        .btn-remove { background: transparent; border: 1px solid #ff5555; color: #ff5555; border-radius: 5px; cursor: pointer; padding: 5px; margin-left: 10px; transition: 0.3s;}
+        .btn-remove:hover { background: #ff5555; color: white; }
         .cart-total { font-size: 1.5rem; text-align: right; margin-top: 20px; color: #00f3ff; font-family: 'Orbitron', sans-serif; }
-        .btn-whatsapp-cart { width: 100%; padding: 15px; background: linear-gradient(90deg, #25D366, #128C7E); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-top: 20px; cursor: pointer; font-family: 'Rajdhani', sans-serif;}
-        .badge-promo { background: #ffaa00; color: black; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; position: absolute; top: 10px; right: 10px; }
+        .btn-whatsapp-cart { width: 100%; padding: 15px; background: linear-gradient(90deg, #25D366, #128C7E); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-top: 20px; cursor: pointer; font-family: 'Rajdhani', sans-serif; transition: 0.3s;}
+        .btn-whatsapp-cart:hover { filter: brightness(1.1); box-shadow: 0 0 15px rgba(37, 211, 102, 0.5); }
+        .badge-promo { background: #ffaa00; color: black; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; position: absolute; top: 10px; right: 10px; z-index: 10; }
 
-        /* Estilos Nuestro Equipo */
-        .team-img { width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--primary-purple); margin: 0 auto 15px auto; object-fit: cover; }
-        .team-role { color: var(--primary-blue); font-weight: bold; font-size: 1.1rem; margin-bottom: 10px;}
-        .team-desc { color: #aaa; font-size: 0.9rem;}
-        
-        /* Estrellas Testimonios */
+        /* Estilos Nuestro Equipo Mejorados */
+        .team-img { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--primary-purple); margin: 0 auto 15px auto; object-fit: cover; box-shadow: 0 0 15px rgba(188, 19, 254, 0.4); }
+        .team-role { color: var(--primary-blue); font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+        .team-desc { color: #ccc; font-size: 0.95rem; line-height: 1.5; text-align: justify; padding: 0 10px;}
         .stars { color: #ffaa00; margin-bottom: 10px; font-size: 1.2rem;}
     </style>
 </head>
@@ -130,28 +151,28 @@
     </section>
 
     <section id="equipo" class="section-padding">
-        <h2 class="section-title"><i class="fas fa-users-cog"></i> NUESTRO GRUPO EXPERTO</h2>
+        <h2 class="section-title"><i class="fas fa-users-cog"></i> DIRECCIÓN EXPERTA</h2>
         <div class="grid-container">
             
             <div class="team-card glass-card">
-                <img src="https://ui-avatars.com/api/?name=Yhonatan+Aranda&background=bc13fe&color=fff&size=200" alt="Yhonatan Aranda" class="team-img">
+                <img src="https://ui-avatars.com/api/?name=Yhonatan+Aranda&background=bc13fe&color=fff&size=200" alt="Yhonatan Aranda" class="team-img" style="border-color: #bc13fe;">
                 <h3 style="color:white; font-family:'Orbitron', sans-serif;">Yhonatan Aranda</h3>
-                <p class="team-role">Ingeniero de Sistemas</p>
-                <p class="team-desc">Especialista en Ciberseguridad y Desarrollo de Software. <strong>Soporte Nivel 2:</strong> Servidores, redes, implementación de sistemas y soporte a call center.</p>
+                <p class="team-role">Director de Tecnología</p>
+                <p class="team-desc">Ingeniero de Sistemas con especialización en Ciberseguridad y Desarrollo de Software. Como estratega principal, domina el ecosistema IT completo. Lidera el <strong>Soporte Nivel 2</strong>, arquitectura de servidores, infraestructura de redes, integración de Call Centers y soluciones corporativas avanzadas.</p>
             </div>
 
             <div class="team-card glass-card">
-                <img src="https://ui-avatars.com/api/?name=Juan+Carlos&background=00f3ff&color=000&size=200" alt="Juan Carlos Vargas" class="team-img">
-                <h3 style="color:white; font-family:'Orbitron', sans-serif;">Juan Carlos Vargas</h3>
-                <p class="team-role">Tecnólogo Electrónico</p>
-                <p class="team-desc">Especialista en Hardware puro. <strong>Soporte Nivel 1:</strong> Diagnóstico inicial, formateo, cambio de piezas, soldadura y mantenimiento preventivo.</p>
-            </div>
-
-            <div class="team-card glass-card">
-                <img src="https://ui-avatars.com/api/?name=Juan+Pablo&background=ffaa00&color=000&size=200" alt="Juan Pablo Trejos" class="team-img">
+                <img src="https://ui-avatars.com/api/?name=Juan+Pablo&background=ffaa00&color=000&size=200" alt="Juan Pablo Trejos" class="team-img" style="border-color: #ffaa00;">
                 <h3 style="color:white; font-family:'Orbitron', sans-serif;">Juan Pablo Trejos</h3>
-                <p class="team-role">Ingeniero de Sistemas</p>
-                <p class="team-desc">Especialista en Páginas Web y <strong>Soporte Nivel 1</strong>. Atención y resolución ágil de incidencias de software, sistemas operativos y ofimática.</p>
+                <p class="team-role">Líder de Desarrollo Web</p>
+                <p class="team-desc">Ingeniero de Sistemas experto en el despliegue de páginas web modernas y escalables. A su vez, coordina el <strong>Soporte Nivel 1</strong> especializado en software, resolución de incidencias en sistemas operativos y optimización de ofimática, garantizando una fluidez digital impecable.</p>
+            </div>
+
+            <div class="team-card glass-card">
+                <img src="https://ui-avatars.com/api/?name=Juan+Carlos&background=00f3ff&color=000&size=200" alt="Juan Carlos Vargas" class="team-img" style="border-color: #00f3ff;">
+                <h3 style="color:white; font-family:'Orbitron', sans-serif;">Juan Carlos Vargas</h3>
+                <p class="team-role">Líder de Hardware</p>
+                <p class="team-desc">Tecnólogo Electrónico con precisión milimétrica. Es el cerebro detrás del <strong>Soporte Nivel 1</strong> físico. Experto absoluto en diagnóstico de componentes, reemplazo de piezas, mantenimiento preventivo/correctivo y resurrección de equipos físicos que otros consideran perdidos.</p>
             </div>
 
         </div>
@@ -193,7 +214,7 @@
         <div class="cart-modal-overlay" onclick="if(event.target === this) toggleCart()">
             <div class="cart-content">
                 <span class="close-modal" onclick="toggleCart()"><i class="fas fa-times"></i></span>
-                <h2 style="font-family:'Orbitron', sans-serif; color:var(--primary-blue); border-bottom:1px solid #333; padding-bottom:10px;">Tu Compra</h2>
+                <h2 style="font-family:'Orbitron', sans-serif; color:var(--primary-blue); border-bottom:1px solid #333; padding-bottom:10px;">Tu Carrito</h2>
                 
                 <div id="cart-items-container">
                     <p style="text-align:center; color:#aaa; margin-top:20px;">Tu carrito está vacío.</p>

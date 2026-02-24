@@ -38,20 +38,20 @@ function renderizarServicios(servicios) {
     servicios.forEach(srv => {
         let badge = srv.promocion === "Sí" ? `<span class="badge-promo"><i class="fas fa-star"></i> PROMOCIÓN</span>` : "";
         
-        // 🔥 LÓGICA PARA DETECTAR SI ES IMAGEN O ÍCONO
+        // 🔥 LÓGICA PARA DETECTAR IMAGEN Y HACERLA RECTANGULAR
         let mediaVisual = "";
         let inputIcono = srv.icono ? srv.icono.toLowerCase() : "";
         
         if (inputIcono.includes("http") || inputIcono.includes(".jpg") || inputIcono.includes(".png") || inputIcono.includes(".webp")) {
-            // Es una URL de imagen
-            mediaVisual = `<img src="${srv.icono}" alt="${srv.nombre}" style="width:100px; height:100px; object-fit:cover; border-radius:50%; margin: 0 auto 15px auto; border: 2px solid #00f3ff; display:block;">`;
+            // Es una URL de imagen -> RECTÁNGULO ELEGANTE
+            mediaVisual = `<img src="${srv.icono}" alt="${srv.nombre}" style="width:100%; height:160px; object-fit:cover; border-radius:8px; margin-bottom:15px; border: 1px solid rgba(0,243,255,0.3);">`;
         } else {
-            // Es una clase de FontAwesome
-            let iconoClase = srv.icono ? srv.icono : "fas fa-tools"; // Por defecto pone herramientas si está vacío
-            mediaVisual = `<i class="${iconoClase}" style="font-size:3rem; color:#00f3ff; margin-bottom:15px; display:block;"></i>`;
+            // Es un ícono FontAwesome
+            let iconoClase = srv.icono ? srv.icono : "fas fa-tools";
+            mediaVisual = `<div style="height:160px; display:flex; justify-content:center; align-items:center; margin-bottom:15px;"><i class="${iconoClase}" style="font-size:4rem; color:#00f3ff;"></i></div>`;
         }
 
-        let btnCotizar = `<a href="https://wa.me/${numeroWhatsAppEmpresa}?text=Hola, me interesa el servicio de: ${srv.nombre}" class="btn-outline" target="_blank" style="display:block; text-align:center; margin-top:15px; text-decoration:none; padding:10px; border:1px solid #00f3ff; color:#00f3ff; border-radius:5px; transition:0.3s;">Cotizar Servicio</a>`;
+        let btnCotizar = `<a href="https://wa.me/${numeroWhatsAppEmpresa}?text=Hola, me interesa cotizar el servicio de: ${srv.nombre}" class="btn-quote-service" target="_blank"><i class="fab fa-whatsapp"></i> Cotizar Servicio</a>`;
 
         cont.innerHTML += `
             <div class="service-card glass-card">
@@ -60,7 +60,7 @@ function renderizarServicios(servicios) {
                 <h3 style="color:white; font-family:'Orbitron', sans-serif;">${srv.nombre}</h3>
                 <p style="color:#aaa; font-size:0.9rem; margin-top:10px; flex-grow:1;">${srv.descripcion}</p>
                 
-                <div style="font-size:1.3rem; color:#bc13fe; font-weight:bold; margin: 15px 0;">
+                <div style="font-size:1.3rem; color:#00f3ff; font-weight:bold; margin: 15px 0;">
                     ${formatearDinero(srv.precio)}
                 </div>
                 
@@ -76,7 +76,7 @@ function renderizarProductos(productos) {
     cont.innerHTML = "";
 
     productos.forEach(prod => {
-        let img = prod.imagen ? `<img src="${prod.imagen}" alt="${prod.nombre}" style="width:100%; height:150px; object-fit:cover; border-radius:8px; margin-bottom:10px;">` : `<div style="height:150px; background:#111; border-radius:8px; margin-bottom:10px; display:flex; justify-content:center; align-items:center;"><i class="fas fa-box" style="font-size:3rem; color:#444;"></i></div>`;
+        let img = prod.imagen ? `<img src="${prod.imagen}" alt="${prod.nombre}" style="width:100%; height:160px; object-fit:cover; border-radius:8px; margin-bottom:15px;">` : `<div style="height:160px; background:#111; border-radius:8px; margin-bottom:15px; display:flex; justify-content:center; align-items:center;"><i class="fas fa-box" style="font-size:3rem; color:#444;"></i></div>`;
         
         let checkInstalacion = prod.requiere_instalacion === "Sí" ? `
             <label style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa; margin-bottom:10px; cursor:pointer; justify-content:center;">
@@ -88,13 +88,13 @@ function renderizarProductos(productos) {
         cont.innerHTML += `
             <div class="product-card glass-card" style="border-color: rgba(188,19,254,0.3);">
                 ${img}
-                <h3 style="color:#00f3ff; font-family:'Rajdhani', sans-serif; font-size:1.2rem;">${prod.nombre}</h3>
+                <h3 style="color:#bc13fe; font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:bold;">${prod.nombre}</h3>
                 <p style="color:#aaa; font-size:0.8rem; margin:10px 0; flex-grow:1;">${prod.descripcion}</p>
-                <div style="font-size:1.4rem; color:#bc13fe; font-weight:bold; margin-bottom:10px;">${formatearDinero(prod.precio)}</div>
+                <div style="font-size:1.4rem; color:white; font-weight:bold; margin-bottom:10px;">${formatearDinero(prod.precio)}</div>
                 
                 ${checkInstalacion}
 
-                <button onclick="agregarAlCarrito('${prod.id}', '${prod.nombre}', ${prod.precio}, '${prod.requiere_instalacion}')" style="width:100%; padding:10px; background:linear-gradient(90deg, #bc13fe, #00f3ff); border:none; border-radius:5px; color:white; font-weight:bold; cursor:pointer; transition:0.3s;"><i class="fas fa-cart-plus"></i> Añadir a la Tienda</button>
+                <button onclick="agregarAlCarrito('${prod.id}', '${prod.nombre}', ${prod.precio}, '${prod.requiere_instalacion}')" class="btn-add-cart"><i class="fas fa-cart-plus"></i> Añadir al Carrito</button>
             </div>
         `;
     });
@@ -119,7 +119,12 @@ function agregarAlCarrito(id, nombre, precio, requiere_inst) {
 
     carrito.push({ id: id, nombre: nombre, precio: parseFloat(precio) || 0, solicita_instalacion: instalacionPedida });
     actualizarUI_Carrito();
+    
+    // Alerta pequeña y abrir el carrito para que el usuario sepa qué pasó
     alert(`¡${nombre} añadido a tu carrito!`);
+    if(document.getElementById('cart-modal').classList.contains('modal-hidden')){
+        toggleCart();
+    }
 }
 
 function eliminarDelCarrito(index) {
@@ -145,7 +150,7 @@ function actualizarUI_Carrito() {
 
     carrito.forEach((item, index) => {
         total += item.precio;
-        let badgeInst = item.solicita_instalacion ? `<br><span style="font-size:0.75rem; color:#ffaa00;"><i class="fas fa-tools"></i> Requiere Cotizar Instalación</span>` : "";
+        let badgeInst = item.solicita_instalacion ? `<br><span style="font-size:0.75rem; color:#ffaa00;"><i class="fas fa-tools"></i> Req. Instalación</span>` : "";
         
         cont.innerHTML += `
             <div class="cart-item">
@@ -168,12 +173,12 @@ function enviarPedidoWhatsApp() {
     }
 
     let total = 0;
-    let texto = `*NUEVO PEDIDO DE TIENDA TECNOESENCIAL* 🛒💻\n\n`;
+    let texto = `*NUEVO PEDIDO WEB - TECNOESENCIAL* 🛒💻\n\n`;
     
     carrito.forEach((item, index) => {
         total += item.precio;
         let txtInstalacion = item.solicita_instalacion ? ` _(+ Solicita cotizar instalación)_` : "";
-        texto += `${index + 1}. *${item.nombre}* - ${formatearDinero(item.precio)}${txtInstalacion}\n`;
+        texto += `▪️ *${item.nombre}* - ${formatearDinero(item.precio)}${txtInstalacion}\n`;
     });
 
     texto += `\n*Total Estimado: ${formatearDinero(total)}*\n\nHola, me gustaría concretar esta compra.`;
@@ -190,27 +195,6 @@ function enviarPedidoWhatsApp() {
 window.onload = function() {
     cargarCatalogo();
 };
-
-// ==========================================
-// 3. CHAT BOT BÁSICO DE TECNOESENCIAL
-// ==========================================
-function responderChat() {
-    const input = document.getElementById("user-input").value.toLowerCase();
-    const chatBox = document.getElementById("chat-box");
-    if(!input) return;
-
-    chatBox.innerHTML += `<div class="msg-user">${input}</div>`;
-    document.getElementById("user-input").value = "";
-
-    setTimeout(() => {
-        let respuesta = "Entiendo. Por favor, ingresa a nuestro catálogo de la tienda o contáctanos por WhatsApp para ayudarte personalmente.";
-        if(input.includes("lento") || input.includes("virus")) respuesta = "Parece que necesitas una optimización de software o limpieza de virus. Visita nuestra sección de Servicios o contáctanos.";
-        if(input.includes("ram") || input.includes("disco") || input.includes("ssd")) respuesta = "Podemos actualizar tus componentes. En la Tienda abajo puedes ver nuestros productos o solicitar instalación.";
-        
-        chatBox.innerHTML += `<div class="msg-bot">${respuesta}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }, 1000);
-}
 
 // ==========================================
 // 🤖 CEREBRO DE LA IA (CHATBOT)
