@@ -1,333 +1,280 @@
+// 🔴🔴🔴 REEMPLAZA AQUÍ LA MISMA URL LARGA QUE USAS EN SISTEMA.HTML 🔴🔴🔴
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW3DCk_VRl0vU-zZIqwmWAV38RJafJsJ_XI-vQDjAPah1ysv4Xjzt-1G0QZPWhfvl7/exec";
+
+// Variables del carrito
+let carrito = [];
+const numeroWhatsAppEmpresa = "573173669002"; // Número de Cali/Colombia
+
+// Formateador de moneda
+const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
+
 // ==========================================
-// 🔧 PANEL DE DATOS (BASE DE DATOS)
+// 1. CARGAR CATÁLOGO (SERVICIOS Y PRODUCTOS)
 // ==========================================
-
-const telefonoEmpresa = "573173669002"; // Tu WhatsApp
-
-// 1. LISTA DE SERVICIOS (Actualizada con tus precios)
-const servicios = [
-    // --- PORTÁTILES ---
-    {
-        titulo: "Mantenimiento Software Portátil",
-        categoria: "PORTÁTIL",
-        descripcion: "<ul><li>Revisión a domicilio</li><li>Eliminar programas ocultos/innecesarios</li><li>Corregir errores de sistema</li><li>Limpieza y optimización</li><li>Actualizar antivirus</li></ul>",
-        precio: "$80.000",
-        imagen: "https://www.prensalibre.com/wp-content/uploads/2022/03/Mantenimiento-computadoras-03.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Mantenimiento Físico Portátil",
-        categoria: "PORTÁTIL",
-        descripcion: "<ul><li>Eliminación de sulfato en circuitos</li><li>Lubricación sistema de refrigeración</li><li>Limpieza total de polvo interno</li><li>Limpieza carcasa/teclado/pantalla</li><li>Cambio de pasta térmica</li></ul>",
-        precio: "$130.000",
-        imagen: "https://gruposervice.com.uy/blog/files/mantenimiento-de-computadoras-img-1.webp?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Mantenimiento Total Portátil",
-        categoria: "PORTÁTIL",
-        descripcion: "<ul><li>Limpieza profunda de partes (Desensamble)</li><li>Mejorar rendimiento de Windows</li><li>Corrección fallas de software</li><li>Ensamble partes nuevas (si requiere)</li></ul>",
-        precio: "$180.000",
-        imagen: "https://sotein.com.co/wp-content/uploads/2020/07/sotein-Formateo-y-mantenimiento-de-computadoras.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-
-    // --- PC DE ESCRITORIO ---
-    {
-        titulo: "Mantenimiento Software PC",
-        categoria: "ESCRITORIO",
-        descripcion: "<ul><li>Revisión a domicilio</li><li>Eliminar programas ocultos</li><li>Corregir errores de sistema</li><li>Programas de limpieza</li><li>Actualizar antivirus</li></ul>",
-        precio: "$65.000",
-        imagen: "https://www.doctorcomputador.com/wp-content/uploads/2024/11/mantenimiento-software.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Mantenimiento Físico PC",
-        categoria: "ESCRITORIO",
-        descripcion: "<ul><li>Eliminación de sulfato en circuitos</li><li>Lubricación refrigeración</li><li>Limpieza polvo interno</li><li>Limpieza teclado/ratón/monitor</li><li>Cambio de pasta térmica</li></ul>",
-        precio: "$140.000",
-        imagen: "https://tecnologia-informatica.com/wp-content/uploads/2018/09/mantenimiento-computadoras-16.jpeg?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Mantenimiento Total PC",
-        categoria: "ESCRITORIO",
-        descripcion: "<ul><li>Desensamble y limpieza total</li><li>Acelerar programas y Windows</li><li>Corrección fallas software</li><li>Limpieza periféricos</li><li>Ensamble partes nuevas (si requiere)</li></ul>",
-        precio: "$170.000",
-        imagen: "https://magnasolutio.com.co/blog/wp-content/uploads/2017/12/mantenimiento-computadores.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-
-    // --- APPLE (MAC) ---
-    {
-        titulo: "Mantenimiento Sistema MacOS",
-        categoria: "APPLE",
-        descripcion: "<ul><li>Revisión iMac/MacBook a domicilio</li><li>Programas de limpieza</li><li>Corregir errores sistema operativo</li><li>Eliminar archivos ocultos</li><li>Actualizar seguridad</li></ul>",
-        precio: "$150.000",
-        imagen: "https://www.mactualidad.com/wp-content/uploads/2015/02/mantenimiento-mac.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Mantenimiento Físico Mac",
-        categoria: "APPLE",
-        descripcion: "<ul><li>Eliminación sulfato en circuitos</li><li>Lubricación refrigeración</li><li>Limpieza total polvo</li><li>Limpieza periféricos</li><li>Cambio pasta térmica</li></ul>",
-        precio: "$240.000",
-        imagen: "https://boluda.com/files/mantenimiento-macos.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Mantenimiento Total Mac",
-        categoria: "APPLE",
-        descripcion: "<ul><li>Limpieza interna componentes</li><li>Mejorar rendimiento MacOS</li><li>Ensamble partes nuevas (si requiere)</li><li>Servicio Premium a domicilio</li></ul>",
-        precio: "$350.000",
-        imagen: "https://istore.com.pe/cdn/shop/products/ManSoftHardMac_10876543-872a-41ef-a49d-98ebc128d55b.jpg?v=1657272049?auto=format&fit=crop&w=500&q=60"
-    },
-
-    // --- FORMATEO Y SISTEMAS ---
-    {
-        titulo: "Formatear e Instalar Windows",
-        categoria: "SISTEMAS",
-        descripcion: "<ul><li>Instalación Windows más ÓPTIMO</li><li>Eliminar programas basura</li><li>Programas básicos + Antivirus</li><li>Backup temporal de archivos</li></ul>",
-        precio: "$150.000",
-        imagen: "https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/MSFT-Several-Windows-11-PCs-RW10Y2x?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Formatear e Instalar MacOS",
-        categoria: "SISTEMAS",
-        descripcion: "<ul><li>Instalación MacOS más ÓPTIMO</li><li>Programas básicos + Limpieza</li><li>Backup temporal archivos</li><li>Corregir errores de software</li></ul>",
-        precio: "$240.000",
-        imagen: "https://macservicebcn.com/wp-content/uploads/2024/01/Configurando-un-Macbook-Air.png?auto=format&fit=crop&w=500&q=60"
-    },
-
-    // --- INSTALACIÓN DE SOFTWARE ---
-    {
-        titulo: "Pack Programas Básicos",
-        categoria: "SOFTWARE",
-        descripcion: "<ul><li>VLC, Teams, Chrome/Firefox</li><li>Office 2013 + Lector PDF</li><li>WinRAR + CCleaner</li><li>Antivirus (1 Mes)</li></ul>",
-        precio: "$70.000",
-        imagen: "https://www.aqfdesarrollo.com/aqfdesarrollo/img/aplicaciones-escritorio.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Programas de Diseño",
-        categoria: "SOFTWARE",
-        descripcion: "<ul><li>Photoshop, Premiere, Audition</li><li>Illustrator, After Effects</li><li>CorelDRAW</li><li>*Precio por programa individual</li></ul>",
-        precio: "$60.000 c/u",
-        imagen: "https://www.comparapps.com/wp-content/uploads/2022/06/Programas-De-Diseno-Grafico.png?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Software Arquitectura",
-        categoria: "SOFTWARE",
-        descripcion: "<ul><li>Autodesk Revit</li><li>SolidWorks</li><li>AutoCAD</li><li>3ds Max</li><li>*Precio por programa individual</li></ul>",
-        precio: "$40.000 c/u",
-        imagen: "https://blog-es.lac.tdsynnex.com/wp-content/uploads/2023/12/160714_Blog.png?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Licencia Office 365",
-        categoria: "SOFTWARE",
-        descripcion: "<ul><li>Word, Excel, PowerPoint</li><li>Outlook, Access, OneNote</li><li>Microsoft Project</li></ul>",
-        precio: "$80.000",
-        imagen: "https://3clics.co/images/stories/virtuemart/product/1366_2000.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Antivirus Anual",
-        categoria: "SEGURIDAD",
-        descripcion: "<ul><li>Protección tiempo real</li><li>Firewall y Anti-Malware</li><li>Protección amenazas web</li><li>Prevención de exploits</li></ul>",
-        precio: "$90.000",
-        imagen: "https://www.softzone.es/app/uploads-softzone.es/2018/07/Antivirus-Windows.jpg?auto=format&fit=crop&w=500&q=60"
+async function cargarCatalogo() {
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ accion: "obtener_catalogo_web" }) // Nueva función que crearemos en el Motor
+        });
+        const data = await response.json();
+        
+        if (data.status === "success") {
+            renderizarServicios(data.servicios);
+            renderizarProductos(data.productos);
+        }
+    } catch (error) {
+        console.error("Error cargando el catálogo", error);
+        document.getElementById('loader-servicios').innerHTML = "Error al cargar servicios.";
+        document.getElementById('loader-productos').innerHTML = "Error al cargar productos.";
     }
-];
+}
 
-// 2. PRODUCTOS (TIENDA)
-const productos = [
-    // --- ACCESORIOS ---
-    {
-        titulo: "Disco Sólido SSD 240GB",
-        categoria: "ACCESORIOS",
-        descripcion: "Aumenta la velocidad de tu equipo hasta 10 veces más.",
-        precio: "$130.000",
-        imagen: "https://hardzone.es/app/uploads-hardzone.es/2018/07/SSD-discos-duros-mec%C3%A1nicos-01-1200x675.jpg?auto=format&fit=crop&w=500&q=60"
-    },{
-        titulo: "Disco Sólido SSD 480GB",
-        categoria: "ACCESORIOS",
-        descripcion: "Aumenta la velocidad de tu equipo hasta 10 veces más.",
-        precio: "$170.000",
-        imagen: "https://hardzone.es/app/uploads-hardzone.es/2018/07/SSD-discos-duros-mec%C3%A1nicos-01-1200x675.jpg?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Memoria RAM 8GB",
-        descripcion: "Módulos DDR4 para portátiles y escritorio.",
-        precio: "$110.000",
-        imagen: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-        titulo: "Memoria RAM 4GB",
-        descripcion: "Módulos DDR4 para portátiles y escritorio.",
-        precio: "$80.000",
-        imagen: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=500&q=60"
-    },
+function renderizarServicios(servicios) {
+    const cont = document.getElementById('contenedor-servicios');
+    document.getElementById('loader-servicios').style.display = "none";
+    cont.innerHTML = "";
 
-    // --- SEGURIDAD CCTV ---
-    {
-        titulo: "Kit Cámaras Dahua CCTV",
-        categoria: "SEGURIDAD",
-        descripcion: "<ul><li>DVR 4 Canales 1080p</li><li>4 Cámaras (Domo/Bala)</li><li>50m Cable + Accesorios</li><li>*Cotizar instalación aparte</li></ul>",
-        precio: "$850.000",
-        imagen: "https://cdn.tvc.mx/media/194815/kit-de-cctv-Dahua-de-4-Canales-DAD1340033.png?auto=format&fit=crop&w=500&q=60"
+    servicios.forEach(srv => {
+        let badge = srv.promocion === "Sí" ? `<span class="badge-promo"><i class="fas fa-star"></i> PROMOCIÓN</span>` : "";
+        let btnCotizar = `<a href="https://wa.me/${numeroWhatsAppEmpresa}?text=Hola, me interesa el servicio de: ${srv.nombre}" class="btn-outline" target="_blank" style="display:block; text-align:center; margin-top:15px; text-decoration:none; padding:10px; border:1px solid #00f3ff; color:#00f3ff; border-radius:5px;">Cotizar</a>`;
+
+        cont.innerHTML += `
+            <div class="service-card" style="background: rgba(20,20,35,0.8); border: 1px solid rgba(0,243,255,0.3); border-radius: 10px; padding: 20px; text-align:center;">
+                ${badge}
+                <i class="${srv.icono}" style="font-size:3rem; color:#00f3ff; margin-bottom:15px;"></i>
+                <h3 style="color:white; font-family:'Orbitron', sans-serif;">${srv.nombre}</h3>
+                <p style="color:#aaa; font-size:0.9rem; margin-top:10px;">${srv.descripcion}</p>
+                ${btnCotizar}
+            </div>
+        `;
+    });
+}
+
+function renderizarProductos(productos) {
+    const cont = document.getElementById('contenedor-productos');
+    document.getElementById('loader-productos').style.display = "none";
+    cont.innerHTML = "";
+
+    productos.forEach(prod => {
+        let img = prod.imagen ? `<img src="${prod.imagen}" alt="${prod.nombre}" style="width:100%; height:150px; object-fit:cover; border-radius:8px; margin-bottom:10px;">` : `<div style="height:150px; background:#111; border-radius:8px; margin-bottom:10px; display:flex; justify-content:center; align-items:center;"><i class="fas fa-box" style="font-size:3rem; color:#444;"></i></div>`;
+        
+        // Checkbox opcional de instalación
+        let checkInstalacion = prod.requiere_instalacion === "Sí" ? `
+            <label style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa; margin-bottom:10px; cursor:pointer;">
+                <input type="checkbox" id="inst-${prod.id}" style="accent-color:#bc13fe;">
+                ¿Cotizar Instalación Técnica?
+            </label>
+        ` : "";
+
+        cont.innerHTML += `
+            <div class="product-card" style="background: rgba(20,20,35,0.8); border: 1px solid rgba(188,19,254,0.3); border-radius: 10px; padding: 20px;">
+                ${img}
+                <h3 style="color:#00f3ff; font-family:'Rajdhani', sans-serif; font-size:1.2rem;">${prod.nombre}</h3>
+                <p style="color:#aaa; font-size:0.8rem; margin:10px 0;">${prod.descripcion}</p>
+                <div style="font-size:1.4rem; color:#bc13fe; font-weight:bold; margin-bottom:10px;">${formatearDinero(prod.precio)}</div>
+                
+                ${checkInstalacion}
+
+                <button onclick="agregarAlCarrito('${prod.id}', '${prod.nombre}', ${prod.precio}, '${prod.requiere_instalacion}')" style="width:100%; padding:10px; background:linear-gradient(90deg, #bc13fe, #00f3ff); border:none; border-radius:5px; color:white; font-weight:bold; cursor:pointer;"><i class="fas fa-cart-plus"></i> Añadir a la Tienda</button>
+            </div>
+        `;
+    });
+}
+
+// ==========================================
+// 2. LÓGICA DEL CARRITO DE COMPRAS
+// ==========================================
+function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    modal.classList.toggle('modal-hidden');
+}
+
+function agregarAlCarrito(id, nombre, precio, requiere_inst) {
+    let instalacionPedida = false;
+    
+    // Verificar si el cliente marcó el checkbox de instalación en la tarjeta del producto
+    if (requiere_inst === "Sí") {
+        const checkElement = document.getElementById(`inst-${id}`);
+        if (checkElement && checkElement.checked) {
+            instalacionPedida = true;
+        }
     }
-];
 
-// 3. TESTIMONIOS
-const testimonios = [
-    { nombre: "Carlos A.", texto: "Mi portátil estaba para tirar, le hicieron mantenimiento total y ahora vuela." },
-    { nombre: "Laura M.", texto: "Excelente servicio a domicilio en Jamundí. Muy profesionales." },
-    { nombre: "Andrés R.", texto: "Instalaron las cámaras de seguridad en mi negocio super rápido." }
-];
+    // Añadir al array del carrito
+    carrito.push({
+        id: id,
+        nombre: nombre,
+        precio: parseFloat(precio) || 0,
+        solicita_instalacion: instalacionPedida
+    });
+
+    actualizarUI_Carrito();
+    alert(`¡${nombre} añadido a tu equipo!`);
+}
+
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    actualizarUI_Carrito();
+}
+
+function actualizarUI_Carrito() {
+    const cont = document.getElementById('cart-items-container');
+    const totalEl = document.getElementById('cart-total-price');
+    const badge = document.getElementById('cart-count');
+    
+    badge.innerText = carrito.length;
+    
+    if (carrito.length === 0) {
+        cont.innerHTML = `<p style="text-align:center; color:#aaa; margin-top:20px;">Tu carrito está vacío.</p>`;
+        totalEl.innerText = "$0";
+        return;
+    }
+
+    cont.innerHTML = "";
+    let total = 0;
+
+    carrito.forEach((item, index) => {
+        total += item.precio;
+        let badgeInst = item.solicita_instalacion ? `<br><span style="font-size:0.75rem; color:#ffaa00;"><i class="fas fa-tools"></i> Requiere Cotizar Instalación</span>` : "";
+        
+        cont.innerHTML += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.nombre}</div>
+                    <div class="cart-item-price">${formatearDinero(item.precio)} ${badgeInst}</div>
+                </div>
+                <button class="btn-remove" onclick="eliminarDelCarrito(${index})"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+    });
+
+    totalEl.innerText = formatearDinero(total);
+}
+
+function enviarPedidoWhatsApp() {
+    if (carrito.length === 0) {
+        alert("Tu carrito está vacío.");
+        return;
+    }
+
+    let total = 0;
+    let texto = `*NUEVO PEDIDO DE TIENDA TECNOESENCIAL* 🛒💻\n\n`;
+    
+    carrito.forEach((item, index) => {
+        total += item.precio;
+        let txtInstalacion = item.solicita_instalacion ? ` _(+ Solicita cotizar instalación)_` : "";
+        texto += `${index + 1}. *${item.nombre}* - ${formatearDinero(item.precio)}${txtInstalacion}\n`;
+    });
+
+    texto += `\n*Total Estimado: ${formatearDinero(total)}*\n\nHola, me gustaría concretar esta compra.`;
+
+    // Redirigir a WhatsApp
+    const urlWa = `https://wa.me/${numeroWhatsAppEmpresa}?text=${encodeURIComponent(texto)}`;
+    window.open(urlWa, '_blank');
+    
+    // Vaciar carrito
+    carrito = [];
+    actualizarUI_Carrito();
+    toggleCart();
+}
+
+// Inicializar al cargar la página
+window.onload = function() {
+    cargarCatalogo();
+};
 
 // ==========================================
 // 🤖 CEREBRO DE LA IA (CHATBOT)
 // ==========================================
 // ==========================================
-// 🤖 CEREBRO DE LA IA (CHATBOT MEJORADO V2.0)
+// 🧠 CEREBRO REAL CON IA (GEMINI API)
 // ==========================================
 
-function responderChat() {
+// 🔴 PEGA AQUÍ TU API KEY DE GOOGLE (DENTRO DE LAS COMILLAS)
+const API_KEY = "AIzaSyCEII9lI8i4HlFPx_f7WsaWdODKUiuc-lU"; 
+
+async function responderChat() {
     const input = document.getElementById('user-input');
-    const mensajeUsuario = input.value.toLowerCase(); // Convertir a minúsculas para entender mejor
+    const mensajeUsuario = input.value;
     const chatBox = document.getElementById('chat-box');
 
-    // Evitar mensajes vacíos
     if (mensajeUsuario.trim() === "") return;
 
-    // 1. Mostrar lo que el usuario escribió
-    chatBox.innerHTML += `<div class="msg-user">${input.value}</div>`;
-    input.value = ""; // Limpiar la caja de texto
-
-    // 2. Lógica de Respuestas (INTELIGENCIA)
-    let respuestaIA = "";
-    let sugerencia = ""; // Variable para agregar info extra
-
-    // --- BLOQUE 1: MANTENIMIENTO Y LENTITUD ---
-    if (mensajeUsuario.includes("lento") || mensajeUsuario.includes("traba") || mensajeUsuario.includes("pegado") || mensajeUsuario.includes("virus")) {
-        respuestaIA = "Si tu equipo está lento o se bloquea, seguramente necesita nuestro <b>Mantenimiento Total</b> o una optimización de sistema. También revisamos virus.";
-        sugerencia = "Te recomiendo revisar el paquete de $160.000 o $170.000 en la sección de servicios.";
-    } 
+    // 1. Mostrar mensaje del usuario
+    chatBox.innerHTML += `<div class="msg-user">${mensajeUsuario}</div>`;
+    input.value = ""; 
     
-    // --- BLOQUE 2: REPARACIÓN FÍSICA (BISAGRAS, CARCASAS) ---
-    else if (mensajeUsuario.includes("bisagra") || mensajeUsuario.includes("tapa") || mensajeUsuario.includes("carcasa") || mensajeUsuario.includes("partid") || mensajeUsuario.includes("roto") || mensajeUsuario.includes("caida")) {
-        respuestaIA = "¡Sí! Somos expertos en reconstrucción. Arreglamos <b>bisagras, pastas y carcasas</b> de portátiles para que abran y cierren perfecto, sin tener que comprar uno nuevo.";
-        sugerencia = "Por favor envíanos una foto del daño al WhatsApp para cotizarte la reconstrucción.";
-    }
+    // Mostramos estado "Escribiendo..."
+    const loadingId = "loading-" + Date.now();
+    chatBox.innerHTML += `<div id="${loadingId}" class="msg-bot">Thinking... <i class="fas fa-spinner fa-spin"></i></div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
 
-    // --- BLOQUE 3: FORMATEO E INSTALACIONES ---
-    else if (mensajeUsuario.includes("formate") || mensajeUsuario.includes("windows") || mensajeUsuario.includes("office") || mensajeUsuario.includes("instalar") || mensajeUsuario.includes("word")) {
-        respuestaIA = "Realizamos formateo profesional e instalación de programas. Instalamos Windows 10/11, Office, Antivirus y programas de diseño (Adobe, Corel, AutoCAD).";
-        sugerencia = "El servicio incluye respaldo de información si lo necesitas.";
-    }
+    // 2. PREPARAR EL CONTEXTO (LO QUE LA IA DEBE SABER)
+    // Convertimos tus servicios a texto para que la IA los lea
+    const contextoNegocio = `
+        Eres el asistente virtual experto y amable de la empresa TECNOESENCIAL en Cali y Jamundí.
+        
+        TUS REGLAS:
+        1. Tu objetivo es vender y agendar citas por WhatsApp.
+        2. Responde de forma corta, futurista y profesional (máximo 2 párrafos).
+        3. Siempre invita al usuario a escribir al WhatsApp: ${telefonoEmpresa}.
+        4. Solo recomiendas productos que estén en la siguiente lista. Si no está, di que podemos conseguirlo bajo pedido.
 
-    // --- BLOQUE 4: VENTA DE ACCESORIOS Y PARTES ---
-    else if (mensajeUsuario.includes("mouse") || mensajeUsuario.includes("teclado") || mensajeUsuario.includes("disco") || mensajeUsuario.includes("ssd") || mensajeUsuario.includes("ram") || mensajeUsuario.includes("cargador") || mensajeUsuario.includes("bateria") || mensajeUsuario.includes("camara web") || mensajeUsuario.includes("diadema")) {
-        respuestaIA = "En nuestra tienda tecnológica conseguimos de todo: Teclados, Mouse, Discos Sólidos (SSD), Memorias RAM, Cargadores y Baterías. Todo con garantía.";
-        sugerencia = "¿Buscas alguna referencia en especial? Escríbeme al WhatsApp y te paso precio y foto.";
-    }
+        LISTA DE SERVICIOS Y PRODUCTOS DISPONIBLES:
+        ${JSON.stringify(servicios)}
+        ${JSON.stringify(productos)}
 
-    // --- BLOQUE 5: VENTA DE COMPUTADORES (NUEVOS Y USADOS) ---
-    else if (mensajeUsuario.includes("comprar") || mensajeUsuario.includes("vendo") || mensajeUsuario.includes("precio de computador") || mensajeUsuario.includes("portatil nuevo") || mensajeUsuario.includes("usado")) {
-        respuestaIA = "Manejamos venta de equipos tecnológicos. Tenemos <b>computadores nuevos y usados</b> con garantía, listos para trabajar o jugar.";
-        sugerencia = "Dime qué presupuesto tienes o para qué usas el equipo, y te envío opciones al WhatsApp.";
-    }
+        PREGUNTA DEL CLIENTE:
+        "${mensajeUsuario}"
+    `;
 
-    // --- BLOQUE 6: EMPRESAS Y CÁMARAS DE SEGURIDAD (CCTV) ---
-    else if (mensajeUsuario.includes("camara") || mensajeUsuario.includes("seguridad") || mensajeUsuario.includes("cctv") || mensajeUsuario.includes("empresa") || mensajeUsuario.includes("negocio")) {
-        respuestaIA = "Ofrecemos soluciones empresariales: Instalación de circuitos cerrados (CCTV), mantenimiento de redes y soporte técnico para oficinas.";
-        sugerencia = "Podemos agendar una visita técnica para valorar la seguridad de tu empresa.";
-    }
+    try {
+        // 3. CONECTAR CON GOOGLE GEMINI (EL CEREBRO)
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: contextoNegocio }]
+                }]
+            })
+        });
 
-    // --- BLOQUE 7: UBICACIÓN Y DOMICILIO ---
-    else if (mensajeUsuario.includes("donde") || mensajeUsuario.includes("ubicacion") || mensajeUsuario.includes("direccion") || mensajeUsuario.includes("domicilio")) {
-        respuestaIA = "Operamos principalmente con <b>Servicio a Domicilio</b> en todo Cali y Jamundí. Vamos hasta tu casa u oficina para recoger o reparar el equipo.";
-    }
+        const data = await response.json();
+        
+        // 4. OBTENER LA RESPUESTA INTELIGENTE
+        const respuestaIA = data.candidates[0].content.parts[0].text;
 
-    // --- BLOQUE 8: SALUDOS ---
-    else if (mensajeUsuario.includes("hola") || mensajeUsuario.includes("buenos") || mensajeUsuario.includes("buenas")) {
-        respuestaIA = "¡Hola! Soy el asistente virtual de TECNOESENCIAL. Puedo ayudarte con mantenimiento, venta de accesorios, cámaras de seguridad o reparación de partes.";
-        sugerencia = "¿En qué te puedo ayudar hoy?";
-    }
+        // Borrar el "Thinking..." y poner la respuesta real
+        document.getElementById(loadingId).remove();
 
-    // --- DEFAULT (NO ENTENDIÓ) ---
-    else {
-        respuestaIA = "Entiendo que necesitas algo específico. Si es tecnología, ¡seguro lo tenemos o lo conseguimos!";
-        sugerencia = "Por favor presiona el botón de abajo para hablar con un humano en WhatsApp.";
-    }
+        // Convertir formato **negrita** de la IA a HTML <b>
+        const respuestaFormateada = respuestaIA.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
 
-    // 3. Renderizar respuesta con efecto de "Escribiendo..."
-    // Creamos un link específico con el tema de la conversación
-    const linkWa = `https://wa.me/${telefonoEmpresa}?text=Hola Tecnoesencial, estaba hablando con su IA sobre: ${mensajeUsuario}`;
-    
-    setTimeout(() => {
+        const linkWa = `https://wa.me/${telefonoEmpresa}?text=Hola Tecnoesencial, su IA me recomendó esto: ${encodeURIComponent(mensajeUsuario)}`;
+
         chatBox.innerHTML += `
             <div class="msg-bot">
-                ${respuestaIA}
-                <br>
-                <small style="color:#aaa; font-style:italic;">${sugerencia}</small>
+                ${respuestaFormateada}
                 <br><br>
                 <a href="${linkWa}" target="_blank" class="chat-btn-action">
-                    <i class="fab fa-whatsapp"></i> Hablar con un Asesor
+                    <i class="fab fa-whatsapp"></i> Contactar Asesor Humano
                 </a>
             </div>
         `;
-        // Auto-scroll al final
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }, 600);
+
+    } catch (error) {
+        console.error("Error IA:", error);
+        document.getElementById(loadingId).innerHTML = "Lo siento, mis sistemas neuronales están recargados. Por favor escríbenos al WhatsApp directamente.";
+    }
+
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+// Permitir Enter para enviar
 document.getElementById("user-input")?.addEventListener("keypress", function(event) {
     if (event.key === "Enter") responderChat();
-});
-
-// ==========================================
-// ⚙️ RENDERIZADO DE PÁGINA (LÓGICA)
-// ==========================================
-
-function renderizarTarjetas(datos, contenedorID, tipo) {
-    const contenedor = document.getElementById(contenedorID);
-    if (!contenedor) return; // Protección por si no existe el ID
-    
-    contenedor.innerHTML = ""; // Limpiar antes de cargar
-
-    datos.forEach(item => {
-        // Mensaje personalizado para WhatsApp
-        const mensaje = `Hola Tecnoesencial, me interesa el ${tipo}: ${item.titulo} (${item.precio})`;
-        const linkWhatsApp = `https://wa.me/${telefonoEmpresa}?text=${encodeURIComponent(mensaje)}`;
-        
-        // Etiqueta de Categoría (Solo si existe)
-        const catLabel = item.categoria ? `<span class="card-category" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.8); color:#00f3ff; padding:2px 8px; border-radius:4px; font-size:0.7rem; border:1px solid #00f3ff;">${item.categoria}</span>` : '';
-
-        const tarjeta = document.createElement('div');
-        tarjeta.className = 'card';
-        
-        // AQUÍ ESTÁ LA CLAVE: Usamos innerHTML en la descripción para que funcionen las listas <ul>
-        tarjeta.innerHTML = `
-            ${catLabel}
-            <img src="${item.imagen}" alt="${item.titulo}" class="card-img-top">
-            <h3>${item.titulo}</h3>
-            <div style="font-size:0.9rem; color:#ccc; margin-bottom:15px; text-align:left;">${item.descripcion}</div>
-            <span class="price" style="display:block; font-size:1.5rem; color:white; font-weight:bold; margin-bottom:15px;">${item.precio}</span>
-            <a href="${linkWhatsApp}" class="btn-card" target="_blank" style="display:block; width:100%; text-align:center; padding:10px; background:linear-gradient(90deg, #111, #222); border:1px solid #bc13fe; color:white; text-decoration:none; border-radius:8px;">
-                <i class="fab fa-whatsapp"></i> Lo quiero
-            </a>
-        `;
-        
-        contenedor.appendChild(tarjeta);
-    });
-}
-
-// Cargar todo al iniciar
-document.addEventListener('DOMContentLoaded', () => {
-    renderizarTarjetas(servicios, 'contenedor-servicios', 'servicio');
-    renderizarTarjetas(productos, 'contenedor-productos', 'producto');
-
-    // Cargar Testimonios
-    const boxTestimonios = document.getElementById('contenedor-testimonios');
-    if (boxTestimonios) {
-        testimonios.forEach(item => {
-            boxTestimonios.innerHTML += `
-                <div class="testimonio-card" style="background:rgba(20,20,35,0.8); padding:20px; border-radius:10px; border-left:4px solid #00f3ff; margin-bottom:10px;">
-                    <p style="font-style:italic; color:#ddd; margin-bottom:10px;">"${item.texto}"</p>
-                    <div style="font-weight:bold; color:#00f3ff;">${item.nombre}</div>
-                </div>
-            `;
-        });
-    }
 });

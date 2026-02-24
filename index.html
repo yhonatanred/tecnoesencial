@@ -7,6 +7,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilos rápidos para el carrito futurista */
+        .cart-floating { position: fixed; bottom: 90px; right: 20px; background: var(--primary-purple, #bc13fe); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; cursor: pointer; box-shadow: 0 0 15px rgba(188, 19, 254, 0.6); z-index: 1000; transition: 0.3s; }
+        .cart-floating:hover { transform: scale(1.1); }
+        .cart-count { position: absolute; top: -5px; right: -5px; background: var(--primary-blue, #00f3ff); color: black; font-weight: bold; font-size: 0.9rem; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        
+        .modal-hidden { display: none; }
+        .cart-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .cart-content { background: rgba(20, 20, 35, 0.95); border: 1px solid rgba(0, 243, 255, 0.3); border-radius: 15px; padding: 30px; width: 90%; max-width: 500px; color: white; position: relative; max-height: 80vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #00f3ff; cursor: pointer; }
+        .cart-item { border-bottom: 1px solid #333; padding: 10px 0; display: flex; justify-content: space-between; align-items: center;}
+        .cart-item-info { flex-grow: 1; }
+        .cart-item-title { font-weight: bold; color: #00f3ff; font-family: 'Rajdhani', sans-serif;}
+        .cart-item-price { color: #bc13fe; }
+        .btn-remove { background: transparent; border: 1px solid #ff5555; color: #ff5555; border-radius: 5px; cursor: pointer; padding: 5px; margin-left: 10px;}
+        .cart-total { font-size: 1.5rem; text-align: right; margin-top: 20px; color: #00f3ff; font-family: 'Orbitron', sans-serif; }
+        .btn-whatsapp-cart { width: 100%; padding: 15px; background: linear-gradient(90deg, #25D366, #128C7E); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-top: 20px; cursor: pointer; font-family: 'Rajdhani', sans-serif;}
+        
+        /* Etiqueta Promoción */
+        .badge-promo { background: #ffaa00; color: black; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; position: absolute; top: 10px; right: 10px; }
+        .service-card, .product-card { position: relative; } /* Para que el badge se posicione bien */
+    </style>
 </head>
 <body>
 
@@ -22,6 +44,7 @@
             <li><a href="#servicios">Servicios</a></li>
             <li><a href="#ia-diagnostic">Diagnóstico IA</a></li>
             <li><a href="#tienda">Tienda</a></li>
+            <li><a href="sistema.html">Rastrear Equipo</a></li>
         </ul>
         <a href="https://wa.me/573173669002" class="btn-nav">Contactar</a>
     </nav>
@@ -29,7 +52,7 @@
     <header id="inicio" class="hero-section">
         <div class="hero-content">
             <h1 class="glitch-text">OPTIMIZACIÓN <br> <span class="gradient-text">AL MÁXIMO NIVEL</span></h1>
-            <p>Expertos en Hardware y Software en <strong>Cali y Jamundí</strong>.</p>
+            <p>Expertos en Hardware y Software en <strong>Cali, Jamundí y Palmira.</strong></p>
             <div class="hero-buttons">
                 <a href="#ia-diagnostic" class="btn-primary"><i class="fas fa-robot"></i> Diagnóstico Virtual</a>
                 <a href="#servicios" class="btn-secondary">Ver Servicios</a>
@@ -45,7 +68,7 @@
                 <span>TECNO_DIAGNOSTICO_V1.5</span>
             </div>
             <div class="chat-box" id="chat-box">
-                <div class="msg-bot">Hola. Soy la IA de Tecnoesencial. ¿Qué problema tiene tu equipo o qué buscas hoy? (Ej: "Mi pc está lento", "necesito ram", "virus")</div>
+                <div class="msg-bot">Hola. Soy la IA de Tecnoesencial. ¿Qué problema tiene tu equipo o qué buscas hoy?</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="user-input" placeholder="Escribe aquí tu problema...">
@@ -56,17 +79,22 @@
 
     <section id="servicios" class="section-padding">
         <h2 class="section-title">NUESTROS SERVICIOS</h2>
-        <div class="grid-container" id="contenedor-servicios"></div>
+        <div style="text-align:center;" id="loader-servicios"><i class="fas fa-spinner fa-spin" style="color:#00f3ff; font-size:2rem;"></i> Cargando servicios...</div>
+        <div class="grid-container" id="contenedor-servicios">
+            </div>
+    </section>
+
+    <section id="tienda" class="section-padding">
+        <h2 class="section-title">TIENDA TECNO (Catálogo Dinámico)</h2>
+        <div style="text-align:center;" id="loader-productos"><i class="fas fa-spinner fa-spin" style="color:#bc13fe; font-size:2rem;"></i> Cargando productos...</div>
+        <div class="grid-container" id="contenedor-productos">
+            </div>
     </section>
 
     <section id="testimonios" class="section-padding">
         <h2 class="section-title"><i class="fas fa-users"></i> CLIENTES SATISFECHOS</h2>
-        <div class="grid-container" id="contenedor-testimonios"></div>
-    </section>
-
-    <section id="tienda" class="section-padding">
-        <h2 class="section-title">TIENDA TECNO</h2>
-        <div class="grid-container" id="contenedor-productos"></div>
+        <div class="grid-container" id="contenedor-testimonios">
+            </div>
     </section>
 
     <footer>
@@ -78,6 +106,27 @@
         <a href="https://wa.me/573173669002" class="whatsapp-btn" target="_blank">
             <i class="fab fa-whatsapp"></i>
         </a>
+    </div>
+
+    <div class="cart-floating" onclick="toggleCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cart-count">0</span>
+    </div>
+
+    <div id="cart-modal" class="modal-hidden">
+        <div class="cart-modal-overlay" onclick="if(event.target === this) toggleCart()">
+            <div class="cart-content">
+                <span class="close-modal" onclick="toggleCart()"><i class="fas fa-times"></i></span>
+                <h2 style="font-family:'Orbitron', sans-serif; color:var(--primary-blue); border-bottom:1px solid #333; padding-bottom:10px;">Tu Compra</h2>
+                
+                <div id="cart-items-container">
+                    <p style="text-align:center; color:#aaa; margin-top:20px;">Tu carrito está vacío.</p>
+                </div>
+                
+                <div class="cart-total">Total: <span id="cart-total-price">$0</span></div>
+                <button class="btn-whatsapp-cart" onclick="enviarPedidoWhatsApp()"><i class="fab fa-whatsapp"></i> Finalizar Pedido</button>
+            </div>
+        </div>
     </div>
 
     <script src="main.js"></script>
