@@ -3,34 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema TECNOESENCIAL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <title>Sistema TECNOESENCIAL | Rastreo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --bg-dark: #050510; --primary-blue: #00f3ff; --primary-purple: #bc13fe; --glass-bg: rgba(20, 20, 35, 0.8); --glass-border: rgba(0, 243, 255, 0.3); --text-main: #ffffff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
         .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(188,19,254,0.1), transparent), radial-gradient(circle at 80% 20%, rgba(0,243,255,0.15), transparent); z-index: -1; }
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 30px; text-align: center; color: white; text-shadow: 0 0 10px var(--primary-blue); cursor: pointer;}
-        .logo span { color: var(--primary-blue); }
-        .panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; padding: 30px; width: 100%; max-width: 500px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); margin-bottom: 20px; display: none; }
+        
+        /* 🔥 NUEVO: ESTILOS DEL MENÚ DE NAVEGACIÓN IGUAL AL INDEX */
+        .glass-nav { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: rgba(5, 5, 16, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 1000; margin-bottom: 30px;}
+        .logo-container { cursor: pointer; display: flex; align-items: center;}
+        .logo-container img { height: 40px; margin-right: 10px; }
+        .brand-name { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: white;}
+        .highlight { color: var(--primary-blue); }
+        .nav-links { display: flex; list-style: none; gap: 20px; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; font-size: 1.1rem; font-weight: bold;}
+        .nav-links a:hover { color: var(--primary-purple); }
+        .nav-actions { display: flex; align-items: center; gap: 10px; }
+        .btn-nav { padding: 8px 20px; border: 1px solid var(--primary-blue); color: var(--primary-blue); text-decoration: none; border-radius: 5px; font-weight: bold; transition: 0.3s;}
+        .btn-nav:hover { background: var(--primary-blue); color: #000; }
+        .btn-menu-mobile { display: none; background: transparent; color: white; border: none; font-size: 1.8rem; cursor: pointer; margin-left: 5px;}
+
+        /* Estilos de Paneles del Sistema */
+        .panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); margin-bottom: 20px; display: none; }
         .panel.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         h2 { font-family: 'Orbitron', sans-serif; color: var(--primary-blue); margin-bottom: 20px; text-align: center; font-size: 1.5rem; position: relative;}
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9rem; }
-        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 8px; color: white; outline: none; transition: 0.3s; }
+        input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 8px; color: white; outline: none; transition: 0.3s; font-size: 1rem;}
         input[type="file"] { padding: 10px; background: rgba(0,243,255,0.1); border: 1px dashed var(--primary-blue); color: var(--primary-blue); width: 100%; border-radius: 8px; cursor: pointer; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 8px rgba(0,243,255,0.3);}
+        
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; margin-bottom: 10px;}
         .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #ddd; }
         .checkbox-item input { accent-color: var(--primary-purple); width: 18px; height: 18px; }
         .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; font-family: 'Rajdhani', sans-serif; }
         .btn-blue { background: linear-gradient(90deg, #0055ff, var(--primary-blue)); color: white; }
+        .btn-blue:hover { box-shadow: 0 0 15px rgba(0,243,255,0.5); transform: scale(1.02);}
         .btn-outline { background: transparent; border: 1px solid var(--primary-purple); color: var(--primary-purple); }
         .btn-outline:hover { background: var(--primary-purple); color: white; }
         .loader { display: none; text-align: center; margin-top: 15px; color: var(--primary-blue); }
-        .nav-buttons { display: flex; gap: 10px; max-width: 500px; width: 100%; margin-bottom: 20px; }
+        .nav-buttons-sys { display: flex; gap: 10px; max-width: 500px; width: 90%; margin-bottom: 20px; }
         
         .ticket-card, .catalog-card { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 15px; border-radius: 8px; margin-bottom: 10px; transition: 0.2s; position: relative;}
         .ticket-card:hover, .catalog-card:hover { border-color: var(--primary-blue); }
@@ -55,29 +71,62 @@
         .tiempos-box { margin-top: 8px; font-size: 0.8rem; color: #bbb; background: rgba(0,243,255,0.05); padding: 8px; border-radius: 5px; border-left: 2px solid var(--primary-blue); }
         .select-filtro { width: 100%; padding: 10px; border-radius: 8px; background: rgba(188,19,254,0.1); color: white; border: 1px solid var(--primary-purple); font-weight: bold; margin-bottom: 15px; cursor: pointer; }
         
-        /* Botones Switch para Admin */
-        .admin-nav { display: none; gap: 10px; margin-bottom: 20px; }
+        .admin-nav { display: none; gap: 10px; margin-bottom: 20px; width: 90%; max-width: 600px; }
         .admin-nav button { flex: 1; padding: 10px; background: transparent; color: white; border: 1px solid #444; border-radius: 5px; cursor: pointer; font-family: 'Rajdhani'; font-weight: bold;}
         .admin-nav button.active { background: rgba(0,243,255,0.2); border-color: var(--primary-blue); color: var(--primary-blue);}
         
         .costo-row { display: flex; flex-direction: column; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px;}
         .costo-row span { font-size: 0.8rem; color: #aaa; margin-bottom: 5px;}
         .costo-row input { padding: 8px; font-size: 0.9rem; }
+
+        @media (max-width: 768px) {
+            .btn-nav { display: none !important; } 
+            .btn-menu-mobile { display: block; } 
+            .nav-links { position: absolute; top: 100%; left: 0; width: 100%; background: rgba(5, 5, 16, 0.98); flex-direction: column; padding: 20px; text-align: center; gap: 20px; border-bottom: 2px solid var(--primary-blue); display: none; }
+            .nav-links.active { display: flex; }
+            .nav-links li { width: 100%; }
+            .nav-links a { display: block; padding: 10px; font-size: 1.2rem; }
+            .panel { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="bg-glow"></div>
-    <div class="logo" onclick="location.reload()">TECNO<span>ESENCIAL</span></div>
 
-    <div class="nav-buttons" id="nav-menu">
-        <button class="btn btn-outline" onclick="mostrarPanel('panel-cliente')"><i class="fas fa-search"></i> Soy Cliente</button>
-        <button class="btn btn-outline" onclick="mostrarPanel('panel-login')"><i class="fas fa-tools"></i> Equipo Técnico</button>
+    <nav class="glass-nav">
+        <div class="logo-container" onclick="window.location.href='index.html'">
+            <img src="logo.png" alt="TecnoEsencial" class="nav-logo">
+            <span class="brand-name">TECNO<span class="highlight">ESENCIAL</span></span>
+        </div>
+        
+        <ul class="nav-links" id="nav-links-menu">
+            <li><a href="index.html#inicio">Inicio</a></li>
+            <li><a href="index.html#servicios">Servicios</a></li>
+            <li><a href="index.html#tienda">Tienda</a></li>
+            <li><a href="index.html#equipo">Nosotros</a></li>
+            <li><a href="#" style="color:var(--primary-purple); font-weight:bold;">Rastrear Equipo</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <a href="https://wa.me/573173669002" class="btn-nav" target="_blank">Contactar</a> 
+            <button class="btn-menu-mobile" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <div class="nav-buttons-sys" id="nav-menu">
+        <button class="btn btn-outline" onclick="mostrarPanel('panel-cliente')" style="border-color:#00f3ff; color:#00f3ff;"><i class="fas fa-search"></i> Soy Cliente</button>
+        <button class="btn btn-outline" onclick="mostrarPanel('panel-login')"><i class="fas fa-tools"></i> Acceso Técnico</button>
     </div>
 
     <div class="panel active" id="panel-cliente">
         <h2>Rastrear mi Equipo</h2>
-        <div class="form-group"><input type="text" id="ticket-id" placeholder="Ej: TCN-12345"></div>
+        <p style="text-align:center; color:#aaa; font-size:0.9rem; margin-bottom:15px;">Ingresa el número de servicio que te enviamos por WhatsApp.</p>
+        
+        <div class="form-group">
+            <input type="text" id="ticket-id" placeholder="Ej: 84521" style="text-align:center; font-size:1.5rem; letter-spacing:3px; font-weight:bold; color:var(--primary-blue);">
+        </div>
+        
         <button class="btn btn-blue" onclick="consultarTicket()">Buscar Estado</button>
         <div class="loader" id="loader-cliente"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>
         
@@ -99,14 +148,14 @@
     </div>
 
     <div class="panel" id="panel-login">
-        <h2>Acceso Plataforma</h2>
+        <h2>Acceso Privado</h2>
         <div class="form-group"><label>Usuario</label><input type="text" id="login-user" placeholder="Ej: admin"></div>
         <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass" placeholder="Ej: tecno123"></div>
         <button class="btn btn-blue" onclick="iniciarSesion()">Ingresar</button>
         <div class="loader" id="loader-login"><i class="fas fa-spinner fa-spin"></i> Verificando...</div>
     </div>
 
-    <div class="admin-nav" id="admin-nav-menu" style="max-width: 600px; width: 100%;">
+    <div class="admin-nav" id="admin-nav-menu">
         <button id="btn-tab-tickets" onclick="cambiarTabAdmin('tickets')" class="active"><i class="fas fa-wrench"></i> Taller y Tickets</button>
         <button id="btn-tab-catalogo" onclick="cambiarTabAdmin('catalogo')"><i class="fas fa-store"></i> Gestión de Tienda</button>
     </div>
@@ -146,10 +195,8 @@
 
         <h3 style="border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:10px; color:#00f3ff;">🛠️ Servicios en Web</h3>
         <div id="lista-admin-servicios"></div>
-        
         <h3 style="border-bottom:1px solid #333; padding-bottom:5px; margin:20px 0 10px 0; color:#bc13fe;">🛒 Productos en Tienda</h3>
         <div id="lista-admin-productos"></div>
-        
         <div class="loader" id="loader-admin-catalogo"><i class="fas fa-spinner fa-spin"></i> Cargando web...</div>
     </div>
 
@@ -157,29 +204,15 @@
         <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cambiarTabAdmin('catalogo')"></i> <span id="form-cat-titulo">Item</span></h2>
         <input type="hidden" id="cat-id-item">
         <input type="hidden" id="cat-tipo-item">
-        
         <div class="form-group"><label>Nombre del Item</label><input type="text" id="cat-nombre" placeholder="Ej: Formateo de PC o Memoria RAM 8GB"></div>
         <div class="form-group"><label>Precio de Venta ($)</label><input type="number" id="cat-precio" placeholder="Ej: 50000"></div>
         <div class="form-group"><label>Descripción Breve</label><textarea id="cat-descripcion" rows="2" placeholder="Detalle que verá el cliente..."></textarea></div>
-        
-        <div class="form-group" id="grupo-servicio-icono" style="display:none;">
-            <label>Ícono (Clase FontAwesome)</label>
-            <input type="text" id="cat-icono" placeholder="Ej: fas fa-laptop-medical">
-        </div>
-        
-        <div class="form-group" id="grupo-producto-img" style="display:none;">
-            <label>URL de la Imagen (Opcional)</label>
-            <input type="text" id="cat-imagen" placeholder="Ej: https://misitio.com/ram.jpg">
-        </div>
-
+        <div class="form-group" id="grupo-servicio-icono" style="display:none;"><label>Ícono o Imagen URL</label><input type="text" id="cat-icono" placeholder="Ej: fas fa-laptop-medical"></div>
+        <div class="form-group" id="grupo-producto-img" style="display:none;"><label>URL de la Imagen (Opcional)</label><input type="text" id="cat-imagen" placeholder="Ej: https://misitio.com/ram.jpg"></div>
         <div class="form-group">
             <label id="lbl-opcion-extra" style="color:var(--primary-purple);">Opciones</label>
-            <select id="cat-opcion-extra">
-                <option value="No">No</option>
-                <option value="Sí">Sí</option>
-            </select>
+            <select id="cat-opcion-extra"><option value="No">No</option><option value="Sí">Sí</option></select>
         </div>
-
         <button class="btn btn-blue" onclick="guardarItemCatalogo()">Guardar en Web</button>
         <div class="loader" id="loader-cat-save"><i class="fas fa-spinner fa-spin"></i> Publicando...</div>
     </div>
@@ -211,7 +244,7 @@
 
     <div class="panel" id="panel-actualizar" style="max-width: 600px;">
         <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Actualizar Avance</h2>
-        <h3 id="act-id-ticket" style="text-align:center; color:white; margin-bottom:15px;"></h3>
+        <h3 id="act-id-ticket" style="text-align:center; color:white; margin-bottom:15px; letter-spacing: 2px;"></h3>
         <div class="form-group">
             <label>Estado</label>
             <select id="act-estado">
@@ -233,8 +266,8 @@
     <div class="panel" id="panel-asignar" style="max-width: 600px;">
         <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Asignar Equipo</h2>
         <h3 id="asig-id-ticket" style="text-align:center; color:white; margin-bottom:15px;"></h3>
-        <div class="form-group"><label>Técnico Principal (Responsable)</label><select id="asig-principal"></select></div>
-        <div class="form-group"><label>Técnicos Colaboradores</label><input type="text" id="asig-colaboradores" placeholder="Ej: Carlos G, Pedro L"></div>
+        <div class="form-group"><label>Técnico Principal</label><select id="asig-principal"></select></div>
+        <div class="form-group"><label>Colaboradores</label><input type="text" id="asig-colaboradores" placeholder="Ej: Carlos G, Pedro L"></div>
         <button class="btn btn-blue" onclick="guardarAsignacion()" style="background: var(--primary-purple);">Guardar Asignación</button>
         <div class="loader" id="loader-asig"><i class="fas fa-spinner fa-spin"></i> Actualizando...</div>
     </div>
@@ -242,10 +275,9 @@
     <div class="panel" id="panel-editar-costos" style="max-width: 600px;">
         <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Editar Costos</h2>
         <h3 id="edit-id-ticket" style="text-align:center; color:white; margin-bottom:15px;"></h3>
-        <p style="text-align:center; color:#aaa; font-size:0.8rem; margin-bottom:15px;">Corrige los precios de los avances facturados.</p>
         <div id="lista-costos-historial"></div>
         <button class="btn btn-blue" onclick="guardarEdicionCostos()" style="margin-top: 20px; background: #ffaa00; color:#000;">Guardar Cambios</button>
-        <div class="loader" id="loader-edit-costo"><i class="fas fa-spinner fa-spin"></i> Recalculando sistema...</div>
+        <div class="loader" id="loader-edit-costo"><i class="fas fa-spinner fa-spin"></i> Recalculando...</div>
     </div>
 
     <script>
@@ -254,6 +286,11 @@
         
         let tecnicoActual = ""; let tecnicoRol = ""; let ticketSeleccionado = ""; let listaTecnicosCache = [];
         let ticketsCacheGlobal = []; let catalogoCache = { servicios: [], productos: [] };
+
+        // Navegación en celulares
+        function toggleMenu() {
+            document.getElementById('nav-links-menu').classList.toggle('active');
+        }
 
         document.getElementById('ticket-id').addEventListener('keypress', function(e){if(e.key==='Enter') consultarTicket();});
         document.getElementById('login-pass').addEventListener('keypress', function(e){if(e.key==='Enter') iniciarSesion();});
@@ -308,7 +345,11 @@
             if (guardado && rol && tiempo && (new Date().getTime() - tiempo < 28800000)) {
                 tecnicoActual = guardado; tecnicoRol = rol;
                 configurarVistaSegunRol();
-            } else cerrarSesion();
+            } else {
+                cerrarSesion();
+                // 🔥 EL PANEL DEL CLIENTE ES EL QUE SE MUESTRA POR DEFECTO SIEMPRE
+                mostrarPanel('panel-cliente');
+            }
         }
 
         async function iniciarSesion() {
@@ -331,7 +372,7 @@
             localStorage.removeItem('tecno_user'); localStorage.removeItem('tecno_rol'); localStorage.removeItem('tecno_time');
             tecnicoActual = ""; tecnicoRol = "";
             document.getElementById('login-user').value = ""; document.getElementById('login-pass').value = "";
-            mostrarPanel('panel-login');
+            mostrarPanel('panel-cliente'); // Si cierra sesión, lo devuelve a rastreo
         }
 
         function configurarVistaSegunRol() {
@@ -347,7 +388,6 @@
                 mostrarPanel('panel-gestion-catalogo');
                 cargarCatalogoAdmin();
             } else {
-                // Es Técnico
                 document.getElementById('admin-nav-menu').style.display = "none";
                 cargarMisTickets();
             }
@@ -406,20 +446,23 @@
                 let colaboradoresTxt = t.colaboradores ? ` (+${t.colaboradores})` : '';
                 let botonesAdmin = "";
                 
+                // 🔥 Ocultamos visualmente el TCN- en el panel de técnicos también
+                let numLimpio = t.id.replace('TCN-', '');
+
                 if (tecnicoRol === "Administrador") {
                     botonesAdmin = `
-                    <button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe;" onclick="abrirAsignacion('${t.id}', '${t.principal}', '${t.colaboradores}')"><i class="fas fa-users"></i> Asignar</button>
-                    <button class="btn-foto" style="border-color:#ffaa00; color:#ffaa00;" onclick="abrirEdicionCostos('${t.id}')"><i class="fas fa-money-bill-wave"></i> Costos</button>`;
+                    <button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe;" onclick="abrirAsignacion('${t.id}', '${t.principal}', '${t.colaboradores}')"><i class="fas fa-users"></i></button>
+                    <button class="btn-foto" style="border-color:#ffaa00; color:#ffaa00;" onclick="abrirEdicionCostos('${t.id}')"><i class="fas fa-money-bill-wave"></i></button>`;
                 }
 
                 contenedor.innerHTML += `
                     <div class="ticket-card">
-                        <span class="status-badge">${t.estado}</span><strong>${t.id}</strong><br>
+                        <span class="status-badge">${t.estado}</span><strong style="font-size:1.2rem; color:var(--primary-blue); letter-spacing:2px;">${numLimpio}</strong><br>
                         <span style="color:#aaa; font-size:0.9rem;">${t.cliente} - ${t.equipo}</span><br>
                         <span style="color:var(--primary-blue); font-size:0.8rem;"><i class="fas fa-user-wrench"></i> ${t.principal}${colaboradoresTxt}</span>
                         <div class="tiempos-box">
                             <i class="far fa-calendar-alt"></i> Total: <strong>${diasTotal} días</strong> <br>
-                            <i class="fas fa-hourglass-half" style="color:${colorEstado}"></i> En estado actual: <strong style="color:${colorEstado}">${diasEstado} días</strong>
+                            <i class="fas fa-hourglass-half" style="color:${colorEstado}"></i> En estado: <strong style="color:${colorEstado}">${diasEstado} días</strong>
                         </div>
                         <div style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;">
                             <button class="btn-foto" onclick="abrirActualizador('${t.id}')"><i class="fas fa-edit"></i> Avance</button>
@@ -429,10 +472,14 @@
             });
         }
 
-        function abrirActualizador(id) { ticketSeleccionado = id; document.getElementById('act-id-ticket').innerText = "Ticket: " + id; mostrarPanel('panel-actualizar'); }
+        function abrirActualizador(id) { 
+            ticketSeleccionado = id; 
+            document.getElementById('act-id-ticket').innerText = "Orden: " + id.replace('TCN-', ''); 
+            mostrarPanel('panel-actualizar'); 
+        }
 
         function abrirAsignacion(id, principalActual, colabsActuales) {
-            ticketSeleccionado = id; document.getElementById('asig-id-ticket').innerText = "Ticket: " + id;
+            ticketSeleccionado = id; document.getElementById('asig-id-ticket').innerText = "Orden: " + id.replace('TCN-', '');
             const select = document.getElementById('asig-principal'); select.innerHTML = "";
             listaTecnicosCache.forEach(t => { let selected = (t === principalActual) ? "selected" : ""; select.innerHTML += `<option value="${t}" ${selected}>${t}</option>`; });
             document.getElementById('asig-colaboradores').value = colabsActuales !== "undefined" ? colabsActuales : "";
@@ -450,7 +497,7 @@
         }
 
         async function abrirEdicionCostos(id) {
-            ticketSeleccionado = id; document.getElementById('edit-id-ticket').innerText = "Ticket: " + id; mostrarPanel('panel-editar-costos');
+            ticketSeleccionado = id; document.getElementById('edit-id-ticket').innerText = "Orden: " + id.replace('TCN-', ''); mostrarPanel('panel-editar-costos');
             const cont = document.getElementById('lista-costos-historial'); cont.innerHTML = "<p style='text-align:center;'>Cargando historial...</p>";
             try {
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: id }) });
@@ -476,6 +523,7 @@
             } catch (e) { document.getElementById('loader-edit-costo').style.display = "none"; alert("Error guardando costos."); }
         }
 
+        // 🔥 NUEVO MENSAJE DE WHATSAPP ELEGANTE (CREACIÓN)
         async function crearTicket() {
             let invArr = []; document.querySelectorAll('.inv-check:checked').forEach(c => invArr.push(c.value));
             let invFinal = invArr.join(", "); const obs = document.getElementById('form-inv-obs').value.trim(); if(obs) invFinal += " | Obs: " + obs;
@@ -490,10 +538,13 @@
                 const result = await res.json();
                 document.getElementById('loader-registro').style.display = "none";
                 if(result.status === "success") {
-                    alert(`¡Ticket Creado: ${result.ticket}! A continuación se abrirá WhatsApp.`);
+                    
+                    let ticketLimpio = result.ticket.replace('TCN-', '');
+                    alert(`¡Orden Creada: ${ticketLimpio}! Se abrirá WhatsApp.`);
+                    
                     if (numeroWhatsapp) {
                         let numLimpio = numeroWhatsapp.replace(/\D/g, ''); if (numLimpio.length === 10) numLimpio = "57" + numLimpio;
-                        const mensajeWa = `Hola ${nombreCliente} 👋, somos *TECNOESENCIAL*.\n\nHemos recibido tu equipo con éxito. Tu número de ticket es: *${result.ticket}*\n\nRastrea el estado de tu reparación, valores y evidencia ingresando aquí:\n👉 https://tecnoesencial.shop/sistema.html`;
+                        const mensajeWa = `Hola ${nombreCliente} 👋, un gusto saludarte desde *TECNOESENCIAL*.\n\nHemos recibido tu equipo en nuestro laboratorio técnico. Tu número de servicio es el: *${ticketLimpio}*\n\nPuedes hacer seguimiento en tiempo real de tu reparación, ver evidencias fotográficas y el valor estimado ingresando a nuestra plataforma oficial:\n👉 https://tecnoesencial.shop/sistema.html\n\n_¡Gracias por confiar en nosotros!_`;
                         window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(mensajeWa)}`, '_blank');
                     }
                     document.querySelectorAll('input:not(#login-user, #login-pass), textarea').forEach(e => e.value=''); document.querySelectorAll('.inv-check').forEach(c => c.checked=false);
@@ -502,6 +553,7 @@
             } catch (e) { document.getElementById('loader-registro').style.display = "none"; }
         }
 
+        // 🔥 NUEVO MENSAJE DE WHATSAPP ELEGANTE (REPARADO)
         async function guardarActualizacion() {
             const estadoNuevo = document.getElementById('act-estado').value;
             const fotosProcesadas = await procesarFotosInput('act-foto'); if(fotosProcesadas === null) return;
@@ -514,9 +566,12 @@
                 const result = await res.json();
                 document.getElementById('loader-act').style.display = "none";
                 if(result.status === "success") { 
+                    
+                    let ticketLimpio = ticketSeleccionado.replace('TCN-', '');
+
                     if (estadoNuevo === "Reparado" && result.whatsapp) {
                         let numLimpio = result.whatsapp.toString().replace(/\D/g, ''); if (numLimpio.length === 10) numLimpio = "57" + numLimpio;
-                        const msj = `Hola ${result.cliente} 👋, ¡buenas noticias!\n\nTu equipo bajo el ticket *${ticketSeleccionado}* ya se encuentra *REPARADO Y LISTO* para entrega en TECNOESENCIAL. 🚀\n\nDetalle final, fotos y saldo aquí:\n👉 https://tecnoesencial.shop/sistema.html`;
+                        const msj = `Hola ${result.cliente} 👋, ¡tenemos excelentes noticias!\n\nTu equipo bajo la orden *${ticketLimpio}* ya se encuentra *REPARADO Y LISTO* para entrega en *TECNOESENCIAL*. 🚀\n\nPuedes ver el reporte final, las fotografías del trabajo y tu saldo pendiente en nuestra plataforma:\n👉 https://tecnoesencial.shop/sistema.html\n\n_Te esperamos pronto para la entrega._`;
                         alert("¡Equipo a REPARADO! Se abrirá WhatsApp."); window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(msj)}`, '_blank');
                     } else { alert("¡Avance guardado con éxito!"); }
                     document.getElementById('act-detalle').value = ""; document.getElementById('act-costo').value = ""; document.getElementById('act-foto').value = "";
@@ -526,10 +581,17 @@
         }
 
         // ==========================================
-        // FUNCIONES DEL CLIENTE (RASTREO)
+        // FUNCIONES DEL CLIENTE (RASTREO) - LÓGICA TCN OCULTA
         // ==========================================
         async function consultarTicket() {
-            const id = document.getElementById('ticket-id').value.toUpperCase().trim(); if(!id) return;
+            let id = document.getElementById('ticket-id').value.toUpperCase().trim(); 
+            if(!id) return;
+            
+            // 🔥 Si el cliente no escribe TCN-, el sistema se lo pone internamente para buscar
+            if(!id.startsWith("TCN-")) {
+                id = "TCN-" + id;
+            }
+
             document.getElementById('loader-cliente').style.display = "block"; document.getElementById('resultado-cliente').style.display = "none";
             try {
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: id }) });
@@ -552,12 +614,12 @@
                         timeline.innerHTML += `<div class="timeline-item"><div class="timeline-date">${p.fecha} - <strong>${p.estado}</strong></div><div class="timeline-text">${p.detalle} ${bCosto} ${btnFotosHTML}</div></div>`;
                     });
                     document.getElementById('resultado-cliente').style.display = "block";
-                } else alert("Código de ticket no encontrado.");
+                } else alert("Código de servicio no encontrado. Verifica los números.");
             } catch (e) { document.getElementById('loader-cliente').style.display = "none"; }
         }
 
         // ==========================================
-        // FUNCIONES DE CATÁLOGO (NUEVAS)
+        // FUNCIONES DE CATÁLOGO (ADMIN)
         // ==========================================
         async function cargarCatalogoAdmin() {
             document.getElementById('loader-admin-catalogo').style.display = "block";
