@@ -11,7 +11,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(188,19,254,0.1), transparent), radial-gradient(circle at 80% 20%, rgba(0,243,255,0.15), transparent); z-index: -1; }
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 20px; text-align: center; color: white; text-shadow: 0 0 10px var(--primary-blue); cursor: pointer;}
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 30px; text-align: center; color: white; text-shadow: 0 0 10px var(--primary-blue); cursor: pointer;}
         .logo span { color: var(--primary-blue); }
         .panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; padding: 30px; width: 100%; max-width: 500px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); margin-bottom: 20px; display: none; }
         .panel.active { display: block; animation: fadeIn 0.4s ease; }
@@ -35,6 +35,16 @@
         .ticket-card, .catalog-card { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 15px; border-radius: 8px; margin-bottom: 10px; transition: 0.2s; position: relative;}
         .ticket-card:hover, .catalog-card:hover { border-color: var(--primary-blue); }
         .status-badge { background: var(--primary-purple); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; float: right; }
+        .info-cliente { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; border-left: 3px solid var(--primary-purple);}
+        .finanzas-box { margin-top:20px; padding:15px; background:rgba(0,0,0,0.6); border-radius:8px; border: 1px solid #333;}
+        .fin-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: #aaa; }
+        .fin-total { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #555; font-size: 1.3rem; color: var(--primary-blue); font-weight: bold;}
+        .timeline { border-left: 2px solid var(--primary-blue); padding-left: 20px; margin-top: 20px; }
+        .timeline-item { position: relative; margin-bottom: 20px; }
+        .timeline-item::before { content: ''; position: absolute; left: -27px; top: 0; width: 12px; height: 12px; background: var(--primary-blue); border-radius: 50%; }
+        .timeline-date { font-size: 0.8rem; color: #888; }
+        .timeline-text { color: #ddd; font-size: 0.95rem; margin-top: 5px; }
+        .btn-foto { background: rgba(0,243,255,0.1); color: var(--primary-blue); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 8px; border: 1px solid var(--primary-blue); margin-right: 5px; cursor: pointer; }
         
         .header-session { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
         .badge-rol { font-size: 0.75rem; background: var(--primary-purple); padding: 2px 6px; border-radius: 10px; margin-left: 5px; vertical-align: top;}
@@ -49,6 +59,10 @@
         .admin-nav { display: none; gap: 10px; margin-bottom: 20px; }
         .admin-nav button { flex: 1; padding: 10px; background: transparent; color: white; border: 1px solid #444; border-radius: 5px; cursor: pointer; font-family: 'Rajdhani'; font-weight: bold;}
         .admin-nav button.active { background: rgba(0,243,255,0.2); border-color: var(--primary-blue); color: var(--primary-blue);}
+        
+        .costo-row { display: flex; flex-direction: column; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px;}
+        .costo-row span { font-size: 0.8rem; color: #aaa; margin-bottom: 5px;}
+        .costo-row input { padding: 8px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -59,6 +73,29 @@
     <div class="nav-buttons" id="nav-menu">
         <button class="btn btn-outline" onclick="mostrarPanel('panel-cliente')"><i class="fas fa-search"></i> Soy Cliente</button>
         <button class="btn btn-outline" onclick="mostrarPanel('panel-login')"><i class="fas fa-tools"></i> Equipo Técnico</button>
+    </div>
+
+    <div class="panel active" id="panel-cliente">
+        <h2>Rastrear mi Equipo</h2>
+        <div class="form-group"><input type="text" id="ticket-id" placeholder="Ej: TCN-12345"></div>
+        <button class="btn btn-blue" onclick="consultarTicket()">Buscar Estado</button>
+        <div class="loader" id="loader-cliente"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>
+        
+        <div id="resultado-cliente" style="display:none; margin-top:20px;">
+            <div class="info-cliente">
+                <strong>Equipo:</strong> <span id="res-equipo"></span><br>
+                <strong>Técnico Encargado:</strong> <span id="res-tecnico"></span><br>
+                <strong>Recogido en:</strong> <span id="res-dir"></span><br>
+                <strong>Fecha Ingreso:</strong> <span id="res-fecha"></span>
+            </div>
+            <h3 style="color:var(--primary-blue); font-size:1.1rem;">Línea de Tiempo</h3>
+            <div class="timeline" id="timeline-container"></div>
+            <div class="finanzas-box">
+                <div class="fin-row"><span>Valor Revisión:</span> <span id="fin-rev"></span></div>
+                <div class="fin-row"><span>Costos de Reparación:</span> <span id="fin-rep"></span></div>
+                <div class="fin-total"><span>Total Estimado:</span> <span id="fin-total"></span></div>
+            </div>
+        </div>
     </div>
 
     <div class="panel" id="panel-login">
@@ -128,7 +165,6 @@
         <div class="form-group" id="grupo-servicio-icono" style="display:none;">
             <label>Ícono (Clase FontAwesome)</label>
             <input type="text" id="cat-icono" placeholder="Ej: fas fa-laptop-medical">
-            <p style="font-size:0.75rem; color:#aaa; margin-top:5px;">Encuentra íconos en <a href="https://fontawesome.com/v6/search?m=free" target="_blank" style="color:var(--primary-blue);">FontAwesome</a></p>
         </div>
         
         <div class="form-group" id="grupo-producto-img" style="display:none;">
@@ -148,14 +184,124 @@
         <div class="loader" id="loader-cat-save"><i class="fas fa-spinner fa-spin"></i> Publicando...</div>
     </div>
 
+    <div class="panel" id="panel-tecnico-nuevo" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Nuevo Ingreso</h2>
+        <div class="form-group"><label>Cliente</label><input type="text" id="form-cliente" placeholder="Ej: Carlos Ramírez"></div>
+        <div class="form-group"><label>WhatsApp</label><input type="number" id="form-whatsapp" placeholder="Ej: 3173669002"></div>
+        <div class="form-group"><label>Dirección</label><input type="text" id="form-direccion" placeholder="Ej: Cll 10 # 5-20 (Palmira)"></div>
+        <div class="form-group"><label>Equipo</label><input type="text" id="form-equipo" placeholder="Ej: Portátil HP Pavilion"></div>
+        <div class="form-group">
+            <label style="color:var(--primary-purple);">Inventario</label>
+            <div class="checkbox-grid">
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Cargador"> Cargador</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Mouse"> Mouse</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Teclado"> Teclado</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Maletín"> Maletín</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Pantalla"> Pantalla</label>
+                <label class="checkbox-item"><input type="checkbox" class="inv-check" value="Sin Accesorios"> Sin Acc.</label>
+            </div>
+            <input type="text" id="form-inv-obs" placeholder="Ej: Pantalla rayada, falta tecla Esc..." style="margin-top: 10px;">
+        </div>
+        <div class="form-group"><label>Diagnóstico Inicial</label><textarea id="form-diagnostico" rows="2" placeholder="Ej: Equipo no da video."></textarea></div>
+        <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="form-precio-rev" placeholder="Ej: 30000"></div>
+        <div class="form-group"><label><i class="fas fa-camera"></i> Evidencia Inicial (Máximo 5)</label><input type="file" id="form-foto" accept="image/*" multiple></div>
+        <button class="btn btn-blue" onclick="crearTicket()">Registrar Ticket</button>
+        <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Subiendo y guardando...</div>
+    </div>
+
+    <div class="panel" id="panel-actualizar" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Actualizar Avance</h2>
+        <h3 id="act-id-ticket" style="text-align:center; color:white; margin-bottom:15px;"></h3>
+        <div class="form-group">
+            <label>Estado</label>
+            <select id="act-estado">
+                <option value="En Diagnóstico">En Diagnóstico</option>
+                <option value="En Laboratorio">En Laboratorio</option>
+                <option value="Esperando Aprobación">Esperando Aprobación Cliente</option>
+                <option value="Esperando Repuesto">Esperando Repuesto</option>
+                <option value="Reparado">Reparado / Listo</option>
+                <option value="Entregado">Entregado (Cerrar)</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Detalle del Avance</label><textarea id="act-detalle" rows="2" placeholder="Ej: Se instaló disco SSD."></textarea></div>
+        <div class="form-group"><label>Costo Agregado ($)</label><input type="number" id="act-costo" placeholder="Ej: 150000"></div>
+        <div class="form-group"><label><i class="fas fa-camera"></i> Fotos del Avance</label><input type="file" id="act-foto" accept="image/*" multiple></div>
+        <button class="btn btn-blue" onclick="guardarActualizacion()">Guardar Avance</button>
+        <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Subiendo fotos...</div>
+    </div>
+
+    <div class="panel" id="panel-asignar" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Asignar Equipo</h2>
+        <h3 id="asig-id-ticket" style="text-align:center; color:white; margin-bottom:15px;"></h3>
+        <div class="form-group"><label>Técnico Principal (Responsable)</label><select id="asig-principal"></select></div>
+        <div class="form-group"><label>Técnicos Colaboradores</label><input type="text" id="asig-colaboradores" placeholder="Ej: Carlos G, Pedro L"></div>
+        <button class="btn btn-blue" onclick="guardarAsignacion()" style="background: var(--primary-purple);">Guardar Asignación</button>
+        <div class="loader" id="loader-asig"><i class="fas fa-spinner fa-spin"></i> Actualizando...</div>
+    </div>
+
+    <div class="panel" id="panel-editar-costos" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Editar Costos</h2>
+        <h3 id="edit-id-ticket" style="text-align:center; color:white; margin-bottom:15px;"></h3>
+        <p style="text-align:center; color:#aaa; font-size:0.8rem; margin-bottom:15px;">Corrige los precios de los avances facturados.</p>
+        <div id="lista-costos-historial"></div>
+        <button class="btn btn-blue" onclick="guardarEdicionCostos()" style="margin-top: 20px; background: #ffaa00; color:#000;">Guardar Cambios</button>
+        <div class="loader" id="loader-edit-costo"><i class="fas fa-spinner fa-spin"></i> Recalculando sistema...</div>
+    </div>
+
     <script>
-        // 🔴🔴🔴 REEMPLAZA AQUÍ TU URL 🔴🔴🔴
+        // 🔴🔴🔴 REEMPLAZA AQUÍ TU URL DE GOOGLE SCRIPT 🔴🔴🔴
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW3DCk_VRl0vU-zZIqwmWAV38RJafJsJ_XI-vQDjAPah1ysv4Xjzt-1G0QZPWhfvl7/exec";
         
-        let tecnicoActual = ""; let tecnicoRol = ""; let ticketSeleccionado = "";
+        let tecnicoActual = ""; let tecnicoRol = ""; let ticketSeleccionado = ""; let listaTecnicosCache = [];
         let ticketsCacheGlobal = []; let catalogoCache = { servicios: [], productos: [] };
 
-        // ... (Tus funciones existentes de iniciarSesion, formatearDinero, comprimirImagen, etc.) ...
+        document.getElementById('ticket-id').addEventListener('keypress', function(e){if(e.key==='Enter') consultarTicket();});
+        document.getElementById('login-pass').addEventListener('keypress', function(e){if(e.key==='Enter') iniciarSesion();});
+        
+        function mostrarPanel(idPanel) { 
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); 
+            document.getElementById(idPanel).classList.add('active'); 
+            if(idPanel !== 'panel-cliente' && idPanel !== 'panel-login') document.getElementById('nav-menu').style.display = 'none'; 
+            else document.getElementById('nav-menu').style.display = 'flex';
+        }
+
+        const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
+
+        function calcularDias(fechaStr) {
+            if(!fechaStr) return 0;
+            try {
+                let partes = fechaStr.split(",")[0].split("/");
+                if(partes.length !== 3) return 0;
+                let fechaObj = new Date(partes[2], partes[1] - 1, partes[0]);
+                let diferencia = new Date().getTime() - fechaObj.getTime();
+                let dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+                return dias < 0 ? 0 : dias;
+            } catch(e) { return 0; }
+        }
+
+        function comprimirImagen(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image(); img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 800;
+                        const scaleSize = MAX_WIDTH / img.width; canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+                        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve({ base64: canvas.toDataURL('image/jpeg', 0.7), mime: 'image/jpeg' });
+                    };
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function procesarFotosInput(inputId) {
+            const archivos = document.getElementById(inputId).files;
+            if (archivos.length === 0) return [];
+            if (archivos.length > 5) { alert("Máximo 5 fotos."); return null; }
+            let arrayFotos = []; for (let i = 0; i < archivos.length; i++) arrayFotos.push(await comprimirImagen(archivos[i]));
+            return arrayFotos;
+        }
 
         function verificarSesionGuardada() {
             const guardado = localStorage.getItem('tecno_user'); const rol = localStorage.getItem('tecno_rol'); const tiempo = localStorage.getItem('tecno_time');
@@ -181,12 +327,20 @@
             } catch (e) { document.getElementById('loader-login').style.display = "none"; alert("Error de conexión."); }
         }
 
+        function cerrarSesion() {
+            localStorage.removeItem('tecno_user'); localStorage.removeItem('tecno_rol'); localStorage.removeItem('tecno_time');
+            tecnicoActual = ""; tecnicoRol = "";
+            document.getElementById('login-user').value = ""; document.getElementById('login-pass').value = "";
+            mostrarPanel('panel-login');
+        }
+
         function configurarVistaSegunRol() {
             document.getElementById('dash-nombre-tecnico').innerText = tecnicoActual; document.getElementById('dash-rol').innerText = tecnicoRol;
             document.getElementById('cat-nombre-tecnico').innerText = tecnicoActual; document.getElementById('cat-rol').innerText = tecnicoRol;
 
             if(tecnicoRol === "Administrador") {
                 document.getElementById('admin-nav-menu').style.display = "flex";
+                obtenerListaTecnicos();
                 cambiarTabAdmin('tickets');
             } else if (tecnicoRol === "Ventas") {
                 document.getElementById('admin-nav-menu').style.display = "none";
@@ -212,13 +366,203 @@
         }
 
         // ==========================================
-        // LÓGICA DE GESTIÓN DE CATÁLOGO (NUEVO)
+        // FUNCIONES DE TALLER / TICKETS
+        // ==========================================
+        async function obtenerListaTecnicos() {
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "obtener_tecnicos" }) });
+                const result = await res.json();
+                if(result.status === "success") listaTecnicosCache = result.tecnicos;
+            } catch (e) {}
+        }
+
+        async function cargarMisTickets() {
+            mostrarPanel('panel-tech-dashboard');
+            document.getElementById('loader-dashboard').style.display = "block";
+            document.getElementById('lista-mis-tickets').innerHTML = "";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "listar_tickets", tecnico_nombre: tecnicoActual, rol: tecnicoRol }) });
+                const result = await res.json();
+                document.getElementById('loader-dashboard').style.display = "none";
+                if(result.status === "success") {
+                    ticketsCacheGlobal = result.tickets;
+                    renderizarTickets();
+                }
+            } catch (e) { document.getElementById('loader-dashboard').style.display = "none"; }
+        }
+
+        function renderizarTickets() {
+            const filtro = document.getElementById('filtro-estado').value;
+            const contenedor = document.getElementById('lista-mis-tickets');
+            contenedor.innerHTML = "";
+            let ticketsMostrados = ticketsCacheGlobal;
+            
+            if (filtro !== "Todos") ticketsMostrados = ticketsCacheGlobal.filter(t => t.estado.includes(filtro));
+            if(ticketsMostrados.length === 0) { contenedor.innerHTML = "<p style='color:#aaa; text-align:center;'>No hay equipos en esta categoría.</p>"; return; }
+
+            ticketsMostrados.forEach(t => {
+                let diasTotal = calcularDias(t.fecha_ingreso); let diasEstado = calcularDias(t.fecha_ultimo);
+                let colorEstado = diasEstado > 3 ? "#ff5555" : "#00f3ff";
+                let colaboradoresTxt = t.colaboradores ? ` (+${t.colaboradores})` : '';
+                let botonesAdmin = "";
+                
+                if (tecnicoRol === "Administrador") {
+                    botonesAdmin = `
+                    <button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe;" onclick="abrirAsignacion('${t.id}', '${t.principal}', '${t.colaboradores}')"><i class="fas fa-users"></i> Asignar</button>
+                    <button class="btn-foto" style="border-color:#ffaa00; color:#ffaa00;" onclick="abrirEdicionCostos('${t.id}')"><i class="fas fa-money-bill-wave"></i> Costos</button>`;
+                }
+
+                contenedor.innerHTML += `
+                    <div class="ticket-card">
+                        <span class="status-badge">${t.estado}</span><strong>${t.id}</strong><br>
+                        <span style="color:#aaa; font-size:0.9rem;">${t.cliente} - ${t.equipo}</span><br>
+                        <span style="color:var(--primary-blue); font-size:0.8rem;"><i class="fas fa-user-wrench"></i> ${t.principal}${colaboradoresTxt}</span>
+                        <div class="tiempos-box">
+                            <i class="far fa-calendar-alt"></i> Total: <strong>${diasTotal} días</strong> <br>
+                            <i class="fas fa-hourglass-half" style="color:${colorEstado}"></i> En estado actual: <strong style="color:${colorEstado}">${diasEstado} días</strong>
+                        </div>
+                        <div style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;">
+                            <button class="btn-foto" onclick="abrirActualizador('${t.id}')"><i class="fas fa-edit"></i> Avance</button>
+                            ${botonesAdmin}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function abrirActualizador(id) { ticketSeleccionado = id; document.getElementById('act-id-ticket').innerText = "Ticket: " + id; mostrarPanel('panel-actualizar'); }
+
+        function abrirAsignacion(id, principalActual, colabsActuales) {
+            ticketSeleccionado = id; document.getElementById('asig-id-ticket').innerText = "Ticket: " + id;
+            const select = document.getElementById('asig-principal'); select.innerHTML = "";
+            listaTecnicosCache.forEach(t => { let selected = (t === principalActual) ? "selected" : ""; select.innerHTML += `<option value="${t}" ${selected}>${t}</option>`; });
+            document.getElementById('asig-colaboradores').value = colabsActuales !== "undefined" ? colabsActuales : "";
+            mostrarPanel('panel-asignar');
+        }
+
+        async function guardarAsignacion() {
+            document.getElementById('loader-asig').style.display = "block";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "asignar_tecnicos", id_ticket: ticketSeleccionado, principal: document.getElementById('asig-principal').value, colaboradores: document.getElementById('asig-colaboradores').value })});
+                const result = await res.json();
+                document.getElementById('loader-asig').style.display = "none";
+                if(result.status === "success") { alert("Personal asignado."); cargarMisTickets(); }
+            } catch (e) { document.getElementById('loader-asig').style.display = "none"; alert("Error."); }
+        }
+
+        async function abrirEdicionCostos(id) {
+            ticketSeleccionado = id; document.getElementById('edit-id-ticket').innerText = "Ticket: " + id; mostrarPanel('panel-editar-costos');
+            const cont = document.getElementById('lista-costos-historial'); cont.innerHTML = "<p style='text-align:center;'>Cargando historial...</p>";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: id }) });
+                const result = await res.json();
+                cont.innerHTML = "";
+                if(result.status === "success") {
+                    result.historial.forEach((p) => {
+                        cont.innerHTML += `<div class="costo-row"><span><strong>${p.fecha}</strong> - ${p.detalle}</span><input type="number" class="input-edit-costo" data-fecha="${p.fecha}" value="${p.costo}"></div>`;
+                    });
+                }
+            } catch (e) { cont.innerHTML = "Error cargando datos."; }
+        }
+
+        async function guardarEdicionCostos() {
+            const inputs = document.querySelectorAll('.input-edit-costo'); let cambios = [];
+            inputs.forEach(input => { cambios.push({ fecha: input.getAttribute('data-fecha'), costo: input.value }); });
+            document.getElementById('loader-edit-costo').style.display = "block";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "editar_costos", id_ticket: ticketSeleccionado, cambios: cambios }) });
+                const result = await res.json();
+                document.getElementById('loader-edit-costo').style.display = "none";
+                if(result.status === "success") { alert("Costos actualizados y sistema recalculado."); cargarMisTickets(); }
+            } catch (e) { document.getElementById('loader-edit-costo').style.display = "none"; alert("Error guardando costos."); }
+        }
+
+        async function crearTicket() {
+            let invArr = []; document.querySelectorAll('.inv-check:checked').forEach(c => invArr.push(c.value));
+            let invFinal = invArr.join(", "); const obs = document.getElementById('form-inv-obs').value.trim(); if(obs) invFinal += " | Obs: " + obs;
+            const fotosProcesadas = await procesarFotosInput('form-foto'); if(fotosProcesadas === null) return;
+            const nombreCliente = document.getElementById('form-cliente').value; const numeroWhatsapp = document.getElementById('form-whatsapp').value;
+            const datos = { accion: "crear_ticket", tecnico_principal: tecnicoActual, cliente: nombreCliente, whatsapp: numeroWhatsapp, direccion: document.getElementById('form-direccion').value, equipo: document.getElementById('form-equipo').value, inventario: invFinal, diagnostico: document.getElementById('form-diagnostico').value, valor_revision: document.getElementById('form-precio-rev').value, fotos: fotosProcesadas };
+            
+            if(!datos.cliente || !datos.equipo) return alert("Completa cliente y equipo.");
+            document.getElementById('loader-registro').style.display = "block";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(datos) });
+                const result = await res.json();
+                document.getElementById('loader-registro').style.display = "none";
+                if(result.status === "success") {
+                    alert(`¡Ticket Creado: ${result.ticket}! A continuación se abrirá WhatsApp.`);
+                    if (numeroWhatsapp) {
+                        let numLimpio = numeroWhatsapp.replace(/\D/g, ''); if (numLimpio.length === 10) numLimpio = "57" + numLimpio;
+                        const mensajeWa = `Hola ${nombreCliente} 👋, somos *TECNOESENCIAL*.\n\nHemos recibido tu equipo con éxito. Tu número de ticket es: *${result.ticket}*\n\nRastrea el estado de tu reparación, valores y evidencia ingresando aquí:\n👉 https://tecnoesencial.shop/sistema.html`;
+                        window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(mensajeWa)}`, '_blank');
+                    }
+                    document.querySelectorAll('input:not(#login-user, #login-pass), textarea').forEach(e => e.value=''); document.querySelectorAll('.inv-check').forEach(c => c.checked=false);
+                    cargarMisTickets();
+                }
+            } catch (e) { document.getElementById('loader-registro').style.display = "none"; }
+        }
+
+        async function guardarActualizacion() {
+            const estadoNuevo = document.getElementById('act-estado').value;
+            const fotosProcesadas = await procesarFotosInput('act-foto'); if(fotosProcesadas === null) return;
+            const datos = { accion: "actualizar_ticket", id_ticket: ticketSeleccionado, tecnico_nombre: tecnicoActual, detalle: document.getElementById('act-detalle').value, nuevo_estado: estadoNuevo, costo_adicional: document.getElementById('act-costo').value, fotos: fotosProcesadas };
+            
+            if(!datos.detalle) return alert("Escribe un avance.");
+            document.getElementById('loader-act').style.display = "block";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(datos) });
+                const result = await res.json();
+                document.getElementById('loader-act').style.display = "none";
+                if(result.status === "success") { 
+                    if (estadoNuevo === "Reparado" && result.whatsapp) {
+                        let numLimpio = result.whatsapp.toString().replace(/\D/g, ''); if (numLimpio.length === 10) numLimpio = "57" + numLimpio;
+                        const msj = `Hola ${result.cliente} 👋, ¡buenas noticias!\n\nTu equipo bajo el ticket *${ticketSeleccionado}* ya se encuentra *REPARADO Y LISTO* para entrega en TECNOESENCIAL. 🚀\n\nDetalle final, fotos y saldo aquí:\n👉 https://tecnoesencial.shop/sistema.html`;
+                        alert("¡Equipo a REPARADO! Se abrirá WhatsApp."); window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(msj)}`, '_blank');
+                    } else { alert("¡Avance guardado con éxito!"); }
+                    document.getElementById('act-detalle').value = ""; document.getElementById('act-costo').value = ""; document.getElementById('act-foto').value = "";
+                    cargarMisTickets(); 
+                }
+            } catch (e) { document.getElementById('loader-act').style.display = "none"; }
+        }
+
+        // ==========================================
+        // FUNCIONES DEL CLIENTE (RASTREO)
+        // ==========================================
+        async function consultarTicket() {
+            const id = document.getElementById('ticket-id').value.toUpperCase().trim(); if(!id) return;
+            document.getElementById('loader-cliente').style.display = "block"; document.getElementById('resultado-cliente').style.display = "none";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: id }) });
+                const result = await res.json();
+                document.getElementById('loader-cliente').style.display = "none";
+                if(result.status === "success") {
+                    const t = result.ticket;
+                    document.getElementById('res-equipo').innerText = t.equipo; document.getElementById('res-tecnico').innerText = t.tecnico;
+                    document.getElementById('res-dir').innerText = t.direccion; document.getElementById('res-fecha').innerText = t.fecha;
+                    const rev = parseFloat(t.valor_revision); const rep = parseFloat(t.total_reparacion);
+                    document.getElementById('fin-rev').innerText = formatearDinero(rev); document.getElementById('fin-rep').innerText = rep > 0 ? formatearDinero(rep) : "$0";
+                    document.getElementById('fin-total').innerText = formatearDinero(rep > 0 ? rep : rev);
+                    const timeline = document.getElementById('timeline-container'); timeline.innerHTML = "";
+                    result.historial.forEach(p => {
+                        let btnFotosHTML = "";
+                        if(p.foto && p.foto.trim() !== "" && !p.foto.includes("Error")) {
+                            let urls = p.foto.split(", "); urls.forEach((url, i) => { btnFotosHTML += `<br><a href="${url}" target="_blank" class="btn-foto"><i class="fas fa-camera"></i> Ver Foto ${i+1}</a>`; });
+                        }
+                        let bCosto = p.costo > 0 ? `<span style="color:#00f3ff; font-size:0.8rem;">(+ ${formatearDinero(p.costo)})</span>` : '';
+                        timeline.innerHTML += `<div class="timeline-item"><div class="timeline-date">${p.fecha} - <strong>${p.estado}</strong></div><div class="timeline-text">${p.detalle} ${bCosto} ${btnFotosHTML}</div></div>`;
+                    });
+                    document.getElementById('resultado-cliente').style.display = "block";
+                } else alert("Código de ticket no encontrado.");
+            } catch (e) { document.getElementById('loader-cliente').style.display = "none"; }
+        }
+
+        // ==========================================
+        // FUNCIONES DE CATÁLOGO (NUEVAS)
         // ==========================================
         async function cargarCatalogoAdmin() {
             document.getElementById('loader-admin-catalogo').style.display = "block";
             const contSrv = document.getElementById('lista-admin-servicios'); const contPrd = document.getElementById('lista-admin-productos');
             contSrv.innerHTML = ""; contPrd.innerHTML = "";
-
             try {
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "obtener_catalogo_web" }) });
                 const result = await res.json();
@@ -226,29 +570,28 @@
                 
                 if(result.status === "success") {
                     catalogoCache = { servicios: result.servicios, productos: result.productos };
-                    
-                    if(result.servicios.length === 0) contSrv.innerHTML = "<p style='color:#aaa;'>No hay servicios en la web.</p>";
+                    if(result.servicios.length === 0) contSrv.innerHTML = "<p style='color:#aaa;'>No hay servicios.</p>";
                     result.servicios.forEach(s => {
                         contSrv.innerHTML += `
                             <div class="catalog-card">
                                 <strong>${s.nombre}</strong> - ${formatearDinero(s.precio)} <br>
                                 <span style="font-size:0.8rem; color:#aaa;">Promoción: ${s.promocion}</span>
                                 <div style="margin-top:8px;">
-                                    <button onclick="editarItemCatalogo('${s.id}', 'Servicio')" style="background:transparent; border:none; color:#00f3ff; cursor:pointer; margin-right:10px;"><i class="fas fa-edit"></i> Editar</button>
-                                    <button onclick="eliminarItemCatalogo('${s.id}', 'Servicio')" style="background:transparent; border:none; color:#ff5555; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                                    <button onclick="editarItemCatalogo('${s.id}', 'Servicio')" class="btn-foto"><i class="fas fa-edit"></i> Editar</button>
+                                    <button onclick="eliminarItemCatalogo('${s.id}', 'Servicio')" class="btn-foto" style="border-color:#ff5555; color:#ff5555;"><i class="fas fa-trash"></i></button>
                                 </div>
                             </div>`;
                     });
 
-                    if(result.productos.length === 0) contPrd.innerHTML = "<p style='color:#aaa;'>No hay productos en la tienda.</p>";
+                    if(result.productos.length === 0) contPrd.innerHTML = "<p style='color:#aaa;'>No hay productos.</p>";
                     result.productos.forEach(p => {
                         contPrd.innerHTML += `
                             <div class="catalog-card" style="border-color:rgba(188,19,254,0.3);">
                                 <strong>${p.nombre}</strong> - ${formatearDinero(p.precio)} <br>
                                 <span style="font-size:0.8rem; color:#aaa;">Req. Instalación: ${p.requiere_instalacion}</span>
                                 <div style="margin-top:8px;">
-                                    <button onclick="editarItemCatalogo('${p.id}', 'Producto')" style="background:transparent; border:none; color:#bc13fe; cursor:pointer; margin-right:10px;"><i class="fas fa-edit"></i> Editar</button>
-                                    <button onclick="eliminarItemCatalogo('${p.id}', 'Producto')" style="background:transparent; border:none; color:#ff5555; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                                    <button onclick="editarItemCatalogo('${p.id}', 'Producto')" class="btn-foto"><i class="fas fa-edit"></i> Editar</button>
+                                    <button onclick="eliminarItemCatalogo('${p.id}', 'Producto')" class="btn-foto" style="border-color:#ff5555; color:#ff5555;"><i class="fas fa-trash"></i></button>
                                 </div>
                             </div>`;
                     });
@@ -258,10 +601,8 @@
 
         function abrirFormularioCatalogo(tipo) {
             document.getElementById('cat-tipo-item').value = tipo;
-            document.getElementById('cat-id-item').value = tipo.substring(0,3).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000); // Generar ID nuevo temporal
+            document.getElementById('cat-id-item').value = tipo.substring(0,3).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
             document.getElementById('form-cat-titulo').innerText = "Nuevo " + tipo;
-            
-            // Limpiar campos
             document.getElementById('cat-nombre').value = ""; document.getElementById('cat-precio').value = ""; document.getElementById('cat-descripcion').value = "";
             document.getElementById('cat-icono').value = ""; document.getElementById('cat-imagen').value = ""; document.getElementById('cat-opcion-extra').value = "No";
 
@@ -288,29 +629,25 @@
                 itemData = catalogoCache.productos.find(p => p.id === id);
                 document.getElementById('cat-imagen').value = itemData.imagen; document.getElementById('cat-opcion-extra').value = itemData.requiere_instalacion;
             }
-
             document.getElementById('cat-nombre').value = itemData.nombre; document.getElementById('cat-precio').value = itemData.precio; document.getElementById('cat-descripcion').value = itemData.descripcion;
         }
 
         async function guardarItemCatalogo() {
             const tipo = document.getElementById('cat-tipo-item').value;
             const datosItem = {
-                id: document.getElementById('cat-id-item').value,
-                nombre: document.getElementById('cat-nombre').value,
-                precio: document.getElementById('cat-precio').value,
-                descripcion: document.getElementById('cat-descripcion').value,
+                id: document.getElementById('cat-id-item').value, nombre: document.getElementById('cat-nombre').value,
+                precio: document.getElementById('cat-precio').value, descripcion: document.getElementById('cat-descripcion').value,
                 icono_img: tipo === "Servicio" ? document.getElementById('cat-icono').value : document.getElementById('cat-imagen').value,
                 opcion_extra: document.getElementById('cat-opcion-extra').value
             };
 
             if(!datosItem.nombre || !datosItem.precio) return alert("Llena nombre y precio.");
-
             document.getElementById('loader-cat-save').style.display = "block";
             try {
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "guardar_catalogo", tipo: tipo, item: datosItem }) });
                 const result = await res.json();
                 document.getElementById('loader-cat-save').style.display = "none";
-                if(result.status === "success") { alert("Catálogo actualizado en la Web."); cambiarTabAdmin('catalogo'); }
+                if(result.status === "success") { alert("Catálogo actualizado."); cambiarTabAdmin('catalogo'); }
             } catch (e) { document.getElementById('loader-cat-save').style.display = "none"; alert("Error al guardar."); }
         }
 
@@ -323,6 +660,7 @@
             } catch (e) { alert("Error al eliminar."); }
         }
 
+        // INICIO AUTOMÁTICO
         window.onload = function() { verificarSesionGuardada(); };
     </script>
 </body>
