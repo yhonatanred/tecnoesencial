@@ -8,11 +8,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Estilos rápidos para el carrito futurista */
-        .cart-floating { position: fixed; bottom: 90px; right: 20px; background: var(--primary-purple, #bc13fe); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; cursor: pointer; box-shadow: 0 0 15px rgba(188, 19, 254, 0.6); z-index: 1000; transition: 0.3s; }
-        .cart-floating:hover { transform: scale(1.1); }
-        .cart-count { position: absolute; top: -5px; right: -5px; background: var(--primary-blue, #00f3ff); color: black; font-weight: bold; font-size: 0.9rem; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        /* Ajuste de Cuadrícula para evitar que las tarjetas se estiren */
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+            justify-content: center; 
+            justify-items: center; /* Centra los elementos si hay pocos */
+        }
         
+        /* Clase base para todas las tarjetas (Servicios, Tienda, Equipo, Testimonios) */
+        .glass-card {
+            background: rgba(20,20,35,0.8);
+            border: 1px solid rgba(0,243,255,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 350px; /* Tamaño máximo perfecto para PC */
+            position: relative;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary-purple, #bc13fe); }
+
+        /* Estilos del Carrito en el Menú Superior */
+        .nav-actions { display: flex; align-items: center; gap: 10px; }
+        .btn-cart-nav { background: linear-gradient(90deg, #bc13fe, #00f3ff); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: 'Rajdhani', sans-serif; transition: 0.3s;}
+        .btn-cart-nav:hover { transform: scale(1.05); }
+        .btn-cart-nav .badge { background: #050510; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold; }
+
+        /* Estilos del Modal del carrito (Se mantiene igual) */
         .modal-hidden { display: none; }
         .cart-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .cart-content { background: rgba(20, 20, 35, 0.95); border: 1px solid rgba(0, 243, 255, 0.3); border-radius: 15px; padding: 30px; width: 90%; max-width: 500px; color: white; position: relative; max-height: 80vh; overflow-y: auto; }
@@ -24,10 +51,15 @@
         .btn-remove { background: transparent; border: 1px solid #ff5555; color: #ff5555; border-radius: 5px; cursor: pointer; padding: 5px; margin-left: 10px;}
         .cart-total { font-size: 1.5rem; text-align: right; margin-top: 20px; color: #00f3ff; font-family: 'Orbitron', sans-serif; }
         .btn-whatsapp-cart { width: 100%; padding: 15px; background: linear-gradient(90deg, #25D366, #128C7E); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-top: 20px; cursor: pointer; font-family: 'Rajdhani', sans-serif;}
-        
-        /* Etiqueta Promoción */
         .badge-promo { background: #ffaa00; color: black; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; position: absolute; top: 10px; right: 10px; }
-        .service-card, .product-card { position: relative; } /* Para que el badge se posicione bien */
+
+        /* Estilos Nuestro Equipo */
+        .team-img { width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--primary-purple); margin: 0 auto 15px auto; object-fit: cover; }
+        .team-role { color: var(--primary-blue); font-weight: bold; font-size: 1.1rem; margin-bottom: 10px;}
+        .team-desc { color: #aaa; font-size: 0.9rem;}
+        
+        /* Estrellas Testimonios */
+        .stars { color: #ffaa00; margin-bottom: 10px; font-size: 1.2rem;}
     </style>
 </head>
 <body>
@@ -42,11 +74,17 @@
         <ul class="nav-links">
             <li><a href="#inicio">Inicio</a></li>
             <li><a href="#servicios">Servicios</a></li>
-            <li><a href="#ia-diagnostic">Diagnóstico IA</a></li>
             <li><a href="#tienda">Tienda</a></li>
+            <li><a href="#equipo">Nosotros</a></li>
             <li><a href="sistema.html">Rastrear Equipo</a></li>
         </ul>
-        <a href="https://wa.me/573173669002" class="btn-nav">Contactar</a>
+        <div class="nav-actions">
+            <a href="https://wa.me/573173669002" class="btn-nav">Contactar</a>
+            <button class="btn-cart-nav" onclick="toggleCart()">
+                <i class="fas fa-shopping-cart"></i> 
+                <span id="cart-count" class="badge">0</span>
+            </button>
+        </div>
     </nav>
 
     <header id="inicio" class="hero-section">
@@ -85,20 +123,63 @@
     </section>
 
     <section id="tienda" class="section-padding">
-        <h2 class="section-title">TIENDA TECNO (Catálogo Dinámico)</h2>
+        <h2 class="section-title">TIENDA TECNO</h2>
         <div style="text-align:center;" id="loader-productos"><i class="fas fa-spinner fa-spin" style="color:#bc13fe; font-size:2rem;"></i> Cargando productos...</div>
         <div class="grid-container" id="contenedor-productos">
             </div>
     </section>
 
+    <section id="equipo" class="section-padding">
+        <h2 class="section-title"><i class="fas fa-users-cog"></i> NUESTRO GRUPO EXPERTO</h2>
+        <div class="grid-container">
+            
+            <div class="team-card glass-card">
+                <img src="https://ui-avatars.com/api/?name=Yhonatan+Aranda&background=bc13fe&color=fff&size=200" alt="Yhonatan Aranda" class="team-img">
+                <h3 style="color:white; font-family:'Orbitron', sans-serif;">Yhonatan Aranda</h3>
+                <p class="team-role">Ingeniero de Sistemas</p>
+                <p class="team-desc">Especialista en Ciberseguridad y Desarrollo de Software. <strong>Soporte Nivel 2:</strong> Servidores, redes, implementación de sistemas y soporte a call center.</p>
+            </div>
+
+            <div class="team-card glass-card">
+                <img src="https://ui-avatars.com/api/?name=Juan+Carlos&background=00f3ff&color=000&size=200" alt="Juan Carlos Vargas" class="team-img">
+                <h3 style="color:white; font-family:'Orbitron', sans-serif;">Juan Carlos Vargas</h3>
+                <p class="team-role">Tecnólogo Electrónico</p>
+                <p class="team-desc">Especialista en Hardware puro. <strong>Soporte Nivel 1:</strong> Diagnóstico inicial, formateo, cambio de piezas, soldadura y mantenimiento preventivo.</p>
+            </div>
+
+            <div class="team-card glass-card">
+                <img src="https://ui-avatars.com/api/?name=Juan+Pablo&background=ffaa00&color=000&size=200" alt="Juan Pablo Trejos" class="team-img">
+                <h3 style="color:white; font-family:'Orbitron', sans-serif;">Juan Pablo Trejos</h3>
+                <p class="team-role">Ingeniero de Sistemas</p>
+                <p class="team-desc">Especialista en Páginas Web y <strong>Soporte Nivel 1</strong>. Atención y resolución ágil de incidencias de software, sistemas operativos y ofimática.</p>
+            </div>
+
+        </div>
+    </section>
+
     <section id="testimonios" class="section-padding">
         <h2 class="section-title"><i class="fas fa-users"></i> CLIENTES SATISFECHOS</h2>
         <div class="grid-container" id="contenedor-testimonios">
+            <div class="testimonial-card glass-card">
+                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p>"Excelente servicio. Llevé mi portátil que no encendía y en un par de días me lo entregaron como nuevo. Muy recomendados en Palmira."</p>
+                <h4 style="color:#00f3ff; margin-top:10px;">- María Fernanda Gómez</h4>
             </div>
+            <div class="testimonial-card glass-card">
+                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p>"La atención de los ingenieros es de primer nivel. Instalaron la red de mi empresa rápido y sin contratiempos. 10/10."</p>
+                <h4 style="color:#00f3ff; margin-top:10px;">- Carlos Ruiz</h4>
+            </div>
+            <div class="testimonial-card glass-card">
+                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+                <p>"Compré una memoria RAM por la web y me la instalaron en mi casa. El técnico muy amable y profesional. ¡Los mejores de Jamundí!"</p>
+                <h4 style="color:#00f3ff; margin-top:10px;">- Andrés Felipe Castro</h4>
+            </div>
+        </div>
     </section>
 
     <footer>
-        <p>&copy; 2026 TECNOESENCIAL. Cali - Jamundí.</p>
+        <p>&copy; 2026 TECNOESENCIAL. Cali - Jamundí - Palmira.</p>
     </footer>
 
     <div class="whatsapp-container">
@@ -106,11 +187,6 @@
         <a href="https://wa.me/573173669002" class="whatsapp-btn" target="_blank">
             <i class="fab fa-whatsapp"></i>
         </a>
-    </div>
-
-    <div class="cart-floating" onclick="toggleCart()">
-        <i class="fas fa-shopping-cart"></i>
-        <span class="cart-count" id="cart-count">0</span>
     </div>
 
     <div id="cart-modal" class="modal-hidden">

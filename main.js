@@ -15,7 +15,7 @@ async function cargarCatalogo() {
     try {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
-            body: JSON.stringify({ accion: "obtener_catalogo_web" }) // Nueva función que crearemos en el Motor
+            body: JSON.stringify({ accion: "obtener_catalogo_web" })
         });
         const data = await response.json();
         
@@ -37,14 +37,33 @@ function renderizarServicios(servicios) {
 
     servicios.forEach(srv => {
         let badge = srv.promocion === "Sí" ? `<span class="badge-promo"><i class="fas fa-star"></i> PROMOCIÓN</span>` : "";
-        let btnCotizar = `<a href="https://wa.me/${numeroWhatsAppEmpresa}?text=Hola, me interesa el servicio de: ${srv.nombre}" class="btn-outline" target="_blank" style="display:block; text-align:center; margin-top:15px; text-decoration:none; padding:10px; border:1px solid #00f3ff; color:#00f3ff; border-radius:5px;">Cotizar</a>`;
+        
+        // 🔥 LÓGICA PARA DETECTAR SI ES IMAGEN O ÍCONO
+        let mediaVisual = "";
+        let inputIcono = srv.icono ? srv.icono.toLowerCase() : "";
+        
+        if (inputIcono.includes("http") || inputIcono.includes(".jpg") || inputIcono.includes(".png") || inputIcono.includes(".webp")) {
+            // Es una URL de imagen
+            mediaVisual = `<img src="${srv.icono}" alt="${srv.nombre}" style="width:100px; height:100px; object-fit:cover; border-radius:50%; margin: 0 auto 15px auto; border: 2px solid #00f3ff; display:block;">`;
+        } else {
+            // Es una clase de FontAwesome
+            let iconoClase = srv.icono ? srv.icono : "fas fa-tools"; // Por defecto pone herramientas si está vacío
+            mediaVisual = `<i class="${iconoClase}" style="font-size:3rem; color:#00f3ff; margin-bottom:15px; display:block;"></i>`;
+        }
+
+        let btnCotizar = `<a href="https://wa.me/${numeroWhatsAppEmpresa}?text=Hola, me interesa el servicio de: ${srv.nombre}" class="btn-outline" target="_blank" style="display:block; text-align:center; margin-top:15px; text-decoration:none; padding:10px; border:1px solid #00f3ff; color:#00f3ff; border-radius:5px; transition:0.3s;">Cotizar Servicio</a>`;
 
         cont.innerHTML += `
-            <div class="service-card" style="background: rgba(20,20,35,0.8); border: 1px solid rgba(0,243,255,0.3); border-radius: 10px; padding: 20px; text-align:center;">
+            <div class="service-card glass-card">
                 ${badge}
-                <i class="${srv.icono}" style="font-size:3rem; color:#00f3ff; margin-bottom:15px;"></i>
+                ${mediaVisual}
                 <h3 style="color:white; font-family:'Orbitron', sans-serif;">${srv.nombre}</h3>
-                <p style="color:#aaa; font-size:0.9rem; margin-top:10px;">${srv.descripcion}</p>
+                <p style="color:#aaa; font-size:0.9rem; margin-top:10px; flex-grow:1;">${srv.descripcion}</p>
+                
+                <div style="font-size:1.3rem; color:#bc13fe; font-weight:bold; margin: 15px 0;">
+                    ${formatearDinero(srv.precio)}
+                </div>
+                
                 ${btnCotizar}
             </div>
         `;
@@ -59,24 +78,23 @@ function renderizarProductos(productos) {
     productos.forEach(prod => {
         let img = prod.imagen ? `<img src="${prod.imagen}" alt="${prod.nombre}" style="width:100%; height:150px; object-fit:cover; border-radius:8px; margin-bottom:10px;">` : `<div style="height:150px; background:#111; border-radius:8px; margin-bottom:10px; display:flex; justify-content:center; align-items:center;"><i class="fas fa-box" style="font-size:3rem; color:#444;"></i></div>`;
         
-        // Checkbox opcional de instalación
         let checkInstalacion = prod.requiere_instalacion === "Sí" ? `
-            <label style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa; margin-bottom:10px; cursor:pointer;">
+            <label style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa; margin-bottom:10px; cursor:pointer; justify-content:center;">
                 <input type="checkbox" id="inst-${prod.id}" style="accent-color:#bc13fe;">
                 ¿Cotizar Instalación Técnica?
             </label>
         ` : "";
 
         cont.innerHTML += `
-            <div class="product-card" style="background: rgba(20,20,35,0.8); border: 1px solid rgba(188,19,254,0.3); border-radius: 10px; padding: 20px;">
+            <div class="product-card glass-card" style="border-color: rgba(188,19,254,0.3);">
                 ${img}
                 <h3 style="color:#00f3ff; font-family:'Rajdhani', sans-serif; font-size:1.2rem;">${prod.nombre}</h3>
-                <p style="color:#aaa; font-size:0.8rem; margin:10px 0;">${prod.descripcion}</p>
+                <p style="color:#aaa; font-size:0.8rem; margin:10px 0; flex-grow:1;">${prod.descripcion}</p>
                 <div style="font-size:1.4rem; color:#bc13fe; font-weight:bold; margin-bottom:10px;">${formatearDinero(prod.precio)}</div>
                 
                 ${checkInstalacion}
 
-                <button onclick="agregarAlCarrito('${prod.id}', '${prod.nombre}', ${prod.precio}, '${prod.requiere_instalacion}')" style="width:100%; padding:10px; background:linear-gradient(90deg, #bc13fe, #00f3ff); border:none; border-radius:5px; color:white; font-weight:bold; cursor:pointer;"><i class="fas fa-cart-plus"></i> Añadir a la Tienda</button>
+                <button onclick="agregarAlCarrito('${prod.id}', '${prod.nombre}', ${prod.precio}, '${prod.requiere_instalacion}')" style="width:100%; padding:10px; background:linear-gradient(90deg, #bc13fe, #00f3ff); border:none; border-radius:5px; color:white; font-weight:bold; cursor:pointer; transition:0.3s;"><i class="fas fa-cart-plus"></i> Añadir a la Tienda</button>
             </div>
         `;
     });
@@ -92,8 +110,6 @@ function toggleCart() {
 
 function agregarAlCarrito(id, nombre, precio, requiere_inst) {
     let instalacionPedida = false;
-    
-    // Verificar si el cliente marcó el checkbox de instalación en la tarjeta del producto
     if (requiere_inst === "Sí") {
         const checkElement = document.getElementById(`inst-${id}`);
         if (checkElement && checkElement.checked) {
@@ -101,16 +117,9 @@ function agregarAlCarrito(id, nombre, precio, requiere_inst) {
         }
     }
 
-    // Añadir al array del carrito
-    carrito.push({
-        id: id,
-        nombre: nombre,
-        precio: parseFloat(precio) || 0,
-        solicita_instalacion: instalacionPedida
-    });
-
+    carrito.push({ id: id, nombre: nombre, precio: parseFloat(precio) || 0, solicita_instalacion: instalacionPedida });
     actualizarUI_Carrito();
-    alert(`¡${nombre} añadido a tu equipo!`);
+    alert(`¡${nombre} añadido a tu carrito!`);
 }
 
 function eliminarDelCarrito(index) {
@@ -169,11 +178,9 @@ function enviarPedidoWhatsApp() {
 
     texto += `\n*Total Estimado: ${formatearDinero(total)}*\n\nHola, me gustaría concretar esta compra.`;
 
-    // Redirigir a WhatsApp
     const urlWa = `https://wa.me/${numeroWhatsAppEmpresa}?text=${encodeURIComponent(texto)}`;
     window.open(urlWa, '_blank');
     
-    // Vaciar carrito
     carrito = [];
     actualizarUI_Carrito();
     toggleCart();
@@ -183,6 +190,27 @@ function enviarPedidoWhatsApp() {
 window.onload = function() {
     cargarCatalogo();
 };
+
+// ==========================================
+// 3. CHAT BOT BÁSICO DE TECNOESENCIAL
+// ==========================================
+function responderChat() {
+    const input = document.getElementById("user-input").value.toLowerCase();
+    const chatBox = document.getElementById("chat-box");
+    if(!input) return;
+
+    chatBox.innerHTML += `<div class="msg-user">${input}</div>`;
+    document.getElementById("user-input").value = "";
+
+    setTimeout(() => {
+        let respuesta = "Entiendo. Por favor, ingresa a nuestro catálogo de la tienda o contáctanos por WhatsApp para ayudarte personalmente.";
+        if(input.includes("lento") || input.includes("virus")) respuesta = "Parece que necesitas una optimización de software o limpieza de virus. Visita nuestra sección de Servicios o contáctanos.";
+        if(input.includes("ram") || input.includes("disco") || input.includes("ssd")) respuesta = "Podemos actualizar tus componentes. En la Tienda abajo puedes ver nuestros productos o solicitar instalación.";
+        
+        chatBox.innerHTML += `<div class="msg-bot">${respuesta}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }, 1000);
+}
 
 // ==========================================
 // 🤖 CEREBRO DE LA IA (CHATBOT)
