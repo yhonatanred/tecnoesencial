@@ -205,7 +205,7 @@ function enviarPedidoWhatsApp() {
 }
 
 // ==========================================
-// 3. 🧠 CEREBRO REAL CON IA (AHORA SEGURO A TRAVÉS DE APPS SCRIPT)
+// 3. 🧠 CEREBRO REAL CON IA (MEJORADO Y BLINDADO)
 // ==========================================
 async function responderChat() {
     const input = document.getElementById('user-input');
@@ -214,46 +214,58 @@ async function responderChat() {
 
     if (mensajeUsuario.trim() === "") return;
 
+    // Mostrar mensaje del usuario
     chatBox.innerHTML += `<div class="msg-user">${mensajeUsuario}</div>`;
     input.value = ""; 
     
+    // Mostrar estado "Pensando..."
     const loadingId = "loading-" + Date.now();
     chatBox.innerHTML += `<div id="${loadingId}" class="msg-bot">Pensando... <i class="fas fa-spinner fa-spin"></i></div>`;
     chatBox.scrollTop = chatBox.scrollHeight;
 
+    // Convertimos catálogo a un resumen para la IA
     let resumenCatalogo = "SERVICIOS:\n";
     listaServiciosIA.forEach(s => resumenCatalogo += `- ${s.nombre} (${s.precio})\n`);
     resumenCatalogo += "\nPRODUCTOS:\n";
     listaProductosIA.forEach(p => resumenCatalogo += `- ${p.nombre} (${p.precio})\n`);
 
+    // 🔥 EL NUEVO SÚPER CONTEXTO DE LA EMPRESA
     const contextoNegocio = `
-        Eres el asistente virtual experto y amable de la empresa TECNOESENCIAL en Cali, Palmira y Jamundí.
-        TUS REGLAS:
-        1. Tu objetivo es ayudar al cliente y agendar citas o ventas por WhatsApp.
-        2. Responde de forma muy natural, corta, amigable y profesional (máximo 2 párrafos).
-        3. SIEMPRE invita al usuario a escribir al WhatsApp: ${numeroWhatsAppEmpresa}.
-        4. Trata de recomendar u orientar con base en este catálogo real de la empresa:
-        
-        CATÁLOGO DISPONIBLE:
+        Eres el asistente virtual experto, amable y corporativo de la empresa de tecnología TECNOESENCIAL.
+
+        INFORMACIÓN DE TU EMPRESA:
+        - Zonas de operación: Jamundí, Cali y Palmira.
+        - Modalidades de servicio: A domicilio, revisión en el lugar, o recogida de equipo. Si la reparación toma tiempo, recogemos el equipo, le generamos una orden/ticket al cliente y se lo entregamos para que haga el seguimiento de su equipo por nuestra plataforma web.
+        - Qué vendemos: Soporte técnico (hardware y software), mantenimiento, y venta de tecnología (teclados, mouse, pantallas, monitores, memorias RAM, discos duros, etc.).
+        - Promesa de valor: Si el cliente necesita un repuesto o producto que no está en la lista de abajo, dile que "todo lo relacionado con tecnología lo podemos cotizar y conseguir bajo pedido".
+
+        TUS REGLAS ESTRICTAS:
+        1. Si el usuario te saluda (ej: "hola", "buenas"), devuélvele el saludo cordialmente, preséntate como la IA de Tecnoesencial y pregúntale en qué le puedes ayudar.
+        2. Si el usuario te pregunta cosas que NO son de tecnología, ni de soporte, ni de la empresa (ej: recetas, clima, historias, tareas de colegio), dile educadamente que eres un asistente de soporte técnico y solo puedes ayudar con temas tecnológicos de Tecnoesencial. No respondas a temas fuera de tu rol.
+        3. Responde de forma natural, al grano (máximo 2 párrafos) y persuasiva.
+        4. SIEMPRE invita al usuario a escribir al WhatsApp: ${numeroWhatsAppEmpresa} para agendar su cita, recogida o compra.
+
+        NUESTRO CATÁLOGO ACTUAL:
         ${resumenCatalogo}
 
-        Si piden algo que no está en la lista, di que "podemos revisarlo o conseguirlo bajo pedido comunicándose al WhatsApp".
-
-        PREGUNTA DEL CLIENTE:
+        MENSAJE DEL CLIENTE:
         "${mensajeUsuario}"
     `;
 
     try {
-        // 🔥 AHORA LLAMAMOS AL SCRIPT SEGURO, NO A LA API DIRECTA
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify({ accion: "chatbot_ia", contexto: contextoNegocio })
         });
 
         const data = await response.json();
-        document.getElementById(loadingId).remove();
+        
+        // Borrar el "Pensando..." de forma segura
+        const loadingElement = document.getElementById(loadingId);
+        if(loadingElement) loadingElement.remove();
 
         if (data.status === "success") {
+            // Limpiar el texto (convertir **negritas** a HTML y saltos de línea a <br>)
             let respuestaFormateada = data.texto.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
             respuestaFormateada = respuestaFormateada.replace(/\n/g, '<br>');
 
@@ -263,17 +275,23 @@ async function responderChat() {
                 <div class="msg-bot">
                     ${respuestaFormateada}
                     <br><br>
-                    <a href="${linkWa}" target="_blank" class="chat-btn-action" style="border:1px solid #bc13fe; padding:5px 10px; border-radius:5px; color:white; text-decoration:none; display:inline-block; margin-top:10px;">
+                    <a href="${linkWa}" target="_blank" class="chat-btn-action" style="border:1px solid #bc13fe; padding:5px 10px; border-radius:5px; color:white; text-decoration:none; display:inline-block; margin-top:10px; font-weight:bold;">
                         <i class="fab fa-whatsapp" style="color:#25D366;"></i> Contactar Asesor Humano
                     </a>
                 </div>
             `;
         } else {
-            throw new Error("Fallo en backend");
+            // Si hay error en Apps Script, te mostrará exactamente qué falló en color rojo
+            console.error("Error Backend:", data.message);
+            chatBox.innerHTML += `<div class="msg-bot" style="border-left-color: #ff5555; color: #ffaa00;">⚠️ Error de conexión con el motor IA: ${data.message}</div>`;
         }
     } catch (error) {
+        // Si no hay internet o falla el fetch
         console.error("Error IA:", error);
-        document.getElementById(loadingId).innerHTML = "Mis sistemas neuronales están actualizándose. Por favor escríbenos al WhatsApp.";
+        const loadingElement = document.getElementById(loadingId);
+        if(loadingElement) loadingElement.remove();
+        
+        chatBox.innerHTML += `<div class="msg-bot">Mis sistemas neuronales están actualizándose. Por favor escríbenos al WhatsApp directamente.</div>`;
     }
 
     chatBox.scrollTop = chatBox.scrollHeight;
