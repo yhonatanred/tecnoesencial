@@ -1,8 +1,0 @@
-{
-  "useSmtp": true,
-  "host": "smtp.gmail.com",
-  "port": 465,
-  "username": "grupotecnoesencial@gmail.com",
-  "password": "gmfygtodsmqgvyly",
-  "recipientEmail": "grupotecnoesencial@gmail.com"
-}
