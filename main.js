@@ -9,9 +9,18 @@ const numeroWhatsAppEmpresa = "573173669002"; // Número de Cali/Colombia
 const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
 
 // ==========================================
-// 1. CARGAR CATÁLOGO (SERVICIOS Y PRODUCTOS)
+// 1. CARGAR CATÁLOGO (CON CACHÉ ULTRA RÁPIDO)
 // ==========================================
 async function cargarCatalogo() {
+    // 1. Intentar cargar desde la memoria del navegador (Caché) para carga instantánea
+    const catalogoGuardado = localStorage.getItem('tecno_catalogo_web');
+    if (catalogoGuardado) {
+        const data = JSON.parse(catalogoGuardado);
+        renderizarServicios(data.servicios);
+        renderizarProductos(data.productos);
+    }
+
+    // 2. Buscar datos frescos en Google Sheets (En modo invisible/segundo plano)
     try {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
@@ -20,13 +29,23 @@ async function cargarCatalogo() {
         const data = await response.json();
         
         if (data.status === "success") {
-            renderizarServicios(data.servicios);
-            renderizarProductos(data.productos);
+            // Convertimos la nueva data a texto para compararla
+            const dataString = JSON.stringify(data);
+            
+            // Si la base de datos tiene cosas nuevas que no están en el caché, actualizamos
+            if (catalogoGuardado !== dataString) {
+                localStorage.setItem('tecno_catalogo_web', dataString); // Guardar nueva foto
+                renderizarServicios(data.servicios); // Dibujar de nuevo
+                renderizarProductos(data.productos); // Dibujar de nuevo
+            }
         }
     } catch (error) {
-        console.error("Error cargando el catálogo", error);
-        document.getElementById('loader-servicios').innerHTML = "Error al cargar servicios.";
-        document.getElementById('loader-productos').innerHTML = "Error al cargar productos.";
+        console.error("Error cargando el catálogo en segundo plano", error);
+        // Si no hay internet o falla, y tampoco había caché, mostramos error
+        if (!catalogoGuardado) {
+            document.getElementById('loader-servicios').innerHTML = "Error al conectar con el servidor.";
+            document.getElementById('loader-productos').innerHTML = "Error al conectar con el servidor.";
+        }
     }
 }
 

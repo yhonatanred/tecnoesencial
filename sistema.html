@@ -524,7 +524,6 @@
             } catch (e) { document.getElementById('loader-edit-costo').style.display = "none"; alert("Error guardando costos."); }
         }
 
-        // 🔥 NUEVO MENSAJE DE WHATSAPP ELEGANTE (CREACIÓN)
         async function crearTicket() {
             let invArr = []; document.querySelectorAll('.inv-check:checked').forEach(c => invArr.push(c.value));
             let invFinal = invArr.join(", "); const obs = document.getElementById('form-inv-obs').value.trim(); if(obs) invFinal += " | Obs: " + obs;
@@ -545,7 +544,10 @@
                     
                     if (numeroWhatsapp) {
                         let numLimpio = numeroWhatsapp.replace(/\D/g, ''); if (numLimpio.length === 10) numLimpio = "57" + numLimpio;
-                        const mensajeWa = `Hola ${nombreCliente} 👋, un gusto saludarte desde *TECNOESENCIAL*.\n\nHemos recibido tu equipo en nuestro laboratorio técnico. Tu número de servicio es el: *${ticketLimpio}*\n\nPuedes hacer seguimiento en tiempo real de tu reparación, ver evidencias fotográficas y el valor estimado ingresando a nuestra plataforma oficial:\n👉 https://tecnoesencial.shop/sistema.html\n\n_¡Gracias por confiar en nosotros!_`;
+                        
+                        // 🔥 MENSAJE UNIVERSAL: Sirve para taller o para servicios a domicilio
+                        const mensajeWa = `Hola ${nombreCliente} 👋, un gusto saludarte desde *TECNOESENCIAL*.\n\nHemos registrado exitosamente tu solicitud de servicio. Tu número de orden es: *${ticketLimpio}*\n\nPuedes hacer seguimiento en tiempo real de tu solicitud, ver evidencias fotográficas y el valor estimado ingresando a nuestra plataforma oficial:\n👉 https://tecnoesencial.shop/\n\n_¡Gracias por confiar en nosotros!_`;
+                        
                         window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(mensajeWa)}`, '_blank');
                     }
                     document.querySelectorAll('input:not(#login-user, #login-pass), textarea').forEach(e => e.value=''); document.querySelectorAll('.inv-check').forEach(c => c.checked=false);
@@ -553,8 +555,7 @@
                 }
             } catch (e) { document.getElementById('loader-registro').style.display = "none"; }
         }
-
-        // 🔥 NUEVO MENSAJE DE WHATSAPP ELEGANTE (REPARADO)
+        
         async function guardarActualizacion() {
             const estadoNuevo = document.getElementById('act-estado').value;
             const fotosProcesadas = await procesarFotosInput('act-foto'); if(fotosProcesadas === null) return;
@@ -572,7 +573,10 @@
 
                     if (estadoNuevo === "Reparado" && result.whatsapp) {
                         let numLimpio = result.whatsapp.toString().replace(/\D/g, ''); if (numLimpio.length === 10) numLimpio = "57" + numLimpio;
-                        const msj = `Hola ${result.cliente} 👋, ¡tenemos excelentes noticias!\n\nTu equipo bajo la orden *${ticketLimpio}* ya se encuentra *REPARADO Y LISTO* para entrega en *TECNOESENCIAL*. 🚀\n\nPuedes ver el reporte final, las fotografías del trabajo y tu saldo pendiente en nuestra plataforma:\n👉 https://tecnoesencial.shop/sistema.html\n\n_Te esperamos pronto para la entrega._`;
+                        
+                        // 🔥 MENSAJE FINALIZADO UNIVERSAL Y CON URL CORTA
+                        const msj = `Hola ${result.cliente} 👋, ¡tenemos excelentes noticias!\n\nEl servicio bajo la orden *${ticketLimpio}* ya se encuentra *FINALIZADO Y LISTO* en *TECNOESENCIAL*. 🚀\n\nPuedes ver el reporte final, las fotografías del trabajo y tu saldo pendiente en nuestra plataforma:\n👉 https://tecnoesencial.shop/\n\n_Nos pondremos en contacto para coordinar la entrega o finalización del servicio._`;
+                        
                         alert("¡Equipo a REPARADO! Se abrirá WhatsApp."); window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(msj)}`, '_blank');
                     } else { alert("¡Avance guardado con éxito!"); }
                     document.getElementById('act-detalle').value = ""; document.getElementById('act-costo').value = ""; document.getElementById('act-foto').value = "";
