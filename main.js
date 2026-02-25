@@ -1,9 +1,16 @@
 // 🔴🔴🔴 REEMPLAZA AQUÍ LA MISMA URL LARGA QUE USAS EN SISTEMA.HTML 🔴🔴🔴
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW3DCk_VRl0vU-zZIqwmWAV38RJafJsJ_XI-vQDjAPah1ysv4Xjzt-1G0QZPWhfvl7/exec";
 
-// Variables del carrito
+// 🔴 TU API KEY DE GEMINI (Para el Chatbot)
+const API_KEY_GEMINI = "AIzaSyCEII9lI8i4HlFPx_f7WsaWdODKUiuc-lU"; 
+
+// Variables globales
 let carrito = [];
 const numeroWhatsAppEmpresa = "573173669002"; // Número de Cali/Colombia
+
+// Memoria para que la IA sepa qué vendes
+let listaServiciosIA = [];
+let listaProductosIA = [];
 
 // Formateador de moneda
 const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
@@ -12,15 +19,15 @@ const formatearDinero = (v) => new Intl.NumberFormat('es-CO', { style: 'currency
 // 1. CARGAR CATÁLOGO (CON CACHÉ ULTRA RÁPIDO)
 // ==========================================
 async function cargarCatalogo() {
-    // 1. Intentar cargar desde la memoria del navegador (Caché) para carga instantánea
     const catalogoGuardado = localStorage.getItem('tecno_catalogo_web');
     if (catalogoGuardado) {
         const data = JSON.parse(catalogoGuardado);
+        listaServiciosIA = data.servicios; // Guardamos para la IA
+        listaProductosIA = data.productos; // Guardamos para la IA
         renderizarServicios(data.servicios);
         renderizarProductos(data.productos);
     }
 
-    // 2. Buscar datos frescos en Google Sheets (En modo invisible/segundo plano)
     try {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
@@ -29,19 +36,17 @@ async function cargarCatalogo() {
         const data = await response.json();
         
         if (data.status === "success") {
-            // Convertimos la nueva data a texto para compararla
             const dataString = JSON.stringify(data);
-            
-            // Si la base de datos tiene cosas nuevas que no están en el caché, actualizamos
             if (catalogoGuardado !== dataString) {
-                localStorage.setItem('tecno_catalogo_web', dataString); // Guardar nueva foto
-                renderizarServicios(data.servicios); // Dibujar de nuevo
-                renderizarProductos(data.productos); // Dibujar de nuevo
+                localStorage.setItem('tecno_catalogo_web', dataString);
+                listaServiciosIA = data.servicios; // Actualizamos para la IA
+                listaProductosIA = data.productos; // Actualizamos para la IA
+                renderizarServicios(data.servicios);
+                renderizarProductos(data.productos);
             }
         }
     } catch (error) {
-        console.error("Error cargando el catálogo en segundo plano", error);
-        // Si no hay internet o falla, y tampoco había caché, mostramos error
+        console.error("Error cargando el catálogo", error);
         if (!catalogoGuardado) {
             document.getElementById('loader-servicios').innerHTML = "Error al conectar con el servidor.";
             document.getElementById('loader-productos').innerHTML = "Error al conectar con el servidor.";
@@ -57,15 +62,12 @@ function renderizarServicios(servicios) {
     servicios.forEach(srv => {
         let badge = srv.promocion === "Sí" ? `<span class="badge-promo"><i class="fas fa-star"></i> PROMOCIÓN</span>` : "";
         
-        // 🔥 LÓGICA PARA DETECTAR IMAGEN Y HACERLA RECTANGULAR
         let mediaVisual = "";
         let inputIcono = srv.icono ? srv.icono.toLowerCase() : "";
         
         if (inputIcono.includes("http") || inputIcono.includes(".jpg") || inputIcono.includes(".png") || inputIcono.includes(".webp")) {
-            // Es una URL de imagen -> RECTÁNGULO ELEGANTE
             mediaVisual = `<img src="${srv.icono}" alt="${srv.nombre}" style="width:100%; height:160px; object-fit:cover; border-radius:8px; margin-bottom:15px; border: 1px solid rgba(0,243,255,0.3);">`;
         } else {
-            // Es un ícono FontAwesome
             let iconoClase = srv.icono ? srv.icono : "fas fa-tools";
             mediaVisual = `<div style="height:160px; display:flex; justify-content:center; align-items:center; margin-bottom:15px;"><i class="${iconoClase}" style="font-size:4rem; color:#00f3ff;"></i></div>`;
         }
@@ -78,11 +80,9 @@ function renderizarServicios(servicios) {
                 ${mediaVisual}
                 <h3 style="color:white; font-family:'Orbitron', sans-serif;">${srv.nombre}</h3>
                 <p style="color:#aaa; font-size:0.9rem; margin-top:10px; flex-grow:1;">${srv.descripcion}</p>
-                
                 <div style="font-size:1.3rem; color:#00f3ff; font-weight:bold; margin: 15px 0;">
                     ${formatearDinero(srv.precio)}
                 </div>
-                
                 ${btnCotizar}
             </div>
         `;
@@ -110,9 +110,7 @@ function renderizarProductos(productos) {
                 <h3 style="color:#bc13fe; font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:bold;">${prod.nombre}</h3>
                 <p style="color:#aaa; font-size:0.8rem; margin:10px 0; flex-grow:1;">${prod.descripcion}</p>
                 <div style="font-size:1.4rem; color:white; font-weight:bold; margin-bottom:10px;">${formatearDinero(prod.precio)}</div>
-                
                 ${checkInstalacion}
-
                 <button onclick="agregarAlCarrito('${prod.id}', '${prod.nombre}', ${prod.precio}, '${prod.requiere_instalacion}')" class="btn-add-cart"><i class="fas fa-cart-plus"></i> Añadir al Carrito</button>
             </div>
         `;
@@ -139,7 +137,6 @@ function agregarAlCarrito(id, nombre, precio, requiere_inst) {
     carrito.push({ id: id, nombre: nombre, precio: parseFloat(precio) || 0, solicita_instalacion: instalacionPedida });
     actualizarUI_Carrito();
     
-    // Alerta pequeña y abrir el carrito para que el usuario sepa qué pasó
     alert(`¡${nombre} añadido a tu carrito!`);
     if(document.getElementById('cart-modal').classList.contains('modal-hidden')){
         toggleCart();
@@ -210,21 +207,9 @@ function enviarPedidoWhatsApp() {
     toggleCart();
 }
 
-// Inicializar al cargar la página
-window.onload = function() {
-    cargarCatalogo();
-};
-
 // ==========================================
-// 🤖 CEREBRO DE LA IA (CHATBOT)
+// 3. 🧠 CEREBRO REAL CON IA (GEMINI API)
 // ==========================================
-// ==========================================
-// 🧠 CEREBRO REAL CON IA (GEMINI API)
-// ==========================================
-
-// 🔴 PEGA AQUÍ TU API KEY DE GOOGLE (DENTRO DE LAS COMILLAS)
-const API_KEY = "AIzaSyCEII9lI8i4HlFPx_f7WsaWdODKUiuc-lU"; 
-
 async function responderChat() {
     const input = document.getElementById('user-input');
     const mensajeUsuario = input.value;
@@ -232,80 +217,92 @@ async function responderChat() {
 
     if (mensajeUsuario.trim() === "") return;
 
-    // 1. Mostrar mensaje del usuario
+    // Mostrar mensaje del usuario
     chatBox.innerHTML += `<div class="msg-user">${mensajeUsuario}</div>`;
     input.value = ""; 
     
-    // Mostramos estado "Escribiendo..."
+    // Mostrar estado "Pensando..."
     const loadingId = "loading-" + Date.now();
-    chatBox.innerHTML += `<div id="${loadingId}" class="msg-bot">Thinking... <i class="fas fa-spinner fa-spin"></i></div>`;
+    chatBox.innerHTML += `<div id="${loadingId}" class="msg-bot">Pensando... <i class="fas fa-spinner fa-spin"></i></div>`;
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // 2. PREPARAR EL CONTEXTO (LO QUE LA IA DEBE SABER)
-    // Convertimos tus servicios a texto para que la IA los lea
+    // Convertimos catálogo a un resumen para la IA
+    let resumenCatalogo = "SERVICIOS:\n";
+    listaServiciosIA.forEach(s => resumenCatalogo += `- ${s.nombre} (${s.precio})\n`);
+    resumenCatalogo += "\nPRODUCTOS:\n";
+    listaProductosIA.forEach(p => resumenCatalogo += `- ${p.nombre} (${p.precio})\n`);
+
+    // Preparar contexto para la IA
     const contextoNegocio = `
-        Eres el asistente virtual experto y amable de la empresa TECNOESENCIAL en Cali y Jamundí.
+        Eres el asistente virtual experto y amable de la empresa TECNOESENCIAL en Cali, Palmira y Jamundí.
         
         TUS REGLAS:
-        1. Tu objetivo es vender y agendar citas por WhatsApp.
-        2. Responde de forma corta, futurista y profesional (máximo 2 párrafos).
-        3. Siempre invita al usuario a escribir al WhatsApp: ${telefonoEmpresa}.
-        4. Solo recomiendas productos que estén en la siguiente lista. Si no está, di que podemos conseguirlo bajo pedido.
+        1. Tu objetivo es ayudar al cliente y agendar citas o ventas por WhatsApp.
+        2. Responde de forma muy natural, corta, amigable y profesional (máximo 2 párrafos).
+        3. SIEMPRE invita al usuario a escribir al WhatsApp: ${numeroWhatsAppEmpresa}.
+        4. Trata de recomendar u orientar con base en este catálogo real de la empresa:
+        
+        CATÁLOGO DISPONIBLE:
+        ${resumenCatalogo}
 
-        LISTA DE SERVICIOS Y PRODUCTOS DISPONIBLES:
-        ${JSON.stringify(servicios)}
-        ${JSON.stringify(productos)}
+        Si piden algo que no está en la lista, di que "podemos revisarlo o conseguirlo bajo pedido comunicándose al WhatsApp".
 
         PREGUNTA DEL CLIENTE:
         "${mensajeUsuario}"
     `;
 
     try {
-        // 3. CONECTAR CON GOOGLE GEMINI (EL CEREBRO)
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_GEMINI}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: contextoNegocio }]
-                }]
+                contents: [{ parts: [{ text: contextoNegocio }] }]
             })
         });
 
         const data = await response.json();
-        
-        // 4. OBTENER LA RESPUESTA INTELIGENTE
         const respuestaIA = data.candidates[0].content.parts[0].text;
 
-        // Borrar el "Thinking..." y poner la respuesta real
+        // Borrar el "Pensando..."
         document.getElementById(loadingId).remove();
 
-        // Convertir formato **negrita** de la IA a HTML <b>
-        const respuestaFormateada = respuestaIA.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        // Limpiar el texto (convertir **negritas** a HTML)
+        let respuestaFormateada = respuestaIA.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        // Convertir saltos de línea a <br>
+        respuestaFormateada = respuestaFormateada.replace(/\n/g, '<br>');
 
-        const linkWa = `https://wa.me/${telefonoEmpresa}?text=Hola Tecnoesencial, su IA me recomendó esto: ${encodeURIComponent(mensajeUsuario)}`;
+        const linkWa = `https://wa.me/${numeroWhatsAppEmpresa}?text=Hola Tecnoesencial, el asistente virtual me recomendó consultarte por esto: ${encodeURIComponent(mensajeUsuario)}`;
 
         chatBox.innerHTML += `
             <div class="msg-bot">
                 ${respuestaFormateada}
                 <br><br>
-                <a href="${linkWa}" target="_blank" class="chat-btn-action">
-                    <i class="fab fa-whatsapp"></i> Contactar Asesor Humano
+                <a href="${linkWa}" target="_blank" class="chat-btn-action" style="border:1px solid #bc13fe; padding:5px 10px; border-radius:5px; color:white; text-decoration:none; display:inline-block; margin-top:10px;">
+                    <i class="fab fa-whatsapp" style="color:#25D366;"></i> Contactar Asesor Humano
                 </a>
             </div>
         `;
 
     } catch (error) {
         console.error("Error IA:", error);
-        document.getElementById(loadingId).innerHTML = "Lo siento, mis sistemas neuronales están recargados. Por favor escríbenos al WhatsApp directamente.";
+        document.getElementById(loadingId).innerHTML = "Lo siento, mis sistemas neuronales están actualizándose. Por favor escríbenos al WhatsApp directamente.";
     }
 
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Permitir Enter para enviar
-document.getElementById("user-input")?.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") responderChat();
-});
+// INICIALIZACIÓN
+window.onload = function() {
+    cargarCatalogo();
+    
+    // Agregar evento para que el Chat funcione presionando la tecla "Enter"
+    const inputChat = document.getElementById("user-input");
+    if(inputChat) {
+        inputChat.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                responderChat();
+            }
+        });
+    }
+};

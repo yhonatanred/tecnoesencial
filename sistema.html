@@ -236,7 +236,13 @@
             </div>
             <input type="text" id="form-inv-obs" placeholder="Ej: Pantalla rayada, falta tecla Esc..." style="margin-top: 10px;">
         </div>
-        <div class="form-group"><label>Diagnóstico Inicial</label><textarea id="form-diagnostico" rows="2" placeholder="Ej: Equipo no da video."></textarea></div>
+        <div class="form-group">
+            <label style="display:flex; justify-content:space-between; align-items:center;">
+                Diagnóstico Inicial
+                <button type="button" onclick="mejorarTextoIA('form-diagnostico')" style="background:rgba(188,19,254,0.2); border:1px solid #bc13fe; color:white; border-radius:5px; padding:3px 8px; cursor:pointer; font-size:0.8rem; font-family:'Rajdhani', sans-serif;"><i class="fas fa-magic"></i> Mejorar con IA</button>
+            </label>
+            <textarea id="form-diagnostico" rows="2" placeholder="Ej: pc no da video, cambiar ram..."></textarea>
+        </div>
         <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="form-precio-rev" placeholder="Ej: 30000"></div>
         <div class="form-group"><label><i class="fas fa-camera"></i> Evidencia Inicial (Máximo 5)</label><input type="file" id="form-foto" accept="image/*" multiple></div>
         <button class="btn btn-blue" onclick="crearTicket()">Registrar Ticket</button>
@@ -257,7 +263,13 @@
                 <option value="Entregado">Entregado (Cerrar)</option>
             </select>
         </div>
-        <div class="form-group"><label>Detalle del Avance</label><textarea id="act-detalle" rows="2" placeholder="Ej: Se instaló disco SSD."></textarea></div>
+        <div class="form-group">
+            <label style="display:flex; justify-content:space-between; align-items:center;">
+                Detalle del Avance
+                <button type="button" onclick="mejorarTextoIA('act-detalle')" style="background:rgba(188,19,254,0.2); border:1px solid #bc13fe; color:white; border-radius:5px; padding:3px 8px; cursor:pointer; font-size:0.8rem; font-family:'Rajdhani', sans-serif;"><i class="fas fa-magic"></i> Mejorar con IA</button>
+            </label>
+            <textarea id="act-detalle" rows="2" placeholder="Ej: formatié el pc y le puse ssd"></textarea>
+        </div>
         <div class="form-group"><label>Costo Agregado ($)</label><input type="number" id="act-costo" placeholder="Ej: 150000"></div>
         <div class="form-group"><label><i class="fas fa-camera"></i> Fotos del Avance</label><input type="file" id="act-foto" accept="image/*" multiple></div>
         <button class="btn btn-blue" onclick="guardarActualizacion()">Guardar Avance</button>
@@ -725,6 +737,46 @@
                 const result = await res.json();
                 if(result.status === "success") { cargarCatalogoAdmin(); }
             } catch (e) { alert("Error al eliminar."); }
+        }
+
+        // ==========================================
+        // 🔥 MAGIA CON INTELIGENCIA ARTIFICIAL
+        // ==========================================
+        async function mejorarTextoIA(idTextarea) {
+            const textarea = document.getElementById(idTextarea);
+            const textoOriginal = textarea.value.trim();
+            
+            if(!textoOriginal) return alert("Escribe un resumen rápido primero para que la IA pueda mejorarlo.");
+            
+            // Cambiar visualmente el botón mientras piensa
+            const labelContainer = textarea.previousElementSibling;
+            const boton = labelContainer.querySelector('button');
+            const textoBotonOriginal = boton.innerHTML;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+            boton.style.borderColor = "#00f3ff";
+            
+            try {
+                const res = await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ accion: "mejorar_texto", texto: textoOriginal }) 
+                });
+                const result = await res.json();
+                
+                if(result.status === "success") {
+                    // Reemplaza el texto feo por la obra de arte de la IA
+                    textarea.value = result.texto;
+                    boton.innerHTML = '<i class="fas fa-check"></i> ¡Mejorado!';
+                    setTimeout(() => { boton.innerHTML = textoBotonOriginal; boton.style.borderColor = "#bc13fe"; }, 3000);
+                } else {
+                    alert("Error en la IA. Intenta de nuevo.");
+                    boton.innerHTML = textoBotonOriginal;
+                    boton.style.borderColor = "#bc13fe";
+                }
+            } catch (e) {
+                alert("Error de conexión con el motor de IA.");
+                boton.innerHTML = textoBotonOriginal;
+                boton.style.borderColor = "#bc13fe";
+            }
         }
 
         // INICIO AUTOMÁTICO
