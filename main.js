@@ -1,9 +1,6 @@
 // 🔴🔴🔴 REEMPLAZA AQUÍ LA MISMA URL LARGA QUE USAS EN SISTEMA.HTML 🔴🔴🔴
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW3DCk_VRl0vU-zZIqwmWAV38RJafJsJ_XI-vQDjAPah1ysv4Xjzt-1G0QZPWhfvl7/exec";
 
-// 🔴 TU API KEY DE GEMINI (Para el Chatbot)
-const API_KEY_GEMINI = "AIzaSyCEII9lI8i4HlFPx_f7WsaWdODKUiuc-lU"; 
-
 // Variables globales
 let carrito = [];
 const numeroWhatsAppEmpresa = "573173669002"; // Número de Cali/Colombia
@@ -208,7 +205,7 @@ function enviarPedidoWhatsApp() {
 }
 
 // ==========================================
-// 3. 🧠 CEREBRO REAL CON IA (GEMINI API)
+// 3. 🧠 CEREBRO REAL CON IA (AHORA SEGURO A TRAVÉS DE APPS SCRIPT)
 // ==========================================
 async function responderChat() {
     const input = document.getElementById('user-input');
@@ -217,25 +214,20 @@ async function responderChat() {
 
     if (mensajeUsuario.trim() === "") return;
 
-    // Mostrar mensaje del usuario
     chatBox.innerHTML += `<div class="msg-user">${mensajeUsuario}</div>`;
     input.value = ""; 
     
-    // Mostrar estado "Pensando..."
     const loadingId = "loading-" + Date.now();
     chatBox.innerHTML += `<div id="${loadingId}" class="msg-bot">Pensando... <i class="fas fa-spinner fa-spin"></i></div>`;
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Convertimos catálogo a un resumen para la IA
     let resumenCatalogo = "SERVICIOS:\n";
     listaServiciosIA.forEach(s => resumenCatalogo += `- ${s.nombre} (${s.precio})\n`);
     resumenCatalogo += "\nPRODUCTOS:\n";
     listaProductosIA.forEach(p => resumenCatalogo += `- ${p.nombre} (${p.precio})\n`);
 
-    // Preparar contexto para la IA
     const contextoNegocio = `
         Eres el asistente virtual experto y amable de la empresa TECNOESENCIAL en Cali, Palmira y Jamundí.
-        
         TUS REGLAS:
         1. Tu objetivo es ayudar al cliente y agendar citas o ventas por WhatsApp.
         2. Responde de forma muy natural, corta, amigable y profesional (máximo 2 párrafos).
@@ -252,40 +244,36 @@ async function responderChat() {
     `;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_GEMINI}`, {
+        // 🔥 AHORA LLAMAMOS AL SCRIPT SEGURO, NO A LA API DIRECTA
+        const response = await fetch(SCRIPT_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: contextoNegocio }] }]
-            })
+            body: JSON.stringify({ accion: "chatbot_ia", contexto: contextoNegocio })
         });
 
         const data = await response.json();
-        const respuestaIA = data.candidates[0].content.parts[0].text;
-
-        // Borrar el "Pensando..."
         document.getElementById(loadingId).remove();
 
-        // Limpiar el texto (convertir **negritas** a HTML)
-        let respuestaFormateada = respuestaIA.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-        // Convertir saltos de línea a <br>
-        respuestaFormateada = respuestaFormateada.replace(/\n/g, '<br>');
+        if (data.status === "success") {
+            let respuestaFormateada = data.texto.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            respuestaFormateada = respuestaFormateada.replace(/\n/g, '<br>');
 
-        const linkWa = `https://wa.me/${numeroWhatsAppEmpresa}?text=Hola Tecnoesencial, el asistente virtual me recomendó consultarte por esto: ${encodeURIComponent(mensajeUsuario)}`;
+            const linkWa = `https://wa.me/${numeroWhatsAppEmpresa}?text=Hola Tecnoesencial, el asistente virtual me recomendó consultarte por esto: ${encodeURIComponent(mensajeUsuario)}`;
 
-        chatBox.innerHTML += `
-            <div class="msg-bot">
-                ${respuestaFormateada}
-                <br><br>
-                <a href="${linkWa}" target="_blank" class="chat-btn-action" style="border:1px solid #bc13fe; padding:5px 10px; border-radius:5px; color:white; text-decoration:none; display:inline-block; margin-top:10px;">
-                    <i class="fab fa-whatsapp" style="color:#25D366;"></i> Contactar Asesor Humano
-                </a>
-            </div>
-        `;
-
+            chatBox.innerHTML += `
+                <div class="msg-bot">
+                    ${respuestaFormateada}
+                    <br><br>
+                    <a href="${linkWa}" target="_blank" class="chat-btn-action" style="border:1px solid #bc13fe; padding:5px 10px; border-radius:5px; color:white; text-decoration:none; display:inline-block; margin-top:10px;">
+                        <i class="fab fa-whatsapp" style="color:#25D366;"></i> Contactar Asesor Humano
+                    </a>
+                </div>
+            `;
+        } else {
+            throw new Error("Fallo en backend");
+        }
     } catch (error) {
         console.error("Error IA:", error);
-        document.getElementById(loadingId).innerHTML = "Lo siento, mis sistemas neuronales están actualizándose. Por favor escríbenos al WhatsApp directamente.";
+        document.getElementById(loadingId).innerHTML = "Mis sistemas neuronales están actualizándose. Por favor escríbenos al WhatsApp.";
     }
 
     chatBox.scrollTop = chatBox.scrollHeight;
