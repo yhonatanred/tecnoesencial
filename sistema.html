@@ -353,14 +353,22 @@
             return arrayFotos;
         }
 
+        // ==========================================
+        // SISTEMA DE SESIÓN Y PERMISOS MODULARES
+        // ==========================================
+        let permisosActuales = {};
+
         function verificarSesionGuardada() {
-            const guardado = localStorage.getItem('tecno_user'); const rol = localStorage.getItem('tecno_rol'); const tiempo = localStorage.getItem('tecno_time');
-            if (guardado && rol && tiempo && (new Date().getTime() - tiempo < 28800000)) {
-                tecnicoActual = guardado; tecnicoRol = rol;
+            const guardado = localStorage.getItem('tecno_user'); 
+            const permisosGuardados = localStorage.getItem('tecno_permisos'); 
+            const tiempo = localStorage.getItem('tecno_time');
+            
+            if (guardado && permisosGuardados && tiempo && (new Date().getTime() - tiempo < 28800000)) {
+                tecnicoActual = guardado; 
+                permisosActuales = JSON.parse(permisosGuardados);
                 configurarVistaSegunRol();
             } else {
                 cerrarSesion();
-                // 🔥 EL PANEL DEL CLIENTE ES EL QUE SE MUESTRA POR DEFECTO SIEMPRE
                 mostrarPanel('panel-cliente');
             }
         }
@@ -373,36 +381,56 @@
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "login", usuario: user, password: pass }) });
                 const result = await res.json();
                 document.getElementById('loader-login').style.display = "none";
+                
                 if(result.status === "success") { 
-                    tecnicoActual = result.data.nombre; tecnicoRol = result.data.rol || "Técnico"; 
-                    localStorage.setItem('tecno_user', tecnicoActual); localStorage.setItem('tecno_rol', tecnicoRol); localStorage.setItem('tecno_time', new Date().getTime());
+                    tecnicoActual = result.data.nombre; 
+                    permisosActuales = result.data.permisos; 
+                    
+                    localStorage.setItem('tecno_user', tecnicoActual); 
+                    localStorage.setItem('tecno_permisos', JSON.stringify(permisosActuales)); 
+                    localStorage.setItem('tecno_time', new Date().getTime());
+                    
                     configurarVistaSegunRol();
                 } else alert("Credenciales incorrectas."); 
             } catch (e) { document.getElementById('loader-login').style.display = "none"; alert("Error de conexión."); }
         }
 
         function cerrarSesion() {
-            localStorage.removeItem('tecno_user'); localStorage.removeItem('tecno_rol'); localStorage.removeItem('tecno_time');
-            tecnicoActual = ""; tecnicoRol = "";
+            localStorage.removeItem('tecno_user'); 
+            localStorage.removeItem('tecno_permisos'); 
+            localStorage.removeItem('tecno_time');
+            tecnicoActual = ""; permisosActuales = {};
             document.getElementById('login-user').value = ""; document.getElementById('login-pass').value = "";
-            mostrarPanel('panel-cliente'); // Si cierra sesión, lo devuelve a rastreo
+            mostrarPanel('panel-cliente'); 
         }
 
         function configurarVistaSegunRol() {
-            document.getElementById('dash-nombre-tecnico').innerText = tecnicoActual; document.getElementById('dash-rol').innerText = tecnicoRol;
-            document.getElementById('cat-nombre-tecnico').innerText = tecnicoActual; document.getElementById('cat-rol').innerText = tecnicoRol;
+            document.getElementById('dash-nombre-tecnico').innerText = tecnicoActual; 
+            document.getElementById('cat-nombre-tecnico').innerText = tecnicoActual; 
+            
+            // Ocultamos el rol en texto, ya que ahora son permisos modulares
+            document.getElementById('dash-rol').innerText = "Personal Autorizado";
+            document.getElementById('cat-rol').innerText = "Personal Autorizado";
 
-            if(tecnicoRol === "Administrador") {
-                document.getElementById('admin-nav-menu').style.display = "flex";
-                obtenerListaTecnicos();
+            // MENÚ ADMINISTRATIVO DINÁMICO
+            document.getElementById('admin-nav-menu').style.display = "flex";
+            const btnTickets = document.getElementById('btn-tab-tickets');
+            const btnCatalogo = document.getElementById('btn-tab-catalogo');
+            
+            btnTickets.style.display = permisosActuales.tickets ? "block" : "none";
+            btnCatalogo.style.display = permisosActuales.catalogo ? "block" : "none";
+
+            // OBTENER LISTA DE TÉCNICOS SOLO SI PUEDE ASIGNAR
+            if(permisosActuales.asignacion) obtenerListaTecnicos();
+
+            // DECIDIR A QUÉ PANTALLA ENVIARLO AL INICIAR SESIÓN
+            if(permisosActuales.tickets) {
                 cambiarTabAdmin('tickets');
-            } else if (tecnicoRol === "Ventas") {
-                document.getElementById('admin-nav-menu').style.display = "none";
-                mostrarPanel('panel-gestion-catalogo');
-                cargarCatalogoAdmin();
+            } else if (permisosActuales.catalogo) {
+                cambiarTabAdmin('catalogo');
             } else {
-                document.getElementById('admin-nav-menu').style.display = "none";
-                cargarMisTickets();
+                alert("Tu usuario no tiene módulos asignados. Contacta a gerencia.");
+                cerrarSesion();
             }
         }
 
@@ -462,10 +490,11 @@
                 // 🔥 Ocultamos visualmente el TCN- en el panel de técnicos también
                 let numLimpio = t.id.replace('TCN-', '');
 
-                if (tecnicoRol === "Administrador") {
-                    botonesAdmin = `
-                    <button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe;" onclick="abrirAsignacion('${t.id}', '${t.principal}', '${t.colaboradores}')"><i class="fas fa-users"></i></button>
-                    <button class="btn-foto" style="border-color:#ffaa00; color:#ffaa00;" onclick="abrirEdicionCostos('${t.id}')"><i class="fas fa-money-bill-wave"></i></button>`;
+                if (permisosActuales.asignacion) {
+                    botonesAdmin += `<button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe;" onclick="abrirAsignacion('${t.id}', '${t.principal}', '${t.colaboradores}')"><i class="fas fa-users"></i> Asignar</button>`;
+                }
+                if (permisosActuales.finanzas) {
+                    botonesAdmin += `<button class="btn-foto" style="border-color:#ffaa00; color:#ffaa00;" onclick="abrirEdicionCostos('${t.id}')"><i class="fas fa-money-bill-wave"></i> Costos</button>`;
                 }
 
                 contenedor.innerHTML += `
