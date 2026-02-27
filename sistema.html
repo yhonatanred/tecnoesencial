@@ -396,11 +396,26 @@
         }
 
         function cerrarSesion() {
+            // 1. Borramos la memoria
             localStorage.removeItem('tecno_user'); 
             localStorage.removeItem('tecno_permisos'); 
             localStorage.removeItem('tecno_time');
-            tecnicoActual = ""; permisosActuales = {};
-            document.getElementById('login-user').value = ""; document.getElementById('login-pass').value = "";
+            tecnicoActual = ""; 
+            permisosActuales = {};
+            
+            // 2. Limpiamos las cajas de texto del login
+            document.getElementById('login-user').value = ""; 
+            document.getElementById('login-pass').value = "";
+            
+            // 🔥 3. OCULTAMOS LOS BOTONES DE ADMINISTRACIÓN Y TIENDA
+            document.getElementById('admin-nav-menu').style.display = "none";
+            
+            // 4. Limpiamos la pantalla por seguridad (para que no quede nada cargado en el fondo)
+            document.getElementById('lista-mis-tickets').innerHTML = "";
+            document.getElementById('lista-admin-servicios').innerHTML = "";
+            document.getElementById('lista-admin-productos').innerHTML = "";
+            
+            // 5. Devolvemos al usuario a la vista de rastreo
             mostrarPanel('panel-cliente'); 
         }
 
