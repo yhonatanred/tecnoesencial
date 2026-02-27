@@ -357,7 +357,22 @@
             } catch (e) { document.getElementById('loader-gasto').style.display = "none"; alert("Error."); }
         }
 
-        window.onload = function() { verificarSesionGuardada(); };
+        window.onload = function() { 
+            verificarSesionGuardada(); 
+            
+            // 1. Activar ENTER para el Login de Técnicos/Admin
+            document.getElementById('login-pass').addEventListener('keypress', function(e){
+                if(e.key === 'Enter') iniciarSesion();
+            });
+            document.getElementById('login-user').addEventListener('keypress', function(e){
+                if(e.key === 'Enter') iniciarSesion();
+            });
+
+            // 2. Activar ENTER para el Rastreo de Clientes
+            document.getElementById('ticket-id').addEventListener('keypress', function(e){
+                if(e.key === 'Enter') consultarTicket();
+            });
+        };
     </script>
 </body>
 </html>
