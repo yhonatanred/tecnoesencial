@@ -655,27 +655,51 @@
         }
 
         // ==========================================
-        // GESTIÓN WEB Y CATÁLOGO
+        // GESTIÓN WEB Y CATÁLOGO (CON CACHÉ)
         // ==========================================
         async function cargarCatalogoAdmin() {
-            document.getElementById('loader-admin-catalogo').style.display = "block";
-            const contSrv = document.getElementById('lista-admin-servicios'); const contPrd = document.getElementById('lista-admin-productos');
-            contSrv.innerHTML = ""; contPrd.innerHTML = "";
+            const contSrv = document.getElementById('lista-admin-servicios'); 
+            const contPrd = document.getElementById('lista-admin-productos');
+            
+            // 1. Cargar desde la memoria (Instantáneo)
+            const cache = localStorage.getItem('tecno_catalogo_web');
+            if (cache) {
+                const data = JSON.parse(cache);
+                catalogoCache = { servicios: data.servicios, productos: data.productos };
+                renderizarListasCatalogoAdmin(data.servicios, data.productos, contSrv, contPrd);
+            } else {
+                document.getElementById('loader-admin-catalogo').style.display = "block";
+            }
+
+            // 2. Revisar si hay cambios en Google Sheets
             try {
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "obtener_catalogo_web" }) });
-                const result = await res.json(); document.getElementById('loader-admin-catalogo').style.display = "none";
+                const result = await res.json(); 
+                document.getElementById('loader-admin-catalogo').style.display = "none";
+                
                 if(result.status === "success") {
-                    catalogoCache = { servicios: result.servicios, productos: result.productos };
-                    if(result.servicios.length === 0) contSrv.innerHTML = "<p style='color:#aaa;'>No hay servicios.</p>";
-                    result.servicios.forEach(s => {
-                        contSrv.innerHTML += `<div class="catalog-card"><strong>${s.nombre}</strong> - ${formatearDinero(s.precio)} <br><span style="font-size:0.8rem; color:#aaa;">Promoción: ${s.promocion}</span><div style="margin-top:8px;"><button onclick="editarItemCatalogo('${s.id}', 'Servicio')" class="btn-foto"><i class="fas fa-edit"></i> Editar</button><button onclick="eliminarItemCatalogo('${s.id}', 'Servicio')" class="btn-foto" style="border-color:#ff5555; color:#ff5555;"><i class="fas fa-trash"></i></button></div></div>`;
-                    });
-                    if(result.productos.length === 0) contPrd.innerHTML = "<p style='color:#aaa;'>No hay productos.</p>";
-                    result.productos.forEach(p => {
-                        contPrd.innerHTML += `<div class="catalog-card" style="border-color:rgba(188,19,254,0.3);"><strong>${p.nombre}</strong> - ${formatearDinero(p.precio)} <br><span style="font-size:0.8rem; color:#aaa;">Req. Instalación: ${p.requiere_instalacion}</span><div style="margin-top:8px;"><button onclick="editarItemCatalogo('${p.id}', 'Producto')" class="btn-foto"><i class="fas fa-edit"></i> Editar</button><button onclick="eliminarItemCatalogo('${p.id}', 'Producto')" class="btn-foto" style="border-color:#ff5555; color:#ff5555;"><i class="fas fa-trash"></i></button></div></div>`;
-                    });
+                    const dataString = JSON.stringify(result);
+                    // Si Excel tiene algo nuevo que no está en la memoria, actualiza
+                    if(cache !== dataString) {
+                        localStorage.setItem('tecno_catalogo_web', dataString);
+                        catalogoCache = { servicios: result.servicios, productos: result.productos };
+                        renderizarListasCatalogoAdmin(result.servicios, result.productos, contSrv, contPrd);
+                    }
                 }
             } catch (e) { document.getElementById('loader-admin-catalogo').style.display = "none"; }
+        }
+
+        // Función auxiliar para no repetir código visual
+        function renderizarListasCatalogoAdmin(servicios, productos, contSrv, contPrd) {
+            contSrv.innerHTML = ""; contPrd.innerHTML = "";
+            if(servicios.length === 0) contSrv.innerHTML = "<p style='color:#aaa;'>No hay servicios.</p>";
+            servicios.forEach(s => {
+                contSrv.innerHTML += `<div class="catalog-card"><strong>${s.nombre}</strong> - ${formatearDinero(s.precio)} <br><span style="font-size:0.8rem; color:#aaa;">Promoción: ${s.promocion}</span><div style="margin-top:8px;"><button onclick="editarItemCatalogo('${s.id}', 'Servicio')" class="btn-foto"><i class="fas fa-edit"></i> Editar</button><button onclick="eliminarItemCatalogo('${s.id}', 'Servicio')" class="btn-foto" style="border-color:#ff5555; color:#ff5555;"><i class="fas fa-trash"></i></button></div></div>`;
+            });
+            if(productos.length === 0) contPrd.innerHTML = "<p style='color:#aaa;'>No hay productos.</p>";
+            productos.forEach(p => {
+                contPrd.innerHTML += `<div class="catalog-card" style="border-color:rgba(188,19,254,0.3);"><strong>${p.nombre}</strong> - ${formatearDinero(p.precio)} <br><span style="font-size:0.8rem; color:#aaa;">Req. Instalación: ${p.requiere_instalacion}</span><div style="margin-top:8px;"><button onclick="editarItemCatalogo('${p.id}', 'Producto')" class="btn-foto"><i class="fas fa-edit"></i> Editar</button><button onclick="eliminarItemCatalogo('${p.id}', 'Producto')" class="btn-foto" style="border-color:#ff5555; color:#ff5555;"><i class="fas fa-trash"></i></button></div></div>`;
+            });
         }
 
         function abrirFormularioCatalogo(tipo) {
@@ -756,21 +780,43 @@
         }
 
         // ==========================================
-        // MEJORAR TEXTO IA
+        // MEJORAR TEXTO IA (BLINDADO)
         // ==========================================
         async function mejorarTextoIA(idTextarea) {
-            const textarea = document.getElementById(idTextarea); const textoOriginal = textarea.value.trim();
+            const textarea = document.getElementById(idTextarea); 
+            const textoOriginal = textarea.value.trim();
             if(!textoOriginal) return alert("Escribe un resumen rápido primero.");
-            const boton = textarea.previousElementSibling.querySelector('button'); const textoBotonOriginal = boton.innerHTML;
-            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...'; boton.style.borderColor = "#00f3ff";
+            
+            const boton = textarea.previousElementSibling.querySelector('button'); 
+            const textoBotonOriginal = boton.innerHTML;
+            
+            // Bloqueamos el botón para que el usuario no le dé 10 veces seguidas
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...'; 
+            boton.style.borderColor = "#00f3ff";
+            boton.disabled = true; 
+
             try {
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "mejorar_texto", texto: textoOriginal }) });
                 const result = await res.json();
+                
                 if(result.status === "success") {
-                    textarea.value = result.texto; boton.innerHTML = '<i class="fas fa-check"></i> ¡Mejorado!';
-                    setTimeout(() => { boton.innerHTML = textoBotonOriginal; boton.style.borderColor = "#bc13fe"; }, 3000);
-                } else { alert("Error IA."); boton.innerHTML = textoBotonOriginal; boton.style.borderColor = "#bc13fe"; }
-            } catch (e) { alert("Error motor IA."); boton.innerHTML = textoBotonOriginal; boton.style.borderColor = "#bc13fe"; }
+                    textarea.value = result.texto; 
+                    boton.innerHTML = '<i class="fas fa-check"></i> ¡Mejorado!';
+                } else { 
+                    alert("⚠️ Error IA: " + result.message); 
+                    boton.innerHTML = textoBotonOriginal; 
+                }
+            } catch (e) { 
+                alert("Error de conexión al servidor."); 
+                boton.innerHTML = textoBotonOriginal; 
+            } finally {
+                // Siempre, pase lo que pase (falle o funcione), devolvemos el botón a la normalidad
+                boton.style.borderColor = "#bc13fe";
+                boton.disabled = false;
+                if(boton.innerHTML.includes('¡Mejorado!')) {
+                    setTimeout(() => { boton.innerHTML = textoBotonOriginal; }, 3000);
+                }
+            }
         }
 
         // ==========================================
