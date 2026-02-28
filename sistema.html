@@ -166,6 +166,13 @@
 
     <div class="panel" id="panel-finanzas">
         <h2>Flujo de Caja</h2>
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px; background: rgba(0,0,0,0.5); padding:10px; border-radius:8px; border:1px solid #333;">
+            <div style="flex:1;"><label style="font-size:0.8rem; margin:0;">Desde:</label><input type="date" id="fin-fecha-inicio" style="padding:8px;"></div>
+            <div style="flex:1;"><label style="font-size:0.8rem; margin:0;">Hasta:</label><input type="date" id="fin-fecha-fin" style="padding:8px;"></div>
+            <button class="btn btn-blue" style="width:auto; margin-top:17px; padding:0 15px;" onclick="cargarFinanzas()"><i class="fas fa-search"></i></button>
+        </div>
+
         <div class="finanzas-dash">
             <div class="fin-box" style="border-color:var(--success-green);"><h4>Ingresos</h4><div class="monto" id="fin-dash-ingresos" style="color:var(--success-green);">$0</div></div>
             <div class="fin-box" style="border-color:#ff5555;"><h4>Salidas/Gastos</h4><div class="monto" id="fin-dash-gastos" style="color:#ff5555;">$0</div></div>
@@ -174,9 +181,12 @@
         
         <button class="btn btn-outline" onclick="mostrarPanel('panel-registrar-gasto')" style="border-color:#ffaa00; color:#ffaa00; margin-bottom:20px;"><i class="fas fa-file-invoice-dollar"></i> Registrar Gasto o Pago a Técnico</button>
         
-        <h3 style="border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:15px; color:#aaa; font-size:1rem;">Últimos Movimientos</h3>
+        <h3 style="border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:15px; color:#aaa; font-size:1rem;">Movimientos del Periodo</h3>
         <div id="lista-movimientos"></div>
         <div class="loader" id="loader-finanzas"><i class="fas fa-spinner fa-spin"></i> Calculando...</div>
+
+        <h3 style="border-bottom:1px solid #333; padding-bottom:5px; margin:30px 0 15px 0; color:#ffaa00; font-size:1.1rem;"><i class="fas fa-exclamation-triangle"></i> Cuentas por Cobrar (Pendientes)</h3>
+        <div id="lista-pendientes-cobro"></div>
     </div>
 
     <div class="panel" id="panel-cobrar-ticket">
@@ -276,7 +286,7 @@
             </label>
             <textarea id="form-diagnostico" rows="2" placeholder="Ej: pc no da video, cambiar ram..."></textarea>
         </div>
-        <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="form-precio-rev" placeholder="Ej: 30000"></div>
+        <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="form-precio-rev" value="40000" placeholder="Ej: 40000"></div>
         <div class="form-group"><label><i class="fas fa-camera"></i> Evidencia Inicial (Máximo 5)</label><input type="file" id="form-foto" accept="image/*" multiple></div>
         <button class="btn btn-blue" onclick="crearTicket()">Registrar Ticket</button>
         <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Subiendo y guardando...</div>
@@ -502,18 +512,24 @@
                 if (permisosActuales.asignacion) botonesAdmin += `<button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe;" onclick="abrirAsignacion('${t.id}', '${t.principal}', '${t.colaboradores}')"><i class="fas fa-users"></i> Asignar</button>`;
                 if (permisosActuales.finanzas) botonesAdmin += `<button class="btn-foto" style="border-color:#ffaa00; color:#ffaa00;" onclick="abrirEdicionCostos('${t.id}')"><i class="fas fa-money-bill-wave"></i> Costos</button>`;
 
-                // 🔥 NUEVOS BOTONES DE HISTORIAL Y ANULAR
                 let btnHistorial = `<button class="btn-foto" style="border-color:#00f3ff; color:#00f3ff;" onclick="verHistorialTecnico('${t.id}')"><i class="fas fa-history"></i> Historial</button>`;
                 let btnAnular = `<button class="btn-foto" style="border-color:#ff5555; color:#ff5555; background:rgba(255,0,0,0.1);" onclick="anularTicket('${t.id}')"><i class="fas fa-ban"></i> Anular</button>`;
+                let btnAvance = `<button class="btn-foto" onclick="abrirActualizador('${t.id}')"><i class="fas fa-edit"></i> Avance</button>`;
+
+                // 🔥 LÓGICA DE BLOQUEO PARA TICKETS ANULADOS
+                if(t.estado === "Anulado") {
+                    badgeDinero = `<span style="color:#ff5555; font-size:0.8rem; font-weight:bold;"><i class="fas fa-ban"></i> ORDEN CANCELADA</span>`;
+                    btnCobrar = ""; botonesAdmin = ""; btnAnular = ""; btnAvance = ""; // Desaparecemos todo excepto historial
+                }
 
                 cont.innerHTML += `
                     <div class="ticket-card">
-                        <span class="status-badge">${t.estado}</span><strong style="font-size:1.2rem; color:var(--primary-blue); letter-spacing:2px;">${numLimpio}</strong><br>
+                        <span class="status-badge" style="${t.estado === 'Anulado' ? 'background:#ff5555;' : ''}">${t.estado}</span><strong style="font-size:1.2rem; color:var(--primary-blue); letter-spacing:2px;">${numLimpio}</strong><br>
                         <span style="color:#aaa; font-size:0.9rem;">${t.cliente} - ${t.equipo}</span><br>
                         ${badgeDinero}
                         ${badgeRevision}
                         <div style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;">
-                            <button class="btn-foto" onclick="abrirActualizador('${t.id}')"><i class="fas fa-edit"></i> Avance</button>
+                            ${btnAvance}
                             ${btnCobrar}
                             ${btnHistorial}
                             ${botonesAdmin}
@@ -616,13 +632,19 @@
             } catch (e) { document.getElementById('loader-edit-costo').style.display = "none"; alert("Error guardando costos."); }
         }
 
-        // ==========================================
-        // FINANZAS Y PAGOS
-        // ==========================================
         async function cargarFinanzas() {
             mostrarPanel('panel-finanzas'); document.getElementById('loader-finanzas').style.display = "block";
+            
+            // Lógica de fechas (Por defecto hoy)
+            let inputInicio = document.getElementById('fin-fecha-inicio');
+            let inputFin = document.getElementById('fin-fecha-fin');
+            if(!inputInicio.value) {
+                let hoyStr = new Date().toLocaleDateString('en-CA'); // Da formato YYYY-MM-DD
+                inputInicio.value = hoyStr; inputFin.value = hoyStr;
+            }
+
             try {
-                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "obtener_finanzas" }) });
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "obtener_finanzas", fecha_inicio: inputInicio.value, fecha_fin: inputFin.value }) });
                 const result = await res.json(); document.getElementById('loader-finanzas').style.display = "none";
                 if(result.status === "success") {
                     document.getElementById('fin-dash-ingresos').innerText = formatearDinero(result.balance.ingresos);
@@ -630,15 +652,26 @@
                     document.getElementById('fin-dash-utilidad').innerText = formatearDinero(result.balance.utilidades);
                     
                     const cont = document.getElementById('lista-movimientos'); cont.innerHTML = "";
-                    if(result.movimientos.length === 0) cont.innerHTML = "<p style='text-align:center; color:#aaa;'>Sin movimientos recientes.</p>";
+                    if(result.movimientos.length === 0) cont.innerHTML = "<p style='text-align:center; color:#aaa;'>Sin movimientos en esta fecha.</p>";
                     result.movimientos.forEach(m => {
                         let claseBorde = m.tipo === "Ingreso" ? "mov-ingreso" : "mov-gasto";
                         let colorValor = m.tipo === "Ingreso" ? "var(--success-green)" : "#ff5555";
                         let signo = m.tipo === "Ingreso" ? "+" : "-";
-                        cont.innerHTML += `
-                            <div class="mov-card ${claseBorde}">
-                                <div><strong style="color:white; font-size:0.9rem;">${m.concepto}</strong><br><span style="color:#aaa; font-size:0.75rem;">${m.fecha} | ${m.metodo} (${m.responsable})</span></div>
-                                <div style="color:${colorValor}; font-weight:bold; font-family:'Orbitron';">${signo}${formatearDinero(m.valor)}</div>
+                        cont.innerHTML += `<div class="mov-card ${claseBorde}"><div><strong style="color:white; font-size:0.9rem;">${m.concepto}</strong><br><span style="color:#aaa; font-size:0.75rem;">${m.fecha} | ${m.metodo} (${m.responsable})</span></div><div style="color:${colorValor}; font-weight:bold; font-family:'Orbitron';">${signo}${formatearDinero(m.valor)}</div></div>`;
+                    });
+
+                    // 🔥 Renderizar Cuentas por Cobrar
+                    const contPendientes = document.getElementById('lista-pendientes-cobro'); contPendientes.innerHTML = "";
+                    let pendientes = ticketsCacheGlobal.filter(t => t.saldo > 0 && t.estado !== "Anulado");
+                    if(pendientes.length === 0) { contPendientes.innerHTML = "<p style='text-align:center; color:var(--success-green);'>¡Todo al día! No hay cuentas por cobrar.</p>"; }
+                    pendientes.forEach(t => {
+                        contPendientes.innerHTML += `
+                            <div class="mov-card" style="border-left-color: #ffaa00; display:flex; justify-content:space-between; align-items:center;">
+                                <div><strong style="color:white; font-size:1rem;">${t.id.replace('TCN-','')} - ${t.cliente}</strong><br><span style="color:#aaa; font-size:0.8rem;">Estado: ${t.estado}</span></div>
+                                <div style="text-align:right;">
+                                    <div style="color:#ffaa00; font-weight:bold; font-size:1.1rem;">${formatearDinero(t.saldo)}</div>
+                                    <button class="btn-foto" style="border-color:var(--success-green); color:var(--success-green); margin-top:5px; padding:2px 8px;" onclick="abrirCobro('${t.id}', ${t.saldo}, '${t.whatsapp}')"><i class="fas fa-hand-holding-usd"></i> Cobrar</button>
+                                </div>
                             </div>`;
                     });
                 }
