@@ -109,6 +109,7 @@
         <button id="btn-tab-tickets" onclick="cambiarTabAdmin('tickets')" class="active"><i class="fas fa-wrench"></i> Taller</button>
         <button id="btn-tab-catalogo" onclick="cambiarTabAdmin('catalogo')"><i class="fas fa-store"></i> Web</button>
         <button id="btn-tab-finanzas" onclick="cambiarTabAdmin('finanzas')"><i class="fas fa-wallet"></i> Caja</button>
+        <button id="btn-tab-domicilios" onclick="abrirPanelDomicilio()"><i class="fas fa-motorcycle"></i> Domicilio</button>
         <button onclick="cerrarSesion()" style="background:rgba(255,0,0,0.1); border-color:#ff5555; color:#ff5555; flex-grow:0;"><i class="fas fa-sign-out-alt"></i></button>
     </div>
 
@@ -281,6 +282,25 @@
         <div class="loader" id="loader-registro"><i class="fas fa-spinner fa-spin"></i> Subiendo y guardando...</div>
     </div>
 
+    <div class="panel" id="panel-nuevo-domicilio" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Agendar Visita</h2>
+        <div class="form-group"><label>Cliente</label><input type="text" id="dom-cliente" placeholder="Ej: Juan Pérez"></div>
+        <div class="form-group"><label>WhatsApp</label><input type="number" id="dom-whatsapp" placeholder="Ej: 3173669002"></div>
+        <div class="form-group"><label>Dirección de Visita</label><input type="text" id="dom-direccion" placeholder="Ej: Cll 10 # 5-20 (Palmira)"></div>
+        <div class="form-group"><label>Equipo a Revisar</label><input type="text" id="dom-equipo" placeholder="Ej: Red WiFi / PC Escritorio"></div>
+        <div class="form-group"><label>Técnico a Asignar</label><select id="dom-tecnico"></select></div>
+        <div class="form-group"><label>Detalle de la Falla</label><textarea id="dom-detalle" rows="2" placeholder="Ej: No hay internet en el segundo piso..."></textarea></div>
+        <button class="btn btn-blue" style="background:var(--primary-purple);" onclick="crearTicketDomicilio()"><i class="fas fa-motorcycle"></i> Agendar Domicilio</button>
+        <div class="loader" id="loader-domicilio"><i class="fas fa-spinner fa-spin"></i> Agendando...</div>
+    </div>
+
+    <div class="panel" id="panel-historial-tecnico" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Historial Técnico</h2>
+        <h3 id="hist-id-ticket" style="text-align:center; color:var(--primary-blue); margin-bottom:15px; letter-spacing: 2px;"></h3>
+        <div class="timeline" id="hist-timeline-container" style="max-height: 400px; overflow-y: auto;"></div>
+        <div class="loader" id="loader-hist-tec"><i class="fas fa-spinner fa-spin"></i> Cargando historial...</div>
+    </div>
+
     <div class="panel" id="panel-actualizar" style="max-width: 600px;">
         <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Actualizar Avance</h2>
         <h3 id="act-id-ticket" style="text-align:center; color:white; margin-bottom:15px; letter-spacing: 2px;"></h3>
@@ -421,6 +441,7 @@
             document.getElementById('btn-tab-tickets').style.display = permisosActuales.tickets ? "block" : "none";
             document.getElementById('btn-tab-catalogo').style.display = permisosActuales.catalogo ? "block" : "none";
             document.getElementById('btn-tab-finanzas').style.display = permisosActuales.finanzas ? "block" : "none";
+            document.getElementById('btn-tab-domicilios').style.display = permisosActuales.domicilios ? "block" : "none";
 
             if(permisosActuales.asignacion) obtenerListaTecnicos();
 
@@ -474,19 +495,29 @@
                     badgeDinero = `<span style="color:var(--success-green); font-size:0.8rem; font-weight:bold;"><i class="fas fa-check-double"></i> PAGADO</span>`;
                 }
 
+                // 🔥 NUEVO: ALERTA DE REVISIÓN GRATIS
+                let badgeRevision = t.revision === 0 ? `<br><span style="background:#ffaa00; color:#000; padding:2px 6px; border-radius:4px; font-size:0.75rem; font-weight:bold; margin-top:5px; display:inline-block;"><i class="fas fa-gift"></i> REVISIÓN GRATUITA ($0)</span>` : "";
+
                 let botonesAdmin = "";
                 if (permisosActuales.asignacion) botonesAdmin += `<button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe;" onclick="abrirAsignacion('${t.id}', '${t.principal}', '${t.colaboradores}')"><i class="fas fa-users"></i> Asignar</button>`;
                 if (permisosActuales.finanzas) botonesAdmin += `<button class="btn-foto" style="border-color:#ffaa00; color:#ffaa00;" onclick="abrirEdicionCostos('${t.id}')"><i class="fas fa-money-bill-wave"></i> Costos</button>`;
+
+                // 🔥 NUEVOS BOTONES DE HISTORIAL Y ANULAR
+                let btnHistorial = `<button class="btn-foto" style="border-color:#00f3ff; color:#00f3ff;" onclick="verHistorialTecnico('${t.id}')"><i class="fas fa-history"></i> Historial</button>`;
+                let btnAnular = `<button class="btn-foto" style="border-color:#ff5555; color:#ff5555; background:rgba(255,0,0,0.1);" onclick="anularTicket('${t.id}')"><i class="fas fa-ban"></i> Anular</button>`;
 
                 cont.innerHTML += `
                     <div class="ticket-card">
                         <span class="status-badge">${t.estado}</span><strong style="font-size:1.2rem; color:var(--primary-blue); letter-spacing:2px;">${numLimpio}</strong><br>
                         <span style="color:#aaa; font-size:0.9rem;">${t.cliente} - ${t.equipo}</span><br>
                         ${badgeDinero}
+                        ${badgeRevision}
                         <div style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;">
                             <button class="btn-foto" onclick="abrirActualizador('${t.id}')"><i class="fas fa-edit"></i> Avance</button>
                             ${btnCobrar}
+                            ${btnHistorial}
                             ${botonesAdmin}
+                            ${btnAnular}
                         </div>
                     </div>`;
             });
@@ -817,6 +848,68 @@
                     setTimeout(() => { boton.innerHTML = textoBotonOriginal; }, 3000);
                 }
             }
+        }
+
+        // ==========================================
+        // 🔥 NUEVAS FUNCIONES: HISTORIAL, DOMICILIOS Y ANULAR
+        // ==========================================
+        async function verHistorialTecnico(id) {
+            document.getElementById('hist-id-ticket').innerText = "Orden: " + id.replace('TCN-', '');
+            const timeline = document.getElementById('hist-timeline-container'); timeline.innerHTML = "";
+            mostrarPanel('panel-historial-tecnico'); document.getElementById('loader-hist-tec').style.display = "block";
+            
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: id }) });
+                const result = await res.json(); document.getElementById('loader-hist-tec').style.display = "none";
+                if(result.status === "success") {
+                    result.historial.forEach(p => {
+                        let btnFotosHTML = "";
+                        if(p.foto && p.foto.trim() !== "" && !p.foto.includes("Error")) {
+                            let urls = p.foto.split(", "); urls.forEach((url, i) => { btnFotosHTML += `<br><a href="${url}" target="_blank" class="btn-foto"><i class="fas fa-camera"></i> Foto ${i+1}</a>`; });
+                        }
+                        timeline.innerHTML += `<div class="timeline-item"><div class="timeline-date">${p.fecha} - <strong>${p.estado} (${p.costo > 0 ? '+'+formatearDinero(p.costo) : '$0'})</strong></div><div class="timeline-text">${p.detalle} ${btnFotosHTML}</div></div>`;
+                    });
+                }
+            } catch (e) { document.getElementById('loader-hist-tec').style.display = "none"; alert("Error al cargar el historial."); }
+        }
+
+        function abrirPanelDomicilio() {
+            document.querySelectorAll('.admin-nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-tab-domicilios').classList.add('active');
+            const select = document.getElementById('dom-tecnico'); select.innerHTML = "";
+            listaTecnicosCache.forEach(t => { select.innerHTML += `<option value="${t}">${t}</option>`; });
+            mostrarPanel('panel-nuevo-domicilio');
+        }
+
+        async function crearTicketDomicilio() {
+            const nom = document.getElementById('dom-cliente').value, wp = document.getElementById('dom-whatsapp').value, dir = document.getElementById('dom-direccion').value, eq = document.getElementById('dom-equipo').value, tec = document.getElementById('dom-tecnico').value, det = document.getElementById('dom-detalle').value;
+            if(!nom || !dir || !eq) return alert("Cliente, Dirección y Equipo son obligatorios.");
+            document.getElementById('loader-domicilio').style.display = "block";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "crear_ticket_domicilio", cliente: nom, whatsapp: wp, direccion: dir, equipo: eq, tecnico_asignado: tec, detalle: det }) });
+                const result = await res.json(); document.getElementById('loader-domicilio').style.display = "none";
+                if(result.status === "success") {
+                    let ticketLimpio = result.ticket.replace('TCN-', '');
+                    if (wp) {
+                        let numLimpio = wp.replace(/\D/g, ''); if (numLimpio.length === 10) numLimpio = "57" + numLimpio;
+                        const mensajeWa = `Hola ${nom} 👋, ¡Bienvenido a *TECNOESENCIAL*!\n\nHemos agendado tu visita a domicilio. Tu número de ticket de seguimiento es: *${ticketLimpio}*\n\n👨‍🔧 Tu técnico asignado es: *${tec}*, quien se pondrá en contacto contigo muy pronto para coordinar su llegada a tu domicilio.\n\nPuedes hacer seguimiento aquí: 👉 https://tecnoesencial.shop/\n\n_¡Gracias por confiar en nosotros!_`;
+                        window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(mensajeWa)}`, '_blank');
+                    } else { alert("Visita agendada con éxito."); }
+                    document.querySelectorAll('#panel-nuevo-domicilio input, #panel-nuevo-domicilio textarea').forEach(e => e.value='');
+                    cargarMisTickets();
+                }
+            } catch (e) { document.getElementById('loader-domicilio').style.display = "none"; alert("Error al agendar."); }
+        }
+
+        async function anularTicket(id) {
+            let motivo = prompt(`⚠️ ATENCIÓN: Vas a ANULAR la orden ${id.replace('TCN-','')}.\nPor favor, escribe la justificación de la anulación:`);
+            if (!motivo || motivo.trim() === "") return alert("La anulación requiere una justificación obligatoria.");
+            
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "anular_ticket", id_ticket: id, motivo: motivo, tecnico: tecnicoActual }) });
+                const result = await res.json();
+                if(result.status === "success") { alert("Orden anulada exitosamente."); cargarMisTickets(); }
+            } catch (e) { alert("Error al anular."); }
         }
 
         // ==========================================
