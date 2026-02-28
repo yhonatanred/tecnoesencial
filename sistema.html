@@ -36,6 +36,9 @@
         input[type="text"], input[type="password"], input[type="number"], select, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 8px; color: white; outline: none; transition: 0.3s; font-size: 1rem;}
         input[type="file"] { padding: 10px; background: rgba(0,243,255,0.1); border: 1px dashed var(--primary-blue); color: var(--primary-blue); width: 100%; border-radius: 8px; cursor: pointer; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 8px rgba(0,243,255,0.3);}
+
+        /* 🔥 NUEVO: Arreglo de colores para las listas desplegables */
+        select option { background-color: var(--bg-dark); color: white; font-size: 1rem; }
         
         .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; margin-bottom: 10px;}
         .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #ddd; }
@@ -506,8 +509,8 @@
                     badgeDinero = `<span style="color:var(--success-green); font-size:0.8rem; font-weight:bold;"><i class="fas fa-check-double"></i> PAGADO</span>`;
                 }
 
-                // 🔥 NUEVO: ALERTA DE REVISIÓN GRATIS
-                let badgeRevision = t.revision === 0 ? `<br><span style="background:#ffaa00; color:#000; padding:2px 6px; border-radius:4px; font-size:0.75rem; font-weight:bold; margin-top:5px; display:inline-block;"><i class="fas fa-gift"></i> REVISIÓN GRATUITA ($0)</span>` : "";
+                // 🔥 CORRECCIÓN 1: La revisión gratuita solo sale si NO está anulado
+                let badgeRevision = (t.revision === 0 && t.estado !== "Anulado") ? `<br><span style="background:#ffaa00; color:#000; padding:2px 6px; border-radius:4px; font-size:0.75rem; font-weight:bold; margin-top:5px; display:inline-block;"><i class="fas fa-gift"></i> REVISIÓN GRATUITA ($0)</span>` : "";
 
                 let botonesAdmin = "";
                 if (permisosActuales.asignacion) botonesAdmin += `<button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe;" onclick="abrirAsignacion('${t.id}', '${t.principal}', '${t.colaboradores}')"><i class="fas fa-users"></i> Asignar</button>`;
@@ -517,16 +520,17 @@
                 let btnAnular = `<button class="btn-foto" style="border-color:#ff5555; color:#ff5555; background:rgba(255,0,0,0.1);" onclick="anularTicket('${t.id}')"><i class="fas fa-ban"></i> Anular</button>`;
                 let btnAvance = `<button class="btn-foto" onclick="abrirActualizador('${t.id}')"><i class="fas fa-edit"></i> Avance</button>`;
 
-                // 🔥 LÓGICA DE BLOQUEO PARA TICKETS ANULADOS
                 if(t.estado === "Anulado") {
                     badgeDinero = `<span style="color:#ff5555; font-size:0.8rem; font-weight:bold;"><i class="fas fa-ban"></i> ORDEN CANCELADA</span>`;
-                    btnCobrar = ""; botonesAdmin = ""; btnAnular = ""; btnAvance = ""; // Desaparecemos todo excepto historial
+                    btnCobrar = ""; botonesAdmin = ""; btnAnular = ""; btnAvance = ""; 
                 }
 
+                // 🔥 CORRECCIÓN 2: Se agregó el nombre del técnico (t.principal) en la tarjeta
                 cont.innerHTML += `
                     <div class="ticket-card">
                         <span class="status-badge" style="${t.estado === 'Anulado' ? 'background:#ff5555;' : ''}">${t.estado}</span><strong style="font-size:1.2rem; color:var(--primary-blue); letter-spacing:2px;">${numLimpio}</strong><br>
                         <span style="color:#aaa; font-size:0.9rem;">${t.cliente} - ${t.equipo}</span><br>
+                        <span style="color:var(--primary-blue); font-size:0.8rem;"><i class="fas fa-user-wrench"></i> Téc: <strong>${t.principal}</strong></span><br>
                         ${badgeDinero}
                         ${badgeRevision}
                         <div style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;">
