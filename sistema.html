@@ -299,6 +299,7 @@
         <div class="form-group"><label>Dirección de Visita</label><input type="text" id="dom-direccion" placeholder="Ej: Cll 10 # 5-20 (Palmira)"></div>
         <div class="form-group"><label>Equipo a Revisar</label><input type="text" id="dom-equipo" placeholder="Ej: Red WiFi / PC Escritorio"></div>
         <div class="form-group"><label>Técnico a Asignar</label><select id="dom-tecnico"></select></div>
+        <div class="form-group"><label>Costo de Visita / Revisión ($)</label><input type="number" id="dom-precio-rev" value="40000" placeholder="Ej: 40000"></div>
         <div class="form-group"><label>Detalle de la Falla</label><textarea id="dom-detalle" rows="2" placeholder="Ej: No hay internet en el segundo piso..."></textarea></div>
         <button class="btn btn-blue" style="background:var(--primary-purple);" onclick="crearTicketDomicilio()"><i class="fas fa-motorcycle"></i> Agendar Domicilio</button>
         <div class="loader" id="loader-domicilio"><i class="fas fa-spinner fa-spin"></i> Agendando...</div>
@@ -915,11 +916,25 @@
         }
 
         async function crearTicketDomicilio() {
-            const nom = document.getElementById('dom-cliente').value, wp = document.getElementById('dom-whatsapp').value, dir = document.getElementById('dom-direccion').value, eq = document.getElementById('dom-equipo').value, tec = document.getElementById('dom-tecnico').value, det = document.getElementById('dom-detalle').value;
+            const nom = document.getElementById('dom-cliente').value, 
+                  wp = document.getElementById('dom-whatsapp').value, 
+                  dir = document.getElementById('dom-direccion').value, 
+                  eq = document.getElementById('dom-equipo').value, 
+                  tec = document.getElementById('dom-tecnico').value, 
+                  det = document.getElementById('dom-detalle').value,
+                  rev = document.getElementById('dom-precio-rev').value; // 🔥 Capturamos el precio
+
             if(!nom || !dir || !eq) return alert("Cliente, Dirección y Equipo son obligatorios.");
             document.getElementById('loader-domicilio').style.display = "block";
             try {
-                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "crear_ticket_domicilio", cliente: nom, whatsapp: wp, direccion: dir, equipo: eq, tecnico_asignado: tec, detalle: det }) });
+                const res = await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ 
+                        accion: "crear_ticket_domicilio", 
+                        cliente: nom, whatsapp: wp, direccion: dir, equipo: eq, 
+                        tecnico_asignado: tec, detalle: det, valor_revision: rev // 🔥 Se lo enviamos al servidor
+                    }) 
+                });
                 const result = await res.json(); document.getElementById('loader-domicilio').style.display = "none";
                 if(result.status === "success") {
                     let ticketLimpio = result.ticket.replace('TCN-', '');
@@ -928,7 +943,13 @@
                         const mensajeWa = `Hola ${nom} 👋, ¡Bienvenido a *TECNOESENCIAL*!\n\nHemos agendado tu visita a domicilio. Tu número de ticket de seguimiento es: *${ticketLimpio}*\n\n👨‍🔧 Tu técnico asignado es: *${tec}*, quien se pondrá en contacto contigo muy pronto para coordinar su llegada a tu domicilio.\n\nPuedes hacer seguimiento aquí: 👉 https://tecnoesencial.shop/\n\n_¡Gracias por confiar en nosotros!_`;
                         window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(mensajeWa)}`, '_blank');
                     } else { alert("Visita agendada con éxito."); }
-                    document.querySelectorAll('#panel-nuevo-domicilio input, #panel-nuevo-domicilio textarea').forEach(e => e.value='');
+                    
+                    // Limpiamos todo el formulario
+                    document.querySelectorAll('#panel-nuevo-domicilio input, #panel-nuevo-domicilio textarea').forEach(e => {
+                        if(e.id !== 'dom-precio-rev') e.value=''; 
+                    });
+                    document.getElementById('dom-precio-rev').value = '40000'; // Lo devolvemos a su estado por defecto
+                    
                     cargarMisTickets();
                 }
             } catch (e) { document.getElementById('loader-domicilio').style.display = "none"; alert("Error al agendar."); }
