@@ -811,7 +811,7 @@
         }
 
         // ==========================================
-        // RASTREO DE CLIENTE Y ENTER KEY
+        // RASTREO DE CLIENTE (CON REVISIÓN TACHADA)
         // ==========================================
         async function consultarTicket() {
             let id = document.getElementById('ticket-id').value.toUpperCase().trim(); 
@@ -826,8 +826,17 @@
                     const t = result.ticket;
                     document.getElementById('res-equipo').innerText = t.equipo; document.getElementById('res-tecnico').innerText = t.tecnico;
                     document.getElementById('res-dir').innerText = t.direccion || "Taller/Domicilio"; document.getElementById('res-fecha').innerText = t.fecha;
+                    
                     const rev = parseFloat(t.valor_revision); const rep = parseFloat(t.total_reparacion); const abono = parseFloat(t.abonado);
-                    document.getElementById('fin-rev').innerText = formatearDinero(rev); document.getElementById('fin-rep').innerText = rep > 0 ? formatearDinero(rep) : "$0";
+                    
+                    // 🔥 CORRECCIÓN VISUAL: Si hay reparación, tachamos el valor de la revisión
+                    if (rep > 0 && rev > 0) {
+                        document.getElementById('fin-rev').innerHTML = `<del style="color:#ff5555; margin-right:5px;">${formatearDinero(rev)}</del> <span style="color:var(--success-green); font-size:0.85rem;"><i class="fas fa-gift"></i> Bonificada</span>`;
+                    } else {
+                        document.getElementById('fin-rev').innerText = formatearDinero(rev);
+                    }
+                    
+                    document.getElementById('fin-rep').innerText = rep > 0 ? formatearDinero(rep) : "$0";
                     
                     let totalPagar = rep > 0 ? rep : rev;
                     let saldoText = totalPagar - abono;
