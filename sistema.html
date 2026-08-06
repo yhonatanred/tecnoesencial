@@ -133,6 +133,9 @@
             <h3 style="color:var(--primary-blue); font-size:1.1rem;">Línea de Tiempo</h3>
             <div class="timeline" id="timeline-container"></div>
             <div class="finanzas-box">
+                <!-- NUEVO: Fila de domicilio oculta por defecto -->
+                <div class="fin-row" id="row-domicilio" style="display:none; color:#bc13fe;"><span>Costo Domicilio:</span> <span id="fin-dom"></span></div>
+                
                 <div class="fin-row"><span>Valor Revisión:</span> <span id="fin-rev"></span></div>
                 <div class="fin-row"><span>Costos de Reparación:</span> <span id="fin-rep"></span></div>
                 <div class="fin-total"><span>Total Estimado:</span> <span id="fin-total"></span></div>
@@ -302,7 +305,9 @@
         <div class="form-group"><label>Dirección de Visita</label><input type="text" id="dom-direccion" placeholder="Ej: Cll 10 # 5-20 (Palmira)"></div>
         <div class="form-group"><label>Equipo a Revisar</label><input type="text" id="dom-equipo" placeholder="Ej: Red WiFi / PC Escritorio"></div>
         <div class="form-group"><label>Técnico a Asignar</label><select id="dom-tecnico"></select></div>
-        <div class="form-group"><label>Costo de Visita / Revisión ($)</label><input type="number" id="dom-precio-rev" value="40000" placeholder="Ej: 40000"></div>
+        <!-- NUEVO: Campo exclusivo para el costo del domicilio -->
+        <div class="form-group"><label>Costo de Domicilio ($) (No suma a caja)</label><input type="number" id="dom-costo-dom" value="0" placeholder="Ej: 10000"></div>
+        <div class="form-group"><label>Costo de Revisión ($)</label><input type="number" id="dom-precio-rev" value="40000" placeholder="Ej: 40000"></div>
         <div class="form-group"><label>Detalle de la Falla</label><textarea id="dom-detalle" rows="2" placeholder="Ej: No hay internet en el segundo piso..."></textarea></div>
         <button class="btn btn-blue" style="background:var(--primary-purple);" onclick="crearTicketDomicilio()"><i class="fas fa-motorcycle"></i> Agendar Domicilio</button>
         <div class="loader" id="loader-domicilio"><i class="fas fa-spinner fa-spin"></i> Agendando...</div>
@@ -340,6 +345,28 @@
         <div class="form-group"><label><i class="fas fa-camera"></i> Fotos del Avance</label><input type="file" id="act-foto" accept="image/*" multiple></div>
         <button class="btn btn-blue" onclick="guardarActualizacion()">Guardar Avance</button>
         <div class="loader" id="loader-act"><i class="fas fa-spinner fa-spin"></i> Subiendo fotos...</div>
+    </div>
+
+    <div class="panel" id="panel-completar-ingreso" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Completar Ingreso</h2>
+        <h3 id="comp-id-ticket" style="text-align:center; color:white; margin-bottom:15px; letter-spacing: 2px;"></h3>
+        <p style="text-align:center; color:#aaa; margin-bottom:15px; font-size:0.9rem;">Llena los datos del equipo recibido tras el domicilio.</p>
+        
+        <div class="form-group">
+            <label style="color:var(--primary-purple);">Inventario Recibido</label>
+            <div class="checkbox-grid">
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Cargador"> Cargador</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Mouse"> Mouse</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Teclado"> Teclado</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Maletín"> Maletín</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Pantalla"> Pantalla</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Sin Accesorios"> Sin Acc.</label>
+            </div>
+            <input type="text" id="comp-inv-obs" placeholder="Ej: Pantalla rayada, golpes..." style="margin-top: 10px;">
+        </div>
+        <div class="form-group"><label>Confirmar Valor de Revisión ($)</label><input type="number" id="comp-precio-rev" placeholder="Ej: 40000"></div>
+        <button class="btn btn-blue" style="background:var(--primary-purple);" onclick="guardarIngresoFisico()"><i class="fas fa-clipboard-check"></i> Guardar Ingreso</button>
+        <div class="loader" id="loader-comp"><i class="fas fa-spinner fa-spin"></i> Registrando...</div>
     </div>
 
     <div class="panel" id="panel-asignar" style="max-width: 600px;">
@@ -519,6 +546,7 @@
                 let btnHistorial = `<button class="btn-foto" style="border-color:#00f3ff; color:#00f3ff;" onclick="verHistorialTecnico('${t.id}')"><i class="fas fa-history"></i> Historial</button>`;
                 let btnAnular = `<button class="btn-foto" style="border-color:#ff5555; color:#ff5555; background:rgba(255,0,0,0.1);" onclick="anularTicket('${t.id}')"><i class="fas fa-ban"></i> Anular</button>`;
                 let btnAvance = `<button class="btn-foto" onclick="abrirActualizador('${t.id}')"><i class="fas fa-edit"></i> Avance</button>`;
+                let btnIngreso = `<button class="btn-foto" style="border-color:#bc13fe; color:#bc13fe; background:rgba(188,19,254,0.1);" onclick="abrirCompletarIngreso('${t.id}')"><i class="fas fa-clipboard-check"></i> Ingreso</button>`;
 
                 if(t.estado === "Anulado") {
                     badgeDinero = `<span style="color:#ff5555; font-size:0.8rem; font-weight:bold;"><i class="fas fa-ban"></i> ORDEN CANCELADA</span>`;
@@ -534,6 +562,7 @@
                         ${badgeDinero}
                         ${badgeRevision}
                         <div style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;">
+                            ${btnIngreso}
                             ${btnAvance}
                             ${btnCobrar}
                             ${btnHistorial}
@@ -827,9 +856,21 @@
                     document.getElementById('res-equipo').innerText = t.equipo; document.getElementById('res-tecnico').innerText = t.tecnico;
                     document.getElementById('res-dir').innerText = t.direccion || "Taller/Domicilio"; document.getElementById('res-fecha').innerText = t.fecha;
                     
-                    const rev = parseFloat(t.valor_revision); const rep = parseFloat(t.total_reparacion); const abono = parseFloat(t.abonado);
+                    // --- AQUÍ EMPIEZA LO NUEVO INTEGRADO ---
+                    const dom = parseFloat(t.costo_domicilio) || 0; // Costo del domicilio
+                    const rev = parseFloat(t.valor_revision) || 0; 
+                    const rep = parseFloat(t.total_reparacion) || 0; 
+                    const abono = parseFloat(t.abonado) || 0;
                     
-                    // 🔥 CORRECCIÓN VISUAL: Si hay reparación, tachamos el valor de la revisión
+                    // Mostramos u ocultamos la fila de domicilio según si hay costo
+                    if (dom > 0) {
+                        document.getElementById('row-domicilio').style.display = "flex";
+                        document.getElementById('fin-dom').innerText = formatearDinero(dom);
+                    } else {
+                        document.getElementById('row-domicilio').style.display = "none";
+                    }
+
+                    // Lógica para tachar la revisión si hay reparación
                     if (rep > 0 && rev > 0) {
                         document.getElementById('fin-rev').innerHTML = `<del style="color:#ff5555; margin-right:5px;">${formatearDinero(rev)}</del> <span style="color:var(--success-green); font-size:0.85rem;"><i class="fas fa-gift"></i> Bonificada</span>`;
                     } else {
@@ -838,11 +879,13 @@
                     
                     document.getElementById('fin-rep').innerText = rep > 0 ? formatearDinero(rep) : "$0";
                     
-                    let totalPagar = rep > 0 ? rep : rev;
+                    // Sumamos el domicilio obligatoriamente al total a pagar
+                    let totalPagar = (rep > 0 ? rep : rev) + dom; 
                     let saldoText = totalPagar - abono;
                     
                     document.getElementById('fin-total').innerHTML = `Total: ${formatearDinero(totalPagar)} <br><span style="font-size:0.9rem; color:#aaa;">Abonado: ${formatearDinero(abono)}</span> <br><span style="color:${saldoText > 0 ? '#ffaa00' : 'var(--success-green)'}">Saldo a Pagar: ${formatearDinero(saldoText > 0 ? saldoText : 0)}</span>`;
-                    
+                    // --- AQUÍ TERMINA LO NUEVO ---
+
                     const timeline = document.getElementById('timeline-container'); timeline.innerHTML = "";
                     result.historial.forEach(p => {
                         let btnFotosHTML = "";
@@ -935,7 +978,8 @@
                   eq = document.getElementById('dom-equipo').value, 
                   tec = document.getElementById('dom-tecnico').value, 
                   det = document.getElementById('dom-detalle').value,
-                  rev = document.getElementById('dom-precio-rev').value; // 🔥 Capturamos el precio
+                  rev = document.getElementById('dom-precio-rev').value,
+                  costoDom = document.getElementById('dom-costo-dom').value; // NUEVO CAMPO
 
             if(!nom || !dir || !eq) return alert("Cliente, Dirección y Equipo son obligatorios.");
             document.getElementById('loader-domicilio').style.display = "block";
@@ -945,7 +989,8 @@
                     body: JSON.stringify({ 
                         accion: "crear_ticket_domicilio", 
                         cliente: nom, whatsapp: wp, direccion: dir, equipo: eq, 
-                        tecnico_asignado: tec, detalle: det, valor_revision: rev // 🔥 Se lo enviamos al servidor
+                        tecnico_asignado: tec, detalle: det, valor_revision: rev,
+                        costo_domicilio: costoDom // SE ENVÍA AL BACKEND
                     }) 
                 });
                 const result = await res.json(); document.getElementById('loader-domicilio').style.display = "none";
@@ -953,16 +998,15 @@
                     let ticketLimpio = result.ticket.replace('TCN-', '');
                     if (wp) {
                         let numLimpio = wp.replace(/\D/g, ''); if (numLimpio.length === 10) numLimpio = "57" + numLimpio;
-                        const mensajeWa = `Hola ${nom} 👋, ¡Bienvenido a *TECNOESENCIAL*!\n\nHemos agendado tu visita a domicilio. Tu número de ticket de seguimiento es: *${ticketLimpio}*\n\n👨‍🔧 Tu técnico asignado es: *${tec}*, quien se pondrá en contacto contigo muy pronto para coordinar su llegada a tu domicilio.\n\nPuedes hacer seguimiento aquí: 👉 https://tecnoesencial.shop/\n\n_¡Gracias por confiar en nosotros!_`;
+                        const mensajeWa = `Hola ${nom} 👋, ¡Bienvenido a *TECNOESENCIAL*!\n\nHemos agendado tu visita a domicilio. Tu número de ticket de seguimiento es: *${ticketLimpio}*\n\nPuedes hacer seguimiento aquí: 👉 https://tecnoesencial.shop/\n\n_¡Gracias por confiar en nosotros!_`;
                         window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(mensajeWa)}`, '_blank');
                     } else { alert("Visita agendada con éxito."); }
                     
-                    // Limpiamos todo el formulario
                     document.querySelectorAll('#panel-nuevo-domicilio input, #panel-nuevo-domicilio textarea').forEach(e => {
-                        if(e.id !== 'dom-precio-rev') e.value=''; 
+                        if(e.id !== 'dom-precio-rev' && e.id !== 'dom-costo-dom') e.value=''; 
                     });
-                    document.getElementById('dom-precio-rev').value = '40000'; // Lo devolvemos a su estado por defecto
-                    
+                    document.getElementById('dom-precio-rev').value = '40000';
+                    document.getElementById('dom-costo-dom').value = '0';
                     cargarMisTickets();
                 }
             } catch (e) { document.getElementById('loader-domicilio').style.display = "none"; alert("Error al agendar."); }
@@ -977,6 +1021,44 @@
                 const result = await res.json();
                 if(result.status === "success") { alert("Orden anulada exitosamente."); cargarMisTickets(); }
             } catch (e) { alert("Error al anular."); }
+        }
+
+        function abrirCompletarIngreso(id) {
+            ticketSeleccionado = id;
+            document.getElementById('comp-id-ticket').innerText = "Orden: " + id.replace('TCN-', '');
+            document.querySelectorAll('.comp-inv-check').forEach(c => c.checked = false);
+            document.getElementById('comp-inv-obs').value = "";
+            document.getElementById('comp-precio-rev').value = "";
+            mostrarPanel('panel-completar-ingreso');
+        }
+
+        async function guardarIngresoFisico() {
+            let invArr = []; document.querySelectorAll('.comp-inv-check:checked').forEach(c => invArr.push(c.value));
+            let invFinal = invArr.join(", ");
+            const obs = document.getElementById('comp-inv-obs').value.trim(); if(obs) invFinal += " | Obs: " + obs;
+            const rev = document.getElementById('comp-precio-rev').value;
+
+            document.getElementById('loader-comp').style.display = "block";
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        accion: "completar_ingreso",
+                        id_ticket: ticketSeleccionado,
+                        inventario: invFinal,
+                        valor_revision: rev,
+                        tecnico: tecnicoActual
+                    })
+                });
+                const result = await res.json();
+                document.getElementById('loader-comp').style.display = "none";
+                if(result.status === "success") {
+                    alert("Inventario y revisión guardados con éxito.");
+                    cargarMisTickets();
+                }
+            } catch (e) {
+                document.getElementById('loader-comp').style.display = "none"; alert("Error al guardar.");
+            }
         }
 
         // ==========================================
