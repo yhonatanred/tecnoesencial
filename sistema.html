@@ -680,7 +680,7 @@
                 document.getElementById('loader-comp').style.display = "none"; alert("Error al guardar.");
             }
         }
-        
+
         async function guardarActualizacion() {
             const estadoNuevo = document.getElementById('act-estado').value;
             const fotosProcesadas = await procesarFotosInput('act-foto'); if(fotosProcesadas === null) return;
@@ -948,7 +948,7 @@
                         document.getElementById('row-domicilio').style.display = "none";
                     }
 
-                    // 🔥 Lógica manual de Revisión. Sin tachados. Si es 0 = Gratuita.
+                    // 🔥 NUEVO: Si es 0 es gratuita. Si tiene valor, se muestra normal y se sumará.
                     if (rev === 0) {
                         document.getElementById('fin-rev').innerHTML = `<span style="color:var(--success-green); font-weight:bold;"><i class="fas fa-gift"></i> Revisión Gratuita</span>`;
                     } else {
@@ -957,7 +957,8 @@
                     
                     document.getElementById('fin-rep').innerText = rep > 0 ? formatearDinero(rep) : "$0";
                     
-                    let totalPagar = (rep > 0 ? rep : rev) + dom; 
+                    // 🔥 NUEVO: Ahora sumamos TODO directamente (Revisión + Reparación + Domicilio)
+                    let totalPagar = rev + rep + dom; 
                     let saldoText = totalPagar - abono;
                     
                     document.getElementById('fin-total').innerHTML = `Total: ${formatearDinero(totalPagar)} <br><span style="font-size:0.9rem; color:#aaa;">Abonado: ${formatearDinero(abono)}</span> <br><span style="color:${saldoText > 0 ? '#ffaa00' : 'var(--success-green)'}">Saldo a Pagar: ${formatearDinero(saldoText > 0 ? saldoText : 0)}</span>`;
@@ -975,7 +976,7 @@
                 } else alert("Código de servicio no encontrado.");
             } catch (e) { document.getElementById('loader-cliente').style.display = "none"; }
         }
-
+        
         // ==========================================
         // MEJORAR TEXTO IA (BLINDADO)
         // ==========================================
