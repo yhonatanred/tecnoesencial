@@ -305,12 +305,41 @@
         <div class="form-group"><label>Dirección de Visita</label><input type="text" id="dom-direccion" placeholder="Ej: Cll 10 # 5-20 (Palmira)"></div>
         <div class="form-group"><label>Equipo a Revisar</label><input type="text" id="dom-equipo" placeholder="Ej: Red WiFi / PC Escritorio"></div>
         <div class="form-group"><label>Técnico a Asignar</label><select id="dom-tecnico"></select></div>
-        <!-- NUEVO: Campo exclusivo para el costo del domicilio -->
-        <div class="form-group"><label>Costo de Domicilio ($) (No suma a caja)</label><input type="number" id="dom-costo-dom" value="0" placeholder="Ej: 10000"></div>
-        <div class="form-group"><label>Costo de Revisión ($)</label><input type="number" id="dom-precio-rev" value="40000" placeholder="Ej: 40000"></div>
-        <div class="form-group"><label>Detalle de la Falla</label><textarea id="dom-detalle" rows="2" placeholder="Ej: No hay internet en el segundo piso..."></textarea></div>
+        <div class="form-group"><label>Costo del Domicilio ($)</label><input type="number" id="dom-costo-dom" placeholder="Ej: 15000"></div>
+        <div class="form-group"><label>Detalle Inicial</label><textarea id="dom-detalle" rows="2" placeholder="Ej: No hay internet en el segundo piso..."></textarea></div>
         <button class="btn btn-blue" style="background:var(--primary-purple);" onclick="crearTicketDomicilio()"><i class="fas fa-motorcycle"></i> Agendar Domicilio</button>
         <div class="loader" id="loader-domicilio"><i class="fas fa-spinner fa-spin"></i> Agendando...</div>
+    </div>
+
+    <div class="panel" id="panel-completar-ingreso" style="max-width: 600px;">
+        <h2><i class="fas fa-arrow-left" style="cursor:pointer; float:left;" onclick="cargarMisTickets()"></i> Recibir Equipo</h2>
+        <h3 id="comp-id-ticket" style="text-align:center; color:white; margin-bottom:15px; letter-spacing: 2px;"></h3>
+        <p style="text-align:center; color:#aaa; margin-bottom:15px; font-size:0.9rem;">Llena los datos del equipo recibido tras el domicilio.</p>
+        
+        <div class="form-group">
+            <label style="color:var(--primary-purple);">Inventario Recibido</label>
+            <div class="checkbox-grid">
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Cargador"> Cargador</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Mouse"> Mouse</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Teclado"> Teclado</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Maletín"> Maletín</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Pantalla"> Pantalla</label>
+                <label class="checkbox-item"><input type="checkbox" class="comp-inv-check" value="Sin Accesorios"> Sin Acc.</label>
+            </div>
+            <input type="text" id="comp-inv-obs" placeholder="Ej: Pantalla rayada, golpes..." style="margin-top: 10px;">
+        </div>
+        <div class="form-group">
+            <label style="display:flex; justify-content:space-between; align-items:center;">
+                Diagnóstico Oficial
+                <button type="button" onclick="mejorarTextoIA('comp-diagnostico')" style="background:rgba(188,19,254,0.2); border:1px solid #bc13fe; color:white; border-radius:5px; padding:3px 8px; cursor:pointer; font-size:0.8rem;"><i class="fas fa-magic"></i> IA</button>
+            </label>
+            <textarea id="comp-diagnostico" rows="2" placeholder="Ej: Placa quemada, requiere cambio..."></textarea>
+        </div>
+        <div class="form-group"><label>Valor de Revisión ($)</label><input type="number" id="comp-precio-rev" value="40000" placeholder="Ej: 40000"></div>
+        <div class="form-group"><label><i class="fas fa-camera"></i> Evidencia Inicial (Máximo 5)</label><input type="file" id="comp-foto" accept="image/*" multiple></div>
+        
+        <button class="btn btn-blue" style="background:var(--primary-purple);" onclick="guardarIngresoFisico()"><i class="fas fa-clipboard-check"></i> Guardar Ingreso</button>
+        <div class="loader" id="loader-comp"><i class="fas fa-spinner fa-spin"></i> Registrando...</div>
     </div>
 
     <div class="panel" id="panel-historial-tecnico" style="max-width: 600px;">
@@ -599,8 +628,59 @@
             } catch (e) { document.getElementById('loader-registro').style.display = "none"; }
         }
 
-        function abrirActualizador(id) { ticketSeleccionado = id; document.getElementById('act-id-ticket').innerText = "Orden: " + id.replace('TCN-', ''); mostrarPanel('panel-actualizar'); }
+        function abrirActualizador(id) { 
+            let t = ticketsCacheGlobal.find(x => x.id === id);
+            ticketSeleccionado = id; 
+            
+            // Si es un domicilio recién agendado, mostramos el formulario completo
+            if (t && t.estado === "Visita Programada") {
+                document.getElementById('comp-id-ticket').innerText = "Orden: " + id.replace('TCN-', '');
+                document.querySelectorAll('.comp-inv-check').forEach(c => c.checked = false);
+                document.getElementById('comp-inv-obs').value = "";
+                document.getElementById('comp-diagnostico').value = "";
+                document.getElementById('comp-precio-rev').value = "40000"; 
+                document.getElementById('comp-foto').value = "";
+                mostrarPanel('panel-completar-ingreso');
+            } else {
+                // Si ya fue recibido o es un ingreso normal, mostramos el avance normal
+                document.getElementById('act-id-ticket').innerText = "Orden: " + id.replace('TCN-', ''); 
+                mostrarPanel('panel-actualizar'); 
+            }
+        }
 
+        async function guardarIngresoFisico() {
+            let invArr = []; document.querySelectorAll('.comp-inv-check:checked').forEach(c => invArr.push(c.value));
+            let invFinal = invArr.join(", ");
+            const obs = document.getElementById('comp-inv-obs').value.trim(); if(obs) invFinal += " | Obs: " + obs;
+            const diagnostico = document.getElementById('comp-diagnostico').value;
+            const rev = document.getElementById('comp-precio-rev').value;
+            const fotosProcesadas = await procesarFotosInput('comp-foto'); if(fotosProcesadas === null) return;
+
+            document.getElementById('loader-comp').style.display = "block";
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        accion: "completar_ingreso",
+                        id_ticket: ticketSeleccionado,
+                        inventario: invFinal,
+                        diagnostico: diagnostico,
+                        valor_revision: rev,
+                        tecnico: tecnicoActual,
+                        fotos: fotosProcesadas
+                    })
+                });
+                const result = await res.json();
+                document.getElementById('loader-comp').style.display = "none";
+                if(result.status === "success") {
+                    alert("Ingreso y diagnóstico guardados con éxito.");
+                    cargarMisTickets();
+                }
+            } catch (e) {
+                document.getElementById('loader-comp').style.display = "none"; alert("Error al guardar.");
+            }
+        }
+        
         async function guardarActualizacion() {
             const estadoNuevo = document.getElementById('act-estado').value;
             const fotosProcesadas = await procesarFotosInput('act-foto'); if(fotosProcesadas === null) return;
@@ -856,13 +936,11 @@
                     document.getElementById('res-equipo').innerText = t.equipo; document.getElementById('res-tecnico').innerText = t.tecnico;
                     document.getElementById('res-dir').innerText = t.direccion || "Taller/Domicilio"; document.getElementById('res-fecha').innerText = t.fecha;
                     
-                    // --- AQUÍ EMPIEZA LO NUEVO INTEGRADO ---
-                    const dom = parseFloat(t.costo_domicilio) || 0; // Costo del domicilio
+                    const dom = parseFloat(t.costo_domicilio) || 0; 
                     const rev = parseFloat(t.valor_revision) || 0; 
                     const rep = parseFloat(t.total_reparacion) || 0; 
                     const abono = parseFloat(t.abonado) || 0;
                     
-                    // Mostramos u ocultamos la fila de domicilio según si hay costo
                     if (dom > 0) {
                         document.getElementById('row-domicilio').style.display = "flex";
                         document.getElementById('fin-dom').innerText = formatearDinero(dom);
@@ -870,21 +948,19 @@
                         document.getElementById('row-domicilio').style.display = "none";
                     }
 
-                    // Lógica para tachar la revisión si hay reparación
-                    if (rep > 0 && rev > 0) {
-                        document.getElementById('fin-rev').innerHTML = `<del style="color:#ff5555; margin-right:5px;">${formatearDinero(rev)}</del> <span style="color:var(--success-green); font-size:0.85rem;"><i class="fas fa-gift"></i> Bonificada</span>`;
+                    // 🔥 Lógica manual de Revisión. Sin tachados. Si es 0 = Gratuita.
+                    if (rev === 0) {
+                        document.getElementById('fin-rev').innerHTML = `<span style="color:var(--success-green); font-weight:bold;"><i class="fas fa-gift"></i> Revisión Gratuita</span>`;
                     } else {
                         document.getElementById('fin-rev').innerText = formatearDinero(rev);
                     }
                     
                     document.getElementById('fin-rep').innerText = rep > 0 ? formatearDinero(rep) : "$0";
                     
-                    // Sumamos el domicilio obligatoriamente al total a pagar
                     let totalPagar = (rep > 0 ? rep : rev) + dom; 
                     let saldoText = totalPagar - abono;
                     
                     document.getElementById('fin-total').innerHTML = `Total: ${formatearDinero(totalPagar)} <br><span style="font-size:0.9rem; color:#aaa;">Abonado: ${formatearDinero(abono)}</span> <br><span style="color:${saldoText > 0 ? '#ffaa00' : 'var(--success-green)'}">Saldo a Pagar: ${formatearDinero(saldoText > 0 ? saldoText : 0)}</span>`;
-                    // --- AQUÍ TERMINA LO NUEVO ---
 
                     const timeline = document.getElementById('timeline-container'); timeline.innerHTML = "";
                     result.historial.forEach(p => {
@@ -978,8 +1054,7 @@
                   eq = document.getElementById('dom-equipo').value, 
                   tec = document.getElementById('dom-tecnico').value, 
                   det = document.getElementById('dom-detalle').value,
-                  rev = document.getElementById('dom-precio-rev').value,
-                  costoDom = document.getElementById('dom-costo-dom').value; // NUEVO CAMPO
+                  costoDom = document.getElementById('dom-costo-dom').value; 
 
             if(!nom || !dir || !eq) return alert("Cliente, Dirección y Equipo son obligatorios.");
             document.getElementById('loader-domicilio').style.display = "block";
@@ -989,8 +1064,8 @@
                     body: JSON.stringify({ 
                         accion: "crear_ticket_domicilio", 
                         cliente: nom, whatsapp: wp, direccion: dir, equipo: eq, 
-                        tecnico_asignado: tec, detalle: det, valor_revision: rev,
-                        costo_domicilio: costoDom // SE ENVÍA AL BACKEND
+                        tecnico_asignado: tec, detalle: det,
+                        costo_domicilio: costoDom 
                     }) 
                 });
                 const result = await res.json(); document.getElementById('loader-domicilio').style.display = "none";
@@ -1002,11 +1077,7 @@
                         window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(mensajeWa)}`, '_blank');
                     } else { alert("Visita agendada con éxito."); }
                     
-                    document.querySelectorAll('#panel-nuevo-domicilio input, #panel-nuevo-domicilio textarea').forEach(e => {
-                        if(e.id !== 'dom-precio-rev' && e.id !== 'dom-costo-dom') e.value=''; 
-                    });
-                    document.getElementById('dom-precio-rev').value = '40000';
-                    document.getElementById('dom-costo-dom').value = '0';
+                    document.querySelectorAll('#panel-nuevo-domicilio input, #panel-nuevo-domicilio textarea').forEach(e => e.value='');
                     cargarMisTickets();
                 }
             } catch (e) { document.getElementById('loader-domicilio').style.display = "none"; alert("Error al agendar."); }
@@ -1032,34 +1103,7 @@
             mostrarPanel('panel-completar-ingreso');
         }
 
-        async function guardarIngresoFisico() {
-            let invArr = []; document.querySelectorAll('.comp-inv-check:checked').forEach(c => invArr.push(c.value));
-            let invFinal = invArr.join(", ");
-            const obs = document.getElementById('comp-inv-obs').value.trim(); if(obs) invFinal += " | Obs: " + obs;
-            const rev = document.getElementById('comp-precio-rev').value;
-
-            document.getElementById('loader-comp').style.display = "block";
-            try {
-                const res = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        accion: "completar_ingreso",
-                        id_ticket: ticketSeleccionado,
-                        inventario: invFinal,
-                        valor_revision: rev,
-                        tecnico: tecnicoActual
-                    })
-                });
-                const result = await res.json();
-                document.getElementById('loader-comp').style.display = "none";
-                if(result.status === "success") {
-                    alert("Inventario y revisión guardados con éxito.");
-                    cargarMisTickets();
-                }
-            } catch (e) {
-                document.getElementById('loader-comp').style.display = "none"; alert("Error al guardar.");
-            }
-        }
+        
 
         // ==========================================
         // INICIO AUTOMÁTICO
