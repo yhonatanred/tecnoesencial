@@ -722,25 +722,70 @@
         }
 
         async function abrirEdicionCostos(id) {
-            ticketSeleccionado = id; document.getElementById('edit-id-ticket').innerText = "Orden: " + id.replace('TCN-', ''); mostrarPanel('panel-editar-costos');
-            const cont = document.getElementById('lista-costos-historial'); cont.innerHTML = "<p style='text-align:center;'>Cargando historial...</p>";
+            ticketSeleccionado = id; 
+            document.getElementById('edit-id-ticket').innerText = "Orden: " + id.replace('TCN-', ''); 
+            mostrarPanel('panel-editar-costos');
+            const cont = document.getElementById('lista-costos-historial'); 
+            cont.innerHTML = "<p style='text-align:center;'>Cargando historial...</p>";
+            
             try {
                 const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "consultar_ticket", id_ticket: id }) });
-                const result = await res.json(); cont.innerHTML = "";
+                const result = await res.json(); 
+                cont.innerHTML = "";
+                
                 if(result.status === "success") {
                     result.historial.forEach((p) => {
-                        cont.innerHTML += `<div class="costo-row"><span><strong>${p.fecha}</strong> - ${p.detalle}</span><input type="number" class="input-edit-costo" data-fecha="${p.fecha}" value="${p.costo}"></div>`;
+                        // 1. Domicilio: AHORA ES EDITABLE
+                        if (p.estado === "Visita Programada") {
+                            cont.innerHTML += `
+                            <div class="costo-row" style="border-left: 3px solid #bc13fe;">
+                                <span><strong>${p.fecha}</strong> - ${p.detalle}</span>
+                                <input type="number" id="input-edit-domicilio" value="${result.ticket.costo_domicilio}" style="border-color: #bc13fe;">
+                                <span style="font-size:0.7rem; color:#bc13fe; margin-top:2px;">* Costo de Domicilio (Modifícalo si decides hacer descuento o no cobrarlo)</span>
+                            </div>`;
+                        } 
+                        // 2. Ingreso Físico: (Este siempre es 0, se queda bloqueado)
+                        else if (p.estado === "Recibido") {
+                            cont.innerHTML += `
+                            <div class="costo-row" style="border-left: 3px solid #555;">
+                                <span><strong>${p.fecha}</strong> - ${p.detalle}</span>
+                                <input type="number" value="0" disabled style="background: rgba(0,0,0,0.2); color: #555; cursor: not-allowed;">
+                            </div>`;
+                        } 
+                        // 3. Reparaciones (Se editan normal)
+                        else {
+                            cont.innerHTML += `
+                            <div class="costo-row">
+                                <span><strong>${p.fecha}</strong> - ${p.detalle}</span>
+                                <input type="number" class="input-edit-costo" data-fecha="${p.fecha}" value="${p.costo}">
+                            </div>`;
+                        }
                     });
                 }
-            } catch (e) { cont.innerHTML = "Error cargando datos."; }
+            } catch (e) { 
+                cont.innerHTML = "Error cargando datos."; 
+            }
         }
 
         async function guardarEdicionCostos() {
             const inputs = document.querySelectorAll('.input-edit-costo'); let cambios = [];
             inputs.forEach(input => { cambios.push({ fecha: input.getAttribute('data-fecha'), costo: input.value }); });
+            
+            // 🔥 NUEVO: Capturamos el nuevo valor del domicilio si existe
+            let inputDom = document.getElementById('input-edit-domicilio');
+            let nuevoDom = inputDom ? parseFloat(inputDom.value) || 0 : null;
+
             document.getElementById('loader-edit-costo').style.display = "block";
             try {
-                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ accion: "editar_costos", id_ticket: ticketSeleccionado, cambios: cambios }) });
+                const res = await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ 
+                        accion: "editar_costos", 
+                        id_ticket: ticketSeleccionado, 
+                        cambios: cambios,
+                        nuevo_domicilio: nuevoDom // Se lo pasamos a AppScript
+                    }) 
+                });
                 const result = await res.json(); document.getElementById('loader-edit-costo').style.display = "none";
                 if(result.status === "success") { alert("Costos actualizados y sistema recalculado."); cargarMisTickets(); }
             } catch (e) { document.getElementById('loader-edit-costo').style.display = "none"; alert("Error guardando costos."); }
